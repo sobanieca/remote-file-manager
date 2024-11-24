@@ -1,0 +1,8 @@
+List all files in directory, 
+
+
+GET /files/.
+
+[
+ { isFile: true, name: "./file.txt" }
+]
