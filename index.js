@@ -1,53 +1,162 @@
 import { Hono } from "jsr:@hono/hono";
-import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
-import { MultipartReader } from "https://deno.land/std@0.114.0/mime/mod.ts";
-import { ensureDir } from "https://deno.land/std@0.114.0/fs/mod.ts";
+import { serve } from "https://deno.land/std@0.220.1/http/server.ts";
+import { join } from "https://deno.land/std@0.220.1/path/mod.ts";
+import { contentType } from "https://deno.land/std@0.220.1/media_types/mod.ts";
+
 const app = new Hono();
-const UPLOAD_DIR = "./uploads";
-const PUBLIC_DIR = "./public";
-// Ensure the upload directory exists
-await ensureDir(UPLOAD_DIR);
-// Serve the index.html file
-app.get("/", async (c) => {
-  const filePath = `${PUBLIC_DIR}/index.html`;
+const BASE_DIR = "./"; // The directory to serve files from
+
+// Helper function to list directory contents
+async function listDirectory(path) {
+  const entries = [];
+  for await (const entry of Deno.readDir(path)) {
+    const fullPath = join(path, entry.name);
+    const stats = await Deno.stat(fullPath);
+    entries.push({
+      name: entry.name,
+      isDirectory: entry.isDirectory,
+      size: stats.size,
+      modified: stats.mtime,
+    });
+  }
+  return entries;
+}
+
+// File explorer route should be first
+/* app.get("/file-explorer/*", async (c) => {
+  const requestPath = c.req.path.replace("/file-explorer", "") || "/";
+  const fullPath = join(BASE_DIR, requestPath);
+  
   try {
-    const fileContent = await Deno.readTextFile(filePath);
-    return c.html(fileContent);
+    const stat = await Deno.stat(fullPath);
+    
+    if (stat.isDirectory) {
+      const entries = await listDirectory(fullPath);
+      const parentPath = requestPath === "/" ? "" : requestPath.split("/").slice(0, -1).join("/");
+  }
+  return c.text("500 Internal Server Error", 500);
+}); */
+
+// File explorer UI
+app.get("/file-explorer*", async (c) => {
+  const requestPath = c.req.path.replace("/file-explorer", "") || "/";
+  const fullPath = join(BASE_DIR, requestPath);
+  
+  try {
+    const stat = await Deno.stat(fullPath);
+    
+    if (stat.isDirectory) {
+      const entries = await listDirectory(fullPath);
+      const parentPath = requestPath === "/" ? "" : requestPath.split("/").slice(0, -1).join("/");
+      
+      const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>File Explorer - ${requestPath}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .entry { margin: 5px 0; }
+            .directory { font-weight: bold; }
+            .actions { margin-left: 10px; }
+          </style>
+        </head>
+        <body>
+          <h1>Directory: ${requestPath}</h1>
+          ${parentPath ? `<a href="/file-explorer${parentPath}">..</a><br>` : ""}
+          ${entries.map(entry => `
+            <div class="entry ${entry.isDirectory ? 'directory' : ''}">
+              <a href="/file-explorer${requestPath}/${entry.name}">
+                ${entry.name}
+              </a>
+              ${!entry.isDirectory ? `
+                <span class="actions">
+                  <a href="/file-explorer${requestPath}/${entry.name}?action=edit">[Edit]</a>
+                </span>
+              ` : ''}
+            </div>
+          `).join("")}
+        </body>
+        </html>
+      `;
+      return c.html(html);
+    } else {
+      const action = new URL(c.req.url).searchParams.get("action");
+      
+      if (action === "edit") {
+        const content = await Deno.readTextFile(fullPath);
+        const html = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Edit - ${fullPath}</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              textarea { width: 100%; height: 400px; }
+            </style>
+          </head>
+          <body>
+            <h1>Edit: ${fullPath}</h1>
+            <form method="POST" action="/file-explorer${requestPath}">
+              <textarea name="content">${content}</textarea>
+              <br><br>
+              <input type="submit" value="Save">
+              <a href="/file-explorer${requestPath.split("/").slice(0, -1).join("/")}">Cancel</a>
+            </form>
+          </body>
+          </html>
+        `;
+        return c.html(html);
+      } else {
+        const content = await Deno.readFile(fullPath);
+        const mimeType = contentType(fullPath.split(".").pop() || "") || "application/octet-stream";
+        return new Response(content, {
+          headers: { "Content-Type": mimeType },
+        });
+      }
+    }
   } catch (error) {
-    return c.text("Error loading page", 500);
+    return c.text(`Error: ${error.message}`, 500);
   }
 });
-// List files in the directory
-app.get("/files", async (c) => {
-  const files = [];
-  for await (const dirEntry of Deno.readDir(UPLOAD_DIR)) {
-    if (dirEntry.isFile) {
-      files.push(dirEntry.name);
-    }
+
+// Handle file updates
+app.post("/file-explorer/*", async (c) => {
+  const path = c.req.path.replace("/file-explorer", "");
+  const fullPath = join(BASE_DIR, path);
+  
+  try {
+    const formData = await c.req.formData();
+    const content = formData.get("content");
+    await Deno.writeTextFile(fullPath, content);
+    return c.redirect(`/file-explorer${path.split("/").slice(0, -1).join("/")}`);
+  } catch (error) {
+    return c.text(`Error saving file: ${error.message}`, 500);
   }
-  return c.json(files);
 });
-// Handle file uploads
-app.post("/upload", async (c) => {
-  const contentType = c.req.headers.get("content-type");
-  if (!contentType || !contentType.startsWith("multipart/form-data")) {
-    return c.text("Invalid content type", 400);
-  }
-  const boundary = contentType.split("boundary=")[1];
-  if (!boundary) {
-    return c.text("Boundary not found", 400);
-  }
-  const reader = new MultipartReader(c.req.body, boundary);
-  const form = await reader.readForm();
-  for (const [name, file] of form.entries()) {
-    if (file instanceof File) {
-      const filePath = `${UPLOAD_DIR}/${file.name}`;
-      await Deno.writeFile(filePath, await file.arrayBuffer());
-    }
-  }
-  return c.text("File uploaded successfully");
-});
+
 // Start the server
 serve(app.fetch, { port: 8000 });
 console.log("Server running on http://localhost:8000");
-
+// Serve static files (this should be last)
+app.get("/*", async (c) => {
+  const path = c.req.path;
+  
+  try {
+    const filePath = join(BASE_DIR, path === "/" ? "index.html" : path);
+    const fileInfo = await Deno.stat(filePath);
+    
+    if (fileInfo.isFile) {
+      const content = await Deno.readFile(filePath);
+      const mimeType = contentType(filePath.split(".").pop() || "") || "application/octet-stream";
+      return new Response(content, {
+        headers: { "Content-Type": mimeType },
+      });
+    }
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      return c.text("404 Not Found", 404);
+    }
+  }
+  return c.text("500 Internal Server Error", 500);
+});
