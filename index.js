@@ -138,6 +138,7 @@ app.post("/file-explorer/*", async (c) => {
 // Start the server
 serve(app.fetch, { port: 8000 });
 console.log("Server running on http://localhost:8000");
+console.log("File explorer running on http://localhost:8000/file-explorer");
 // Serve static files (this should be last)
 app.get("/*", async (c) => {
   const path = c.req.path;
