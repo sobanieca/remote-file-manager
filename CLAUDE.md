@@ -1,16 +1,16 @@
 # CLAUDE.md - Project Guidelines
 
 ## Project Overview
-Remote File Manager - A web-based file explorer for managing files on a remote machine.
+Remote File Manager - A web-based file explorer for managing files on a remote machine. It allows to serve files as well as manage them and edit (text files).
 
 ## Build Commands
-- Start server: `deno run --allow-read --allow-write --allow-net index.js`
-- Format code: `deno fmt index.js`
-- Lint code: `deno lint index.js`
+- Start server: `deno task dev`
+- Format code: `deno fmt`
+- Lint code: `deno lint`
 
 ## Code Style Guidelines
 - **Framework**: Uses Hono.js with Deno runtime
-- **Imports**: Group imports by source (JSR, Deno standard library)
+- **Imports**: Group imports by source (JSR)
 - **Error handling**: Use try/catch blocks with specific error messages
 - **Naming**: 
   - Variables/functions: camelCase
