@@ -1,5 +1,5 @@
 import { Hono } from "@hono/hono";
-import { serveStatic } from "@hono/hono/middleware";
+import { serveStatic } from "@hono/hono/serve-static";
 import { serve } from "@std/http/server";
 import { parse } from "@std/flags";
 
