@@ -3,6 +3,9 @@
     "dev": "deno run --watch src/main.js"
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@1"
+    "@std/assert": "jsr:@std/assert@1",
+    "@std/http": "jsr:@std/http@1",
+    "@std/flags": "jsr:@std/flags@1",
+    "@hono/hono": "jsr:@hono/hono"
   }
 }
