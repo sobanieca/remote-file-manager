@@ -1,12 +1,5 @@
 {
   "tasks": {
-    "dev": "deno run --allow-net --allow-read --watch src/main.js"
-  },
-  "imports": {
-    "@std/assert": "jsr:@std/assert@1",
-    "@std/http": "jsr:@std/http@1",
-    "@std/path": "jsr:@std/path@1",
-    "@hono/hono": "jsr:@hono/hono",
-    "hono": "npm:hono"
+    "dev": "deno run --allow-net --allow-read src/main.js"
   }
 }

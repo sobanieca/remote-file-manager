@@ -8,6 +8,9 @@ machine. It allows to serve files as well as manage them and edit (text files).
 ## Build Commands
 
 - Start server: `deno task dev`
+
+> Ensure that watch is not set for this command.
+
 - Format code: `deno fmt`
 - Lint code: `deno lint`
 

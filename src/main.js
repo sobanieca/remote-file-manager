@@ -1,6 +1,4 @@
-import { Hono } from "@hono/hono";
-import { serveStatic } from "hono/middleware";
-import { extname } from "@std/path";
+import { Hono, serveStatic } from "./deps.js";
 
 const app = new Hono();
 
