@@ -1,22 +1,58 @@
 import { Hono } from "@hono/hono";
-import { serveStatic } from "@hono/hono/serve-static";
-import { serve } from "@std/http/server";
-import { parse } from "@std/flags";
+import { serveStatic } from "hono/middleware";
+import { extname } from "@std/path";
 
 const app = new Hono();
 
-// Serve static files from current working directory
-app.use("/*", serveStatic({ root: Deno.cwd() }));
+// MIME types mapping
+const MIME_TYPES = {
+  ".html": "text/html",
+  ".css": "text/css",
+  ".js": "application/javascript",
+  ".json": "application/json",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+  ".txt": "text/plain",
+  ".md": "text/markdown",
+  ".pdf": "application/pdf",
+  ".zip": "application/zip",
+  ".mp4": "video/mp4",
+  ".mp3": "audio/mpeg",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".ttf": "font/ttf",
+  ".otf": "font/otf",
+  ".eot": "application/vnd.ms-fontobject",
+};
 
 // Parse command line arguments
-const args = parse(Deno.args, {
-  default: {
-    port: 8000,
-  },
-  string: ["port"],
-});
+const defaultPort = 8000;
+let port = defaultPort;
 
-const port = parseInt(args.port);
+// Simple argument parsing
+for (let i = 0; i < Deno.args.length; i++) {
+  const arg = Deno.args[i];
+  if (arg.startsWith("--port=")) {
+    port = parseInt(arg.split("=")[1], 10) || defaultPort;
+  }
+}
+const workingDir = Deno.cwd();
 
-console.log(`Server running at http://localhost:${port}`);
-await serve(app.fetch, { port });
+// Serve static files with proper MIME types
+app.use(
+  "/*",
+  serveStatic({
+    root: workingDir,
+    mimes: MIME_TYPES
+  }),
+);
+
+console.log(`Remote File Manager server running at http://localhost:${port}`);
+console.log(`Serving files from: ${workingDir}`);
+
+// Start the server
+Deno.serve({ port }, app.fetch);
