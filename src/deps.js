@@ -1,5 +1,4 @@
-export { assertEquals, assertNotEquals } from "jsr:@std/assert@1";
-export { serve } from "jsr:@std/http@1";
-export { extname, join, basename, dirname } from "jsr:@std/path@1";
+//export { assertEquals, assertNotEquals } from "jsr:@std/assert";
+//export { extname, join, basename, dirname } from "jsr:@std/path";
 export { Hono } from "jsr:@hono/hono";
 export { serveStatic } from "jsr:@hono/hono/deno";
