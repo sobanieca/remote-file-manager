@@ -2,31 +2,6 @@ import { Hono, serveStatic } from "./deps.js";
 
 const app = new Hono();
 
-// MIME types mapping
-const MIME_TYPES = {
-  ".html": "text/html",
-  ".css": "text/css",
-  ".js": "application/javascript",
-  ".json": "application/json",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".gif": "image/gif",
-  ".svg": "image/svg+xml",
-  ".ico": "image/x-icon",
-  ".txt": "text/plain",
-  ".md": "text/markdown",
-  ".pdf": "application/pdf",
-  ".zip": "application/zip",
-  ".mp4": "video/mp4",
-  ".mp3": "audio/mpeg",
-  ".woff": "font/woff",
-  ".woff2": "font/woff2",
-  ".ttf": "font/ttf",
-  ".otf": "font/otf",
-  ".eot": "application/vnd.ms-fontobject",
-};
-
 // Parse command line arguments
 const defaultPort = 8000;
 let port = defaultPort;
@@ -44,8 +19,7 @@ const workingDir = Deno.cwd();
 app.use(
   "/*",
   serveStatic({
-    root: workingDir,
-    mimes: MIME_TYPES
+    root: workingDir
   }),
 );
 
