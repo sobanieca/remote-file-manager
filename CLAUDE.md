@@ -25,6 +25,8 @@ machine. It allows to serve files as well as manage them and edit (text files).
   - File paths: kebab-case
 - **Formatting**: 2-space indentation
 - **Async handling**: Use async/await pattern consistently
+- **HTML**: Don't repeat common layout. Move it to separate file and re-use when generating endpoints that return HTML
+- **Endpoints**: Each endpoint (especially the one that returns HTML) should be present in separate file (as ES Module)
 
 ## Security Considerations
 
