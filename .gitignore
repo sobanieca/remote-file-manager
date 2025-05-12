@@ -130,3 +130,5 @@ dist
 .pnp.*
 
 uploads/
+
+**/.claude/settings.local.json

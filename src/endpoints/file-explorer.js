@@ -60,12 +60,27 @@ export async function fileExplorer(c) {
 
     for (const entry of entries) {
       if (entry.isDirectory) {
-        filesHtml += `<li><a href="/file-explorer?path=${
+        filesHtml += `<li>
+          <a href="/file-explorer?path=${
           encodeURIComponent(entry.path)
-        }" class="folder">${entry.name}</a></li>`;
+        }" class="folder">${entry.name}</a>
+          <form action="/delete-item" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this folder? This action cannot be undone.');">
+            <input type="hidden" name="path" value="${entry.path}">
+            <input type="hidden" name="type" value="directory">
+            <input type="hidden" name="parentPath" value="${normalizedPath}">
+            <button type="submit" class="delete-btn">Delete</button>
+          </form>
+        </li>`;
       } else {
-        filesHtml +=
-          `<li><a href="/${entry.path}" class="file" target="_blank">${entry.name}</a></li>`;
+        filesHtml += `<li>
+          <a href="/${entry.path}" class="file" target="_blank">${entry.name}</a>
+          <form action="/delete-item" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this file? This action cannot be undone.');">
+            <input type="hidden" name="path" value="${entry.path}">
+            <input type="hidden" name="type" value="file">
+            <input type="hidden" name="parentPath" value="${normalizedPath}">
+            <button type="submit" class="delete-btn">Delete</button>
+          </form>
+        </li>`;
       }
     }
     filesHtml += "</ul>";
@@ -78,12 +93,19 @@ export async function fileExplorer(c) {
     if (success === "folder_created") {
       statusMessageHtml =
         '<div class="status-message success">Folder created successfully!</div>';
+    } else if (success === "item_deleted") {
+      statusMessageHtml =
+        '<div class="status-message success">Item deleted successfully!</div>';
     } else if (error) {
       let errorMessage = "An error occurred";
       if (error === "invalid_name") errorMessage = "Invalid folder name";
       else if (error === "invalid_path") errorMessage = "Invalid path";
       else if (error === "already_exists") {
         errorMessage = "A folder with this name already exists";
+      } else if (error === "delete_failed") {
+        errorMessage = "Failed to delete item";
+      } else if (error === "not_empty") {
+        errorMessage = "Directory is not empty";
       } else errorMessage = `Error: ${error}`;
 
       statusMessageHtml =
