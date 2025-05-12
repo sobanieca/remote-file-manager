@@ -61,25 +61,43 @@ export async function fileExplorer(c) {
     for (const entry of entries) {
       if (entry.isDirectory) {
         filesHtml += `<li>
-          <a href="/file-explorer?path=${
-          encodeURIComponent(entry.path)
-        }" class="folder">${entry.name}</a>
-          <form action="/delete-item" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this folder? This action cannot be undone.');">
-            <input type="hidden" name="path" value="${entry.path}">
-            <input type="hidden" name="type" value="directory">
-            <input type="hidden" name="parentPath" value="${normalizedPath}">
-            <button type="submit" class="delete-btn">Delete</button>
-          </form>
+          <div class="file-item">
+            <a href="/file-explorer?path=${
+            encodeURIComponent(entry.path)
+          }" class="folder">${entry.name}</a>
+            <div class="context-menu-trigger" data-path="${entry.path}" data-type="directory" data-parent="${normalizedPath}">
+              <span class="dots">⋮</span>
+              <div class="context-menu">
+                <form action="/delete-item" method="POST" onsubmit="return confirm('Are you sure you want to delete this folder? This action cannot be undone.');">
+                  <input type="hidden" name="path" value="${entry.path}">
+                  <input type="hidden" name="type" value="directory">
+                  <input type="hidden" name="parentPath" value="${normalizedPath}">
+                  <button type="submit" class="context-menu-item">
+                    <span class="icon">🗑️</span> Delete
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
         </li>`;
       } else {
         filesHtml += `<li>
-          <a href="/${entry.path}" class="file" target="_blank">${entry.name}</a>
-          <form action="/delete-item" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this file? This action cannot be undone.');">
-            <input type="hidden" name="path" value="${entry.path}">
-            <input type="hidden" name="type" value="file">
-            <input type="hidden" name="parentPath" value="${normalizedPath}">
-            <button type="submit" class="delete-btn">Delete</button>
-          </form>
+          <div class="file-item">
+            <a href="/${entry.path}" class="file" target="_blank">${entry.name}</a>
+            <div class="context-menu-trigger" data-path="${entry.path}" data-type="file" data-parent="${normalizedPath}">
+              <span class="dots">⋮</span>
+              <div class="context-menu">
+                <form action="/delete-item" method="POST" onsubmit="return confirm('Are you sure you want to delete this file? This action cannot be undone.');">
+                  <input type="hidden" name="path" value="${entry.path}">
+                  <input type="hidden" name="type" value="file">
+                  <input type="hidden" name="parentPath" value="${normalizedPath}">
+                  <button type="submit" class="context-menu-item">
+                    <span class="icon">🗑️</span> Delete
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
         </li>`;
       }
     }

@@ -84,10 +84,89 @@ export function layout(title, content) {
       background-color: #fce8e6;
       color: #c5221f;
     }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    .file-item a {
+      flex-grow: 1;
+    }
+    .context-menu-trigger {
+      position: relative;
+      cursor: pointer;
+    }
+    .dots {
+      font-size: 18px;
+      padding: 4px 8px;
+      color: #666;
+    }
+    .context-menu {
+      position: absolute;
+      right: 0;
+      top: 24px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      z-index: 100;
+      min-width: 120px;
+      display: none;
+    }
+    .context-menu-trigger:hover .context-menu,
+    .context-menu-trigger.active .context-menu {
+      display: block;
+    }
+    .context-menu-item {
+      background: none;
+      border: none;
+      padding: 8px 12px;
+      text-align: left;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      color: #333;
+    }
+    .context-menu-item:hover {
+      background-color: #f5f5f5;
+    }
+    .context-menu-item .icon {
+      margin-right: 8px;
+    }
   </style>
 </head>
 <body>
   ${content}
+  <script>
+    // Close context menus when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.context-menu-trigger')) {
+        document.querySelectorAll('.context-menu-trigger.active').forEach(menu => {
+          menu.classList.remove('active');
+        });
+      }
+    });
+
+    // Toggle context menu on click
+    document.querySelectorAll('.context-menu-trigger').forEach(trigger => {
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = trigger.classList.contains('active');
+
+        // Close all other menus
+        document.querySelectorAll('.context-menu-trigger.active').forEach(menu => {
+          menu.classList.remove('active');
+        });
+
+        // Toggle current menu
+        if (!isActive) {
+          trigger.classList.add('active');
+        }
+      });
+    });
+  </script>
 </body>
 </html>`;
 }
