@@ -70,8 +70,10 @@ export function layout(title, content) {
     .new-folder-form button:hover {
       background-color: #0255b3;
     }
+    .status-section {
+      margin: 10px 0;
+    }
     .status-message {
-      margin-top: 10px;
       padding: 8px;
       border-radius: 4px;
       width: 100%;

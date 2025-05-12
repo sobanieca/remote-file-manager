@@ -138,14 +138,17 @@ export async function fileExplorer(c) {
         <input type="text" name="folderName" placeholder="New folder name" required>
         <button type="submit">Create Folder</button>
       </form>
-      ${statusMessageHtml}
     </div>
   `;
+
+    // Add status message section if there is a message to show
+    const statusSection = statusMessageHtml ? `<div class="status-section">${statusMessageHtml}</div>` : "";
 
     const content = `
       <h1>File Explorer</h1>
       ${breadcrumbHtml}
       ${newFolderFormHtml}
+      ${statusSection}
       ${filesHtml}
     `;
 
