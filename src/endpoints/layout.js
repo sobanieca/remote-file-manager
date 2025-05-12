@@ -45,6 +45,45 @@ export function layout(title, content) {
       content: "📄";
       margin-right: 8px;
     }
+    .new-folder-form {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      display: flex;
+    }
+    .new-folder-form input[type="text"] {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-right: 10px;
+      flex-grow: 1;
+    }
+    .new-folder-form button {
+      padding: 8px 16px;
+      background-color: #0366d6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .new-folder-form button:hover {
+      background-color: #0255b3;
+    }
+    .status-message {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 4px;
+      width: 100%;
+    }
+    .status-message.success {
+      background-color: #e6f4ea;
+      color: #137333;
+    }
+    .status-message.error {
+      background-color: #fce8e6;
+      color: #c5221f;
+    }
   </style>
 </head>
 <body>

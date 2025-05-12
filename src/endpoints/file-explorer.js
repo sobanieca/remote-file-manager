@@ -1,4 +1,5 @@
 import { layout } from "./layout.js";
+import { combinePaths, getParentPath, normalizePath } from "./utils.js";
 
 export async function fileExplorer(c) {
   try {
@@ -69,9 +70,42 @@ export async function fileExplorer(c) {
     }
     filesHtml += "</ul>";
 
+    // Process success/error messages
+    let statusMessageHtml = "";
+    const success = c.req.query("success");
+    const error = c.req.query("error");
+
+    if (success === "folder_created") {
+      statusMessageHtml =
+        '<div class="status-message success">Folder created successfully!</div>';
+    } else if (error) {
+      let errorMessage = "An error occurred";
+      if (error === "invalid_name") errorMessage = "Invalid folder name";
+      else if (error === "invalid_path") errorMessage = "Invalid path";
+      else if (error === "already_exists") {
+        errorMessage = "A folder with this name already exists";
+      } else errorMessage = `Error: ${error}`;
+
+      statusMessageHtml =
+        `<div class="status-message error">${errorMessage}</div>`;
+    }
+
+    // Form for adding a new folder
+    const newFolderFormHtml = `
+    <div class="new-folder-form">
+      <form action="/create-folder" method="POST">
+        <input type="hidden" name="path" value="${normalizedPath}">
+        <input type="text" name="folderName" placeholder="New folder name" required>
+        <button type="submit">Create Folder</button>
+      </form>
+      ${statusMessageHtml}
+    </div>
+  `;
+
     const content = `
       <h1>File Explorer</h1>
       ${breadcrumbHtml}
+      ${newFolderFormHtml}
       ${filesHtml}
     `;
 
@@ -79,27 +113,4 @@ export async function fileExplorer(c) {
   } catch (error) {
     return c.html(`An error occurred: ${error.message}`, 500);
   }
-}
-
-// Helper functions
-function normalizePath(path) {
-  if (!path || path.includes("..")) {
-    return null;
-  }
-
-  // Convert "./" or just "." to empty string for clean paths
-  return path.replace(/^\.\//, "").replace(/^\.$/, ".");
-}
-
-function combinePaths(dir, file) {
-  if (dir === ".") {
-    return file;
-  }
-  return `${dir}/${file}`;
-}
-
-function getParentPath(path) {
-  const parts = path.split("/");
-  parts.pop();
-  return parts.join("/") || ".";
 }

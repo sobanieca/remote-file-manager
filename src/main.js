@@ -1,5 +1,6 @@
 import { Hono, serveStatic } from "./deps.js";
 import { fileExplorer } from "./endpoints/file-explorer.js";
+import { createFolder } from "./endpoints/create-folder.js";
 
 const app = new Hono();
 
@@ -16,8 +17,9 @@ for (let i = 0; i < Deno.args.length; i++) {
 }
 const workingDir = Deno.cwd();
 
-// File explorer endpoint
+// File explorer endpoints
 app.get("/file-explorer", (c) => fileExplorer(c));
+app.post("/create-folder", (c) => createFolder(c));
 
 // Serve static files with proper MIME types
 app.use(

@@ -28,8 +28,10 @@ machine. It allows to serve files as well as manage them and edit (text files).
 - **Async handling**: Use async/await pattern consistently
 - **HTML**: Don't repeat common layout. Move it to separate file and re-use when
   generating endpoints that return HTML
+- **UI**: Keep each UI component in separate file
 - **Endpoints**: Each endpoint (especially the one that returns HTML) should be
   present in separate file (as ES Module)
+- **Comments**: Avoid writing comments, try to write self documenting code using proper variables names
 
 ## Security Considerations
 
