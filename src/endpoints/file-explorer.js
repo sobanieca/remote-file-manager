@@ -68,6 +68,9 @@ export async function fileExplorer(c) {
             <div class="context-menu-trigger" data-path="${entry.path}" data-type="directory" data-parent="${normalizedPath}">
               <span class="dots">⋮</span>
               <div class="context-menu">
+                <a href="/download-item?path=${encodeURIComponent(entry.path)}&type=directory" class="context-menu-item">
+                  <span class="icon">📥</span> Download Files
+                </a>
                 <form action="/delete-item" method="POST" onsubmit="return confirm('Are you sure you want to delete this folder? This action cannot be undone.');">
                   <input type="hidden" name="path" value="${entry.path}">
                   <input type="hidden" name="type" value="directory">
@@ -87,6 +90,9 @@ export async function fileExplorer(c) {
             <div class="context-menu-trigger" data-path="${entry.path}" data-type="file" data-parent="${normalizedPath}">
               <span class="dots">⋮</span>
               <div class="context-menu">
+                <a href="/download-item?path=${encodeURIComponent(entry.path)}&type=file" class="context-menu-item">
+                  <span class="icon">📥</span> Download
+                </a>
                 <form action="/delete-item" method="POST" onsubmit="return confirm('Are you sure you want to delete this file? This action cannot be undone.');">
                   <input type="hidden" name="path" value="${entry.path}">
                   <input type="hidden" name="type" value="file">

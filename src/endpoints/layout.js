@@ -134,12 +134,19 @@ export function layout(title, content) {
       display: flex;
       align-items: center;
       color: #333;
+      text-decoration: none;
+      font-size: 14px;
     }
     .context-menu-item:hover {
       background-color: #f5f5f5;
     }
     .context-menu-item .icon {
       margin-right: 8px;
+    }
+    .context-menu form {
+      margin: 0;
+      padding: 0;
+      width: 100%;
     }
     .upload-section {
       margin-bottom: 20px;
