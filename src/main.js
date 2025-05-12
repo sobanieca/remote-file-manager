@@ -2,6 +2,7 @@ import { Hono, serveStatic } from "./deps.js";
 import { fileExplorer } from "./endpoints/file-explorer.js";
 import { createFolder } from "./endpoints/create-folder.js";
 import { deleteItem } from "./endpoints/delete-item.js";
+import { uploadFiles } from "./endpoints/upload-files.js";
 
 const app = new Hono();
 
@@ -22,6 +23,7 @@ const workingDir = Deno.cwd();
 app.get("/file-explorer", (c) => fileExplorer(c));
 app.post("/create-folder", (c) => createFolder(c));
 app.post("/delete-item", (c) => deleteItem(c));
+app.post("/upload-files", (c) => uploadFiles(c));
 
 // Serve static files with proper MIME types
 app.use(

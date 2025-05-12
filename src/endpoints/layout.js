@@ -86,6 +86,10 @@ export function layout(title, content) {
       background-color: #fce8e6;
       color: #c5221f;
     }
+    .status-message.warning {
+      background-color: #fff7e6;
+      color: #b06000;
+    }
     .file-item {
       display: flex;
       justify-content: space-between;
@@ -136,6 +140,50 @@ export function layout(title, content) {
     }
     .context-menu-item .icon {
       margin-right: 8px;
+    }
+    .upload-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+    }
+    .upload-forms {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .upload-form {
+      flex: 1;
+      min-width: 250px;
+    }
+    .upload-form h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: #333;
+    }
+    .upload-form form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .upload-form input[type="file"] {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: white;
+    }
+    .upload-form button {
+      padding: 8px 16px;
+      background-color: #0366d6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+    .upload-form button:hover {
+      background-color: #0255b3;
     }
   </style>
 </head>
