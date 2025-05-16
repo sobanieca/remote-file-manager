@@ -32,6 +32,9 @@ app.use(
   "/*",
   serveStatic({
     root: workingDir,
+    mimes: {
+      md: "text/markdown; charset=utf-8",
+    },
   }),
 );
 
