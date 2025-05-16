@@ -1,5 +1,5 @@
 {
   "tasks": {
-    "dev": "deno run -A src/main.js"
+    "dev": "cd test && deno run -A ../src/main.js"
   }
 }
