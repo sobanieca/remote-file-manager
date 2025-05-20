@@ -117,7 +117,7 @@ export function layout(title, content) {
       border-radius: 4px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       z-index: 100;
-      min-width: 120px;
+      min-width: 160px;
       display: none;
     }
     .context-menu-trigger:hover .context-menu,
@@ -136,6 +136,7 @@ export function layout(title, content) {
       color: #333;
       text-decoration: none;
       font-size: 14px;
+      white-space: nowrap;
     }
     .context-menu-item:hover {
       background-color: #f5f5f5;
@@ -208,8 +209,9 @@ export function layout(title, content) {
 
     // Toggle context menu on click
     document.querySelectorAll('.context-menu-trigger').forEach(trigger => {
-      trigger.addEventListener('click', (e) => {
+      trigger.querySelector('.dots').addEventListener('click', (e) => {
         e.stopPropagation();
+        e.preventDefault();
         const isActive = trigger.classList.contains('active');
 
         // Close all other menus
