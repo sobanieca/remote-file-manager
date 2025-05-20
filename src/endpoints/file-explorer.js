@@ -1,4 +1,4 @@
-import { layout } from "./layout.js";
+import { layout } from "./layout/index.js";
 import { combinePaths, getParentPath, normalizePath } from "./utils.js";
 
 export async function fileExplorer(c) {
@@ -63,12 +63,14 @@ export async function fileExplorer(c) {
         filesHtml += `<li>
           <div class="file-item">
             <a href="/file-explorer?path=${
-            encodeURIComponent(entry.path)
-          }" class="folder">${entry.name}</a>
+          encodeURIComponent(entry.path)
+        }" class="folder">${entry.name}</a>
             <div class="context-menu-trigger" data-path="${entry.path}" data-type="directory" data-parent="${normalizedPath}">
               <span class="dots">⋮</span>
               <div class="context-menu">
-                <a href="/download-item?path=${encodeURIComponent(entry.path)}&type=directory" class="context-menu-item">
+                <a href="/download-item?path=${
+          encodeURIComponent(entry.path)
+        }&type=directory" class="context-menu-item">
                   <span class="icon">📥</span> Download Files
                 </a>
                 <form action="/delete-item" method="POST" onsubmit="return confirm('Are you sure you want to delete this folder? This action cannot be undone.');">
@@ -90,7 +92,9 @@ export async function fileExplorer(c) {
             <div class="context-menu-trigger" data-path="${entry.path}" data-type="file" data-parent="${normalizedPath}">
               <span class="dots">⋮</span>
               <div class="context-menu">
-                <a href="/download-item?path=${encodeURIComponent(entry.path)}&type=file" class="context-menu-item">
+                <a href="/download-item?path=${
+          encodeURIComponent(entry.path)
+        }&type=file" class="context-menu-item">
                   <span class="icon">📥</span> Download
                 </a>
                 <form action="/delete-item" method="POST" onsubmit="return confirm('Are you sure you want to delete this file? This action cannot be undone.');">
@@ -125,13 +129,23 @@ export async function fileExplorer(c) {
         '<div class="status-message success">Item deleted successfully!</div>';
     } else if (success === "files_uploaded") {
       statusMessageHtml =
-        `<div class="status-message success">${processedFiles} file${processedFiles === "1" ? "" : "s"} uploaded successfully!</div>`;
+        `<div class="status-message success">${processedFiles} file${
+          processedFiles === "1" ? "" : "s"
+        } uploaded successfully!</div>`;
     } else if (success === "folders_uploaded") {
       statusMessageHtml =
-        `<div class="status-message success">${processedFolders} folder${processedFolders === "1" ? "" : "s"} uploaded successfully!</div>`;
+        `<div class="status-message success">${processedFolders} folder${
+          processedFolders === "1" ? "" : "s"
+        } uploaded successfully!</div>`;
     } else if (success === "partial_upload") {
       statusMessageHtml =
-        `<div class="status-message warning">Uploaded ${processedFiles} file${processedFiles === "1" ? "" : "s"} and ${processedFolders} folder${processedFolders === "1" ? "" : "s"}, but ${failedFiles} file${failedFiles === "1" ? "" : "s"} failed.</div>`;
+        `<div class="status-message warning">Uploaded ${processedFiles} file${
+          processedFiles === "1" ? "" : "s"
+        } and ${processedFolders} folder${
+          processedFolders === "1" ? "" : "s"
+        }, but ${failedFiles} file${
+          failedFiles === "1" ? "" : "s"
+        } failed.</div>`;
     } else if (error) {
       let errorMessage = "An error occurred";
       if (error === "invalid_name") errorMessage = "Invalid folder name";
@@ -164,7 +178,9 @@ export async function fileExplorer(c) {
   `;
 
     // Add status message section if there is a message to show
-    const statusSection = statusMessageHtml ? `<div class="status-section">${statusMessageHtml}</div>` : "";
+    const statusSection = statusMessageHtml
+      ? `<div class="status-section">${statusMessageHtml}</div>`
+      : "";
 
     // Create upload form HTML
     const uploadFormHtml = `
