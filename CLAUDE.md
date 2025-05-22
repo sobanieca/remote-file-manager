@@ -7,7 +7,8 @@ machine. It allows to serve files as well as manage them and edit (text files).
 
 ## Build Commands
 
-- Start server: `deno task dev`
+- Start server: `deno task dev` (don't try to run this command to avoid infinite
+  loop)
 
 > Ensure that watch is not set for this command.
 
@@ -31,7 +32,8 @@ machine. It allows to serve files as well as manage them and edit (text files).
 - **UI**: Keep each UI component in separate file
 - **Endpoints**: Each endpoint (especially the one that returns HTML) should be
   present in separate file (as ES Module)
-- **Comments**: Avoid writing comments, try to write self documenting code using proper variables names
+- **Comments**: Avoid writing comments, try to write self documenting code using
+  proper variables names
 
 ## Security Considerations
 

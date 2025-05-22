@@ -71,7 +71,7 @@ export async function fileExplorer(c) {
                 <a href="/download-item?path=${
           encodeURIComponent(entry.path)
         }&type=directory" class="context-menu-item">
-                  <span class="icon">📥</span> Download Files
+                  <span class="icon">📥</span> Download as ZIP
                 </a>
                 <form action="/delete-item" method="POST" onsubmit="return confirm('Are you sure you want to delete this folder? This action cannot be undone.');">
                   <input type="hidden" name="path" value="${entry.path}">

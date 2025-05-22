@@ -1,5 +1,5 @@
-import { normalizePath, combinePaths } from "./utils.js";
-import { ensureDir, join, dirname } from "../deps.js";
+import { combinePaths, normalizePath } from "./utils.js";
+import { dirname, ensureDir, join } from "../deps.js";
 
 export async function uploadFiles(c) {
   try {
@@ -23,7 +23,11 @@ export async function uploadFiles(c) {
     const files = formData.getAll("files");
 
     if (!files || files.length === 0) {
-      return c.redirect(`/file-explorer?path=${encodeURIComponent(normalizedPath)}&error=no_files`);
+      return c.redirect(
+        `/file-explorer?path=${
+          encodeURIComponent(normalizedPath)
+        }&error=no_files`,
+      );
     }
 
     // Track processed directories to avoid duplicates
@@ -90,17 +94,33 @@ export async function uploadFiles(c) {
     if (failedFiles > 0) {
       if (processedFiles > 0 || processedFolders > 0) {
         // Some files succeeded, some failed
-        return c.redirect(`/file-explorer?path=${encodeURIComponent(normalizedPath)}&success=partial_upload&count=${processedFiles}&folders=${processedFolders}&failed=${failedFiles}`);
+        return c.redirect(
+          `/file-explorer?path=${
+            encodeURIComponent(normalizedPath)
+          }&success=partial_upload&count=${processedFiles}&folders=${processedFolders}&failed=${failedFiles}`,
+        );
       } else {
         // All files failed
-        return c.redirect(`/file-explorer?path=${encodeURIComponent(normalizedPath)}&error=upload_failed`);
+        return c.redirect(
+          `/file-explorer?path=${
+            encodeURIComponent(normalizedPath)
+          }&error=upload_failed`,
+        );
       }
     } else if (processedFolders > 0) {
       // Folder(s) uploaded successfully
-      return c.redirect(`/file-explorer?path=${encodeURIComponent(normalizedPath)}&success=folders_uploaded&count=${processedFolders}`);
+      return c.redirect(
+        `/file-explorer?path=${
+          encodeURIComponent(normalizedPath)
+        }&success=folders_uploaded&count=${processedFolders}`,
+      );
     } else {
       // File(s) uploaded successfully
-      return c.redirect(`/file-explorer?path=${encodeURIComponent(normalizedPath)}&success=files_uploaded&count=${processedFiles}`);
+      return c.redirect(
+        `/file-explorer?path=${
+          encodeURIComponent(normalizedPath)
+        }&success=files_uploaded&count=${processedFiles}`,
+      );
     }
   } catch (error) {
     console.error("Upload error:", error);

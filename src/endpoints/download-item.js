@@ -1,27 +1,35 @@
 import { normalizePath } from "./utils.js";
-import { walk, join, basename, extname } from "../deps.js";
+import {
+  basename,
+  BlobWriter,
+  BlobReader,
+  extname,
+  join,
+  walk,
+  ZipWriter,
+} from "../deps.js";
 
 export async function downloadItem(c) {
   try {
     // Get request parameters
     const path = c.req.query("path");
     const type = c.req.query("type"); // "file" or "directory"
-    
+
     // Validate inputs
     if (!path) {
       return c.text("Invalid path", 400);
     }
-    
+
     // Normalize path to prevent directory traversal
     const normalizedPath = normalizePath(path);
     if (!normalizedPath) {
       return c.text("Invalid path", 400);
     }
-    
+
     // Check if path exists
     try {
       const stat = await Deno.stat(normalizedPath);
-      
+
       // Handle based on type
       if (type === "file") {
         return await downloadFile(c, normalizedPath, stat);
@@ -45,15 +53,18 @@ async function downloadFile(c, filePath, stat) {
   try {
     // Read file content
     const fileContent = await Deno.readFile(filePath);
-    
+
     // Set appropriate headers for file download
     const fileName = basename(filePath);
     const contentType = getContentType(filePath);
-    
+
     c.header("Content-Type", contentType);
-    c.header("Content-Disposition", `attachment; filename="${encodeURIComponent(fileName)}"`);
+    c.header(
+      "Content-Disposition",
+      `attachment; filename="${encodeURIComponent(fileName)}"`,
+    );
     c.header("Content-Length", stat.size.toString());
-    
+
     return c.body(fileContent);
   } catch (error) {
     console.error("File download error:", error);
@@ -61,69 +72,50 @@ async function downloadFile(c, filePath, stat) {
   }
 }
 
-// Download a directory as a file listing
+// Download a directory as a ZIP file
 async function downloadDirectory(c, dirPath) {
   try {
     // Get the directory name
     const directoryName = basename(dirPath);
 
+    // Create ZIP archive
+    const blobWriter = new BlobWriter("application/zip");
+    const zipWriter = new ZipWriter(blobWriter);
+
     // Get all files in the directory
-    const files = [];
     for await (const entry of walk(dirPath, { includeDirs: false })) {
       const relativePath = entry.path.slice(dirPath.length + 1);
-      files.push({
-        path: entry.path,
-        relativePath
-      });
+      const fileContent = await Deno.readFile(entry.path);
+      const fileBlob = new Blob([fileContent]);
+      const fileBlobReader = new BlobReader(fileBlob);
+      await zipWriter.add(relativePath, fileBlobReader);
     }
 
-    // Create an HTML file with links to each file
-    const archiveContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Directory Contents: ${directoryName}</title>
-        <style>
-          body { font-family: sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: 0 auto; }
-          h1 { color: #333; }
-          ul { list-style-type: none; padding: 0; }
-          li { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 4px; }
-          a { color: #0366d6; text-decoration: none; }
-          a:hover { text-decoration: underline; }
-          .note { background: #fff7e6; padding: 15px; border-radius: 4px; margin: 20px 0; }
-        </style>
-      </head>
-      <body>
-        <h1>Files in ${directoryName}</h1>
-        <div class="note">
-          <strong>Note:</strong> Direct folder downloads as ZIP are not currently available.
-          You can download individual files using the links below.
-        </div>
-        <ul>
-          ${files.length === 0 ? '<li>No files found in this directory</li>' : ''}
-          ${files.map(file =>
-            `<li><a href="/download-item?path=${encodeURIComponent(file.path)}&type=file" target="_blank">${file.relativePath}</a></li>`
-          ).join('\n')}
-        </ul>
-      </body>
-      </html>
-    `;
+    // Close the ZIP writer and get the blob
+    await zipWriter.close();
+    const zipBlob = await blobWriter.getData();
+    const zipArrayBuffer = await zipBlob.arrayBuffer();
+    const zipUint8Array = new Uint8Array(zipArrayBuffer);
 
-    // Set headers for HTML file
-    c.header("Content-Type", "text/html");
-    c.header("Content-Disposition", `inline; filename="${encodeURIComponent(directoryName)}-files.html"`);
+    // Set appropriate headers for ZIP download
+    c.header("Content-Type", "application/zip");
+    c.header(
+      "Content-Disposition",
+      `attachment; filename="${encodeURIComponent(directoryName)}.zip"`,
+    );
+    c.header("Content-Length", zipUint8Array.length.toString());
 
-    return c.body(archiveContent);
+    return c.body(zipUint8Array);
   } catch (error) {
     console.error("Directory download error:", error);
-    return c.text("Error creating directory listing", 500);
+    return c.text("Error creating ZIP archive", 500);
   }
 }
 
 // Utility function to determine content type based on file extension
 function getContentType(filePath) {
   const extension = extname(filePath).toLowerCase();
-  
+
   const mimeTypes = {
     ".html": "text/html",
     ".css": "text/css",
@@ -142,6 +134,6 @@ function getContentType(filePath) {
     ".mp3": "audio/mpeg",
     ".mp4": "video/mp4",
   };
-  
+
   return mimeTypes[extension] || "application/octet-stream";
 }

@@ -4,7 +4,8 @@
     "jsr:@hono/hono@*": "4.7.9",
     "jsr:@std/fs@*": "1.0.17",
     "jsr:@std/path@*": "1.0.9",
-    "jsr:@std/path@^1.0.9": "1.0.9"
+    "jsr:@std/path@^1.0.9": "1.0.9",
+    "jsr:@zip-js/zip-js@*": "2.7.62"
   },
   "jsr": {
     "@hono/hono@4.7.5": {
@@ -24,6 +25,9 @@
     },
     "@std/path@1.0.9": {
       "integrity": "260a49f11edd3db93dd38350bf9cd1b4d1366afa98e81b86167b4e3dd750129e"
+    },
+    "@zip-js/zip-js@2.7.62": {
+      "integrity": "11cbe0746fa1e52e6e0a601c89ba97365f16e38a07f139b9d9914f988aec9081"
     }
   }
 }
