@@ -1,6 +1,7 @@
 # The Amazing World of Cats
 
-Cats are fascinating creatures that have been companions to humans for thousands of years.
+Cats are fascinating creatures that have been companions to humans for thousands
+of years.
 
 ## Cat Facts
 
@@ -18,19 +19,18 @@ Cats are fascinating creatures that have been companions to humans for thousands
 4. They're clean animals that groom themselves
 5. They provide companionship without constant attention
 
-![Cat says...](javascript:alert('Miau!'))
-
 > "Time spent with cats is never wasted." - Sigmund Freud
 
-Cats communicate through body language. Here's what different behaviors might mean:
+Cats communicate through body language. Here's what different behaviors might
+mean:
 
-| Behavior | Meaning |
-|----------|---------|
-| Purring | Contentment, but sometimes stress |
-| Kneading | Comfort, marking territory |
-| Slow blinking | Trust and affection |
-| Tail twitching | Excitement or irritation |
-| Ears back | Fear or aggression |
+| Behavior       | Meaning                           |
+| -------------- | --------------------------------- |
+| Purring        | Contentment, but sometimes stress |
+| Kneading       | Comfort, marking territory        |
+| Slow blinking  | Trust and affection               |
+| Tail twitching | Excitement or irritation          |
+| Ears back      | Fear or aggression                |
 
 ```javascript
 // Cat sound simulator
@@ -39,4 +39,5 @@ function catSays() {
 }
 ```
 
-Cats are truly remarkable animals that continue to captivate our hearts and minds!
+Cats are truly remarkable animals that continue to captivate our hearts and
+minds!

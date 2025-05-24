@@ -1,8 +1,8 @@
 import { normalizePath } from "./utils.js";
 import {
   basename,
-  BlobWriter,
   BlobReader,
+  BlobWriter,
   extname,
   join,
   walk,
