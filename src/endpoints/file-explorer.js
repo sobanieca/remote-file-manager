@@ -185,24 +185,24 @@ export async function fileExplorer(c) {
     // Create upload form HTML
     const uploadFormHtml = `
     <div class="upload-section">
-      <div class="upload-forms">
-        <div class="upload-form">
-          <h3>Upload Files</h3>
-          <form action="/upload-files" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="path" value="${normalizedPath}">
-            <input type="file" name="files" multiple>
-            <button type="submit">Upload Files</button>
-          </form>
-        </div>
-        <div class="upload-form">
-          <h3>Upload Folder</h3>
-          <form action="/upload-files" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="path" value="${normalizedPath}">
-            <input type="file" name="files" webkitdirectory directory multiple>
-            <button type="submit">Upload Folder</button>
-          </form>
+      <div class="upload-dropdown">
+        <button type="button" class="upload-trigger">
+          📤 Upload
+          <span class="dropdown-arrow">▼</span>
+        </button>
+        <div class="upload-menu">
+          <div class="upload-option" data-type="files">
+            <span class="icon">📄</span> Upload Files
+          </div>
+          <div class="upload-option" data-type="folder">
+            <span class="icon">📁</span> Upload Folder
+          </div>
         </div>
       </div>
+      <form id="upload-form" action="/upload-files" method="POST" enctype="multipart/form-data" style="display: none;">
+        <input type="hidden" name="path" value="${normalizedPath}">
+        <input type="file" id="file-input" name="files">
+      </form>
     </div>
     `;
 

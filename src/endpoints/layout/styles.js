@@ -148,42 +148,56 @@ export const styles = `
     background-color: #f8f9fa;
     border-radius: 4px;
   }
-  .upload-forms {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+  .upload-dropdown {
+    position: relative;
+    display: inline-block;
   }
-  .upload-form {
-    flex: 1;
-    min-width: 250px;
-  }
-  .upload-form h3 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 16px;
-    color: #333;
-  }
-  .upload-form form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .upload-form input[type="file"] {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: white;
-  }
-  .upload-form button {
+  .upload-trigger {
     padding: 8px 16px;
     background-color: #0366d6;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .upload-form button:hover {
+  .upload-trigger:hover {
     background-color: #0255b3;
+  }
+  .dropdown-arrow {
+    font-size: 12px;
+  }
+  .upload-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 100;
+    min-width: 160px;
+    display: none;
+  }
+  .upload-dropdown.active .upload-menu {
+    display: block;
+  }
+  .upload-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .upload-option:hover {
+    background-color: #f5f5f5;
+  }
+  .upload-option .icon {
+    font-size: 16px;
   }
 `;
