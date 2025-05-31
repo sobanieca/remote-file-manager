@@ -92,6 +92,11 @@ export async function fileExplorer(c) {
             <div class="context-menu-trigger" data-path="${entry.path}" data-type="file" data-parent="${normalizedPath}">
               <span class="dots">⋮</span>
               <div class="context-menu">
+                <a href="/edit-file?path=${
+          encodeURIComponent(entry.path)
+        }" class="context-menu-item">
+                  <span class="icon">✏️</span> Edit
+                </a>
                 <a href="/download-item?path=${
           encodeURIComponent(entry.path)
         }&type=file" class="context-menu-item">
@@ -146,6 +151,9 @@ export async function fileExplorer(c) {
         }, but ${failedFiles} file${
           failedFiles === "1" ? "" : "s"
         } failed.</div>`;
+    } else if (success === "file_saved") {
+      statusMessageHtml =
+        '<div class="status-message success">File saved successfully!</div>';
     } else if (error) {
       let errorMessage = "An error occurred";
       if (error === "invalid_name") errorMessage = "Invalid folder name";
