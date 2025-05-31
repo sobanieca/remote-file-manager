@@ -1,4 +1,6 @@
-import { styles } from "./styles.js";
+import { baseStyles } from "./base-styles.js";
+import { fileExplorerStyles } from "./file-explorer-styles.js";
+import { fileEditorStyles } from "./file-editor-styles.js";
 import { scripts } from "./scripts.js";
 
 export function layout(title, content) {
@@ -9,7 +11,9 @@ export function layout(title, content) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title}</title>
   <style>
-    ${styles}
+    ${baseStyles}
+    ${fileExplorerStyles}
+    ${fileEditorStyles}
   </style>
 </head>
 <body>
