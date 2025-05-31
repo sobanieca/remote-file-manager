@@ -140,7 +140,20 @@ export async function saveFile(c) {
     }
 
     try {
-      await Deno.writeTextFile(normalizedPath, content);
+      let normalizedContent = content.replace(/\r\n/g, "\n");
+
+      try {
+        const originalContent = await Deno.readTextFile(normalizedPath);
+        const originalHadFinalNewline = originalContent.endsWith("\n");
+
+        if (originalHadFinalNewline && !normalizedContent.endsWith("\n")) {
+          normalizedContent += "\n";
+        }
+      } catch (_error) {
+        // Ignore errors when reading original file (e.g., file doesn't exist yet)
+      }
+
+      await Deno.writeTextFile(normalizedPath, normalizedContent);
       const parentPath = filePath.substring(0, filePath.lastIndexOf("/")) ||
         ".";
       return c.redirect(
