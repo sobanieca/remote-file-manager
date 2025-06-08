@@ -1,4 +1,8 @@
 {
+  "name": "@sobanieca/remote-file-manager",
+  "version": "0.1.0",
+  "license": "MIT",
+  "exports": "./src/main.js",
   "tasks": {
     "dev": "cd test && deno run -A ../src/main.js"
   }
