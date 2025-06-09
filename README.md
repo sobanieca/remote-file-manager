@@ -16,8 +16,9 @@ You need to have `deno` installed. Then run following command:
 
 Use the same command to update the tool.
 
-## Examples
+## Usage
 
 To use the tool navigate to the desired working directory where you wsnt to browse/manage files and run:
 
 `rmf`
+
