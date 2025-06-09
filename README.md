@@ -1,24 +1,38 @@
-# remote-file-manager
+# Remote File Manager
 
-Static HTTP server for browsing files on remote server.
-Once run, creates `/file-explorer` endpoint that allows to manage files in working directory.
+A web-based file management system that provides HTTP server functionality for browsing and managing files on remote machines. The application creates a `/file-explorer` endpoint that enables comprehensive file operations within the working directory.
 
-## Use case
+## Overview
 
-This tool is especially useful in SSH scenarios. You can do port forwarding to expose remote port on your local machine and manage files on target machine. 
-It also serves as static HTTP server so it should serve `html` files allowing to render web pages.
+Remote File Manager is designed to streamline file management operations on remote servers through a web interface. The tool combines static HTTP server capabilities with dynamic file management features, making it particularly valuable for remote server administration and development workflows.
+
+## Key Features
+
+- **Web-based File Explorer**: Intuitive interface for browsing directory structures
+- **File Management Operations**: Create, delete, rename, and organize files and folders
+- **Text File Editing**: Built-in editor for modifying text-based files
+- **Static File Serving**: Serves HTML files and other static content
+- **Remote Access**: Optimized for SSH port forwarding scenarios
 
 ## Installation
 
-You need to have `deno` installed. Then run following command:
+### Prerequisites
+- Deno runtime environment
 
-`deno install -g --allow-net --allow-read -n rmf jsr:@sobanieca/remote-file-manager`
+### Install Command
+```bash
+deno install -g --allow-net --allow-read -n rmf jsr:@sobanieca/remote-file-manager
+```
 
-Use the same command to update the tool.
+To update to the latest version, run the same installation command.
 
 ## Usage
 
-To use the tool navigate to the desired working directory where you wsnt to browse/manage files and run:
+Navigate to your desired working directory and execute:
 
-`rmf`
+```bash
+rmf
+```
+
+The server will start and provide access to the file management interface through your web browser.
 
