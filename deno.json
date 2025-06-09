@@ -2,7 +2,12 @@
   "name": "@sobanieca/remote-file-manager",
   "version": "0.1.1",
   "license": "MIT",
-  "exports": "./src/main.js",
+  "exports": {
+    ".": {
+      "import": "./src/main.js",
+      "types": "./src/main.d.ts"
+    }
+  },
   "tasks": {
     "dev": "cd test && deno run -A ../src/main.js"
   }
