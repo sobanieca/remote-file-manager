@@ -5,14 +5,14 @@ Once run, creates `/file-explorer` endpoint that allows to manage files in worki
 
 ## Use case
 
-This tool is especially useful in SSH scenarios. You can do port forwarding to expose remote port on your local machine and manage files on target machine. It
-also serves as static HTTP server so it should serve files like `html` without issues and allow rendering web pages.
+This tool is especially useful in SSH scenarios. You can do port forwarding to expose remote port on your local machine and manage files on target machine. 
+It also serves as static HTTP server so it should serve `html` files allowing to render web pages.
 
 ## Installation
 
 You need to have `deno` installed. Then run following command:
 
-`deno install -g -n rmf @jsr:@sobanieca/remote-file-manager`
+`deno install -g --allow-net --allow-read -n rmf jsr:@sobanieca/remote-file-manager`
 
 Use the same command to update the tool.
 
