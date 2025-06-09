@@ -1,3 +1,4 @@
+/* @ts-self-types="./main.d.ts" */
 import { Hono, serveStatic } from "./deps.js";
 import { fileExplorer } from "./endpoints/file-explorer.js";
 import { createFolder } from "./endpoints/create-folder.js";
