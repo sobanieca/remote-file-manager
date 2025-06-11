@@ -18,6 +18,13 @@ for (let i = 0; i < Deno.args.length; i++) {
   const arg = Deno.args[i];
   if (arg.startsWith("--port=")) {
     port = parseInt(arg.split("=")[1], 10) || defaultPort;
+  } else if (arg === "--port" || arg === "-p") {
+    // Handle --port 3000 or -p 3000 format
+    const nextArg = Deno.args[i + 1];
+    if (nextArg && !nextArg.startsWith("-")) {
+      port = parseInt(nextArg, 10) || defaultPort;
+      i++; // Skip the next argument since we consumed it
+    }
   }
 }
 const workingDir = Deno.cwd();
@@ -43,6 +50,7 @@ app.use(
 );
 
 console.log(`Remote File Manager server running at http://localhost:${port}`);
+console.log(`Use --port or -p to change port (current: ${port})`);
 console.log(`Serving files from: ${workingDir}`);
 console.log(
   `File Explorer available at: http://localhost:${port}/file-explorer`,

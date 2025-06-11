@@ -8,6 +8,15 @@
  * - Static file serving
  * 
  * The server accepts a --port command line argument to specify the port (defaults to 8000).
+ * 
+ * @example
+ * ```bash
+ * # Start server on default port 8000
+ * rmf
+ * 
+ * # Start server on custom port
+ * rmf --port 3000
+ * ```
  */
 
 /**
