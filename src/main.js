@@ -12,19 +12,55 @@ const app = new Hono();
 // Parse command line arguments
 const defaultPort = 8000;
 let port = defaultPort;
+let customPortProvided = false;
 
 // Simple argument parsing
 for (let i = 0; i < Deno.args.length; i++) {
   const arg = Deno.args[i];
   if (arg.startsWith("--port=")) {
     port = parseInt(arg.split("=")[1], 10) || defaultPort;
+    customPortProvided = true;
   } else if (arg === "--port" || arg === "-p") {
     // Handle --port 3000 or -p 3000 format
     const nextArg = Deno.args[i + 1];
     if (nextArg && !nextArg.startsWith("-")) {
       port = parseInt(nextArg, 10) || defaultPort;
+      customPortProvided = true;
       i++; // Skip the next argument since we consumed it
     }
+  }
+}
+
+// If no custom port provided, try to read from localStorage
+if (!customPortProvided) {
+  try {
+    const savedPort = localStorage.getItem("rmf-port");
+    if (savedPort) {
+      const parsedPort = parseInt(savedPort, 10);
+      if (parsedPort && parsedPort !== defaultPort) {
+        port = parsedPort;
+        console.log(`Using saved port from localStorage: ${port}`);
+      }
+    }
+  } catch (error) {
+    console.error("Error when accessing localStorage");
+    console.error(error);
+  }
+}
+
+// Save custom port to localStorage for future use or remove if default
+if (customPortProvided) {
+  try {
+    if (port !== defaultPort) {
+      localStorage.setItem("rmf-port", port.toString());
+      console.log(`Port ${port} saved to localStorage for future sessions`);
+    } else {
+      localStorage.removeItem("rmf-port");
+      console.log(`Default port used, removed saved port from localStorage`);
+    }
+  } catch (error) {
+    console.error("Error when accessing localStorage");
+    console.error(error);
   }
 }
 const workingDir = Deno.cwd();
