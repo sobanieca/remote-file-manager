@@ -31,7 +31,7 @@ valuable for remote server administration and development workflows.
 ### Install Command
 
 ```bash
-deno install -g --allow-net --allow-read -f -n rmf jsr:@sobanieca/remote-file-manager
+deno install -g --allow-net --allow-read -f -r -n rmf jsr:@sobanieca/remote-file-manager
 ```
 
 To update to the latest version, run the same installation command.
