@@ -154,6 +154,9 @@ export async function fileExplorer(c) {
     } else if (success === "file_saved") {
       statusMessageHtml =
         '<div class="status-message success">File saved successfully!</div>';
+    } else if (success === "file_created") {
+      statusMessageHtml =
+        '<div class="status-message success">File created from clipboard successfully!</div>';
     } else if (error) {
       let errorMessage = "An error occurred";
       if (error === "invalid_name") errorMessage = "Invalid folder name";
@@ -168,6 +171,8 @@ export async function fileExplorer(c) {
         errorMessage = "No files were selected for upload";
       } else if (error === "upload_failed") {
         errorMessage = "Failed to upload files";
+      } else if (error === "save_failed") {
+        errorMessage = "Failed to save pasted content";
       } else errorMessage = `Error: ${error}`;
 
       statusMessageHtml =
@@ -207,6 +212,9 @@ export async function fileExplorer(c) {
           </div>
         </div>
       </div>
+      <button type="button" id="paste-btn" class="paste-button" disabled>
+        📋 Paste
+      </button>
       <form id="upload-form" action="/upload-files" method="POST" enctype="multipart/form-data" style="display: none;">
         <input type="hidden" name="path" value="${normalizedPath}">
         <input type="file" id="file-input" name="files">

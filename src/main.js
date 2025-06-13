@@ -6,6 +6,7 @@ import { deleteItem } from "./endpoints/delete-item.js";
 import { uploadFiles } from "./endpoints/upload-files.js";
 import { downloadItem } from "./endpoints/download-item.js";
 import { editFile, saveFile } from "./endpoints/edit-file.js";
+import { pasteContent } from "./endpoints/paste-content.js";
 
 const app = new Hono();
 
@@ -73,6 +74,7 @@ app.post("/upload-files", (c) => uploadFiles(c));
 app.get("/download-item", (c) => downloadItem(c));
 app.get("/edit-file", (c) => editFile(c));
 app.post("/save-file", (c) => saveFile(c));
+app.post("/paste-content", (c) => pasteContent(c));
 
 // Serve static files with proper MIME types
 app.use(

@@ -2,10 +2,14 @@
   "version": "5",
   "specifiers": {
     "jsr:@hono/hono@*": "4.7.9",
+    "jsr:@hono/hono@4.7.9": "4.7.9",
     "jsr:@std/fs@*": "1.0.17",
+    "jsr:@std/fs@1.0.17": "1.0.17",
     "jsr:@std/path@*": "1.0.9",
+    "jsr:@std/path@1.0.9": "1.0.9",
     "jsr:@std/path@^1.0.9": "1.0.9",
-    "jsr:@zip-js/zip-js@*": "2.7.62"
+    "jsr:@zip-js/zip-js@*": "2.7.62",
+    "jsr:@zip-js/zip-js@2.7.62": "2.7.62"
   },
   "jsr": {
     "@hono/hono@4.7.5": {

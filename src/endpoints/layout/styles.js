@@ -147,6 +147,9 @@ export const styles = `
     padding: 15px;
     background-color: #f8f9fa;
     border-radius: 4px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
   }
   .upload-dropdown {
     position: relative;
@@ -199,6 +202,27 @@ export const styles = `
   }
   .upload-option .icon {
     font-size: 16px;
+  }
+  .paste-button {
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .paste-button:hover:not(:disabled) {
+    background-color: #218838;
+  }
+  .paste-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
   }
   .editor-header {
     display: flex;
@@ -285,5 +309,96 @@ export const styles = `
   .binary-file-message p {
     margin: 10px 0;
     color: #856404;
+  }
+  .paste-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .paste-dialog {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 400px;
+  }
+  .paste-dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+  }
+  .paste-dialog-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+  }
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+  }
+  .close-btn:hover {
+    color: #333;
+  }
+  .paste-dialog-body {
+    padding: 20px;
+  }
+  .paste-dialog-body label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+  }
+  .paste-dialog-body input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  .paste-dialog-body input[type="text"]:focus {
+    outline: none;
+    border-color: #0366d6;
+    box-shadow: 0 0 5px rgba(3, 102, 214, 0.3);
+  }
+  .paste-dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .paste-dialog-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .cancel-btn {
+    background-color: #6c757d;
+    color: white;
+  }
+  .cancel-btn:hover {
+    background-color: #5a6268;
+  }
+  .save-btn {
+    background-color: #28a745;
+    color: white;
+  }
+  .save-btn:hover {
+    background-color: #218838;
   }
 `;
