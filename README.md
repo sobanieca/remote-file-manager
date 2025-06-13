@@ -45,4 +45,10 @@ rmf
 ```
 
 The server will start and provide access to the file management interface
-through your web browser.
+through your web browser on default port (8000).
+
+To change port execute:
+
+```bash
+rmf -p 5432
+```
