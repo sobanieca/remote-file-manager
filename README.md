@@ -19,8 +19,11 @@ valuable for remote server administration and development workflows.
 - **File Management Operations**: Create, delete, rename, and organize files and
   folders
 - **Text File Editing**: Built-in editor for modifying text-based files
+- **Clipboard Upload**: Paste screenshots and images directly from clipboard to upload files
 - **Static File Serving**: Serves HTML files and other static content
 - **Remote Access**: Optimized for SSH port forwarding scenarios
+
+![screenshot](./file-explorer.png)
 
 ## Installation
 
