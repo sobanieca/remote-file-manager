@@ -6,7 +6,11 @@ on:
       - main
 
 jobs:
+  check-version:
+    uses: ./.github/workflows/check-version.yml
+    
   publish:
+    needs: check-version
     runs-on: ubuntu-latest
     permissions:
       contents: read
