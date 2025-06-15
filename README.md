@@ -31,7 +31,7 @@ valuable for remote server administration and development workflows.
 ### Install Command
 
 ```bash
-deno install -g --allow-net --allow-read -f -r -n rmf jsr:@sobanieca/remote-file-manager
+deno install -g --allow-net --allow-read -f -r -n rfm jsr:@sobanieca/remote-file-manager
 ```
 
 To update to the latest version, run the same installation command.
@@ -41,7 +41,7 @@ To update to the latest version, run the same installation command.
 Navigate to your desired working directory and execute:
 
 ```bash
-rmf
+rfm
 ```
 
 The server will start and provide access to the file management interface
@@ -50,5 +50,5 @@ through your web browser on default port (8000).
 To change port execute:
 
 ```bash
-rmf -p 5432
+rfm -p 5432
 ```

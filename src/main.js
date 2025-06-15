@@ -7,15 +7,9 @@ import { uploadFiles } from "./endpoints/upload-files.js";
 import { downloadItem } from "./endpoints/download-item.js";
 import { editFile, saveFile } from "./endpoints/edit-file.js";
 import { pasteContent } from "./endpoints/paste-content.js";
+import { version } from "./version.js";
 
-// Read and display version from deno.json
-try {
-  const denoConfigPath = new URL("../deno.json", import.meta.url);
-  const denoConfig = JSON.parse(await Deno.readTextFile(denoConfigPath));
-  console.log(`Remote File Manager v${denoConfig.version}`);
-} catch (_error) {
-  console.log("Remote File Manager (version unknown)");
-}
+console.log(`Remote File Manager v${version}`);
 
 const app = new Hono();
 

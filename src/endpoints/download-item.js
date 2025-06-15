@@ -4,7 +4,6 @@ import {
   BlobReader,
   BlobWriter,
   extname,
-  join,
   walk,
   ZipWriter,
 } from "../deps.js";
