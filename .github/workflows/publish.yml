@@ -40,18 +40,18 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      
+
       - name: Get version from deno.json
         id: version
         run: echo "version=$(deno eval "console.log(JSON.parse(Deno.readTextFileSync('deno.json')).version)")" >> $GITHUB_OUTPUT
-      
+
       - name: Compile binaries
         run: |
           deno compile --allow-net --allow-read --allow-write --target x86_64-unknown-linux-gnu -o remote-file-manager-linux-x64 src/main.js
           deno compile --allow-net --allow-read --allow-write --target aarch64-unknown-linux-gnu -o remote-file-manager-linux-arm64 src/main.js
           deno compile --allow-net --allow-read --allow-write --target x86_64-apple-darwin -o remote-file-manager-macos-x64 src/main.js
           deno compile --allow-net --allow-read --allow-write --target aarch64-apple-darwin -o remote-file-manager-macos-arm64 src/main.js
-      
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
