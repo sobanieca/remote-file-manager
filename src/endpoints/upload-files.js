@@ -44,7 +44,6 @@ export async function uploadFiles(c) {
         let filePath = file.name;
         // If the file is part of a folder upload, it will contain path separators
         if (filePath.includes("/") || filePath.includes("\\")) {
-
           // Normalize path separators to forward slashes
           filePath = filePath.replace(/\\/g, "/");
 

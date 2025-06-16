@@ -19,7 +19,8 @@ valuable for remote server administration and development workflows.
 - **File Management Operations**: Create, delete, rename, and organize files and
   folders
 - **Text File Editing**: Built-in editor for modifying text-based files
-- **Clipboard Upload**: Paste screenshots and images directly from clipboard to upload files
+- **Clipboard Upload**: Paste screenshots and images directly from clipboard to
+  upload files
 - **Static File Serving**: Serves HTML files and other static content
 - **Remote Access**: Optimized for SSH port forwarding scenarios
 
@@ -58,15 +59,20 @@ To change port execute:
 rfm -p 5432
 ```
 
-**Note**: The application remembers the last used port, so you don't need to specify it on subsequent runs unless you want to change it again.
+**Note**: The application remembers the last used port, so you don't need to
+specify it on subsequent runs unless you want to change it again.
 
 ## Remote File Management with SSH Port Forwarding
 
-Remote File Manager is particularly useful when managing files on remote servers through SSH connections. By using SSH port forwarding, you can securely access the web interface from your local machine.
+Remote File Manager is particularly useful when managing files on remote servers
+through SSH connections. By using SSH port forwarding, you can securely access
+the web interface from your local machine.
 
-### Setting up SSH Port Forwarding 
+### Setting up SSH Port Forwarding
 
-To access Remote File Manager running on a remote server from your local machine, use SSH with the `-L` option to forward a local port to the remote server:
+To access Remote File Manager running on a remote server from your local
+machine, use SSH with the `-L` option to forward a local port to the remote
+server:
 
 1. **Connect to the remote server with port forwarding:**
    ```bash
@@ -83,6 +89,5 @@ To access Remote File Manager running on a remote server from your local machine
    rfm
    ```
 
-4. **Access the file manager from your local browser:**
-   Open `http://localhost:8000/file-explorer` in your local web browser
-
+4. **Access the file manager from your local browser:** Open
+   `http://localhost:8000/file-explorer` in your local web browser
