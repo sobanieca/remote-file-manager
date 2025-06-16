@@ -31,9 +31,11 @@ valuable for remote server administration and development workflows.
 ### Option 1: Install via Deno (Recommended)
 
 **Prerequisites:**
+
 - Deno runtime environment
 
 **Install Command:**
+
 ```bash
 deno install -g --allow-write --allow-net --allow-read -f -r -n rfm jsr:@sobanieca/remote-file-manager
 ```
@@ -42,16 +44,20 @@ To update to the latest version, run the same installation command.
 
 ### Option 2: Pre-compiled Binaries
 
-Download the latest pre-compiled binary for your operating system from the [releases page](https://github.com/sobanieca/remote-file-manager/releases/latest):
+Download the latest pre-compiled binary for your operating system from the
+[releases page](https://github.com/sobanieca/remote-file-manager/releases/latest):
 
 **Example for Linux x64:**
+
 ```bash
 curl -L -o rfm https://github.com/sobanieca/remote-file-manager/releases/latest/download/remote-file-manager-linux-x64
 chmod +x rfm
 sudo mv rfm /usr/local/bin/
 ```
 
-Available binaries: `remote-file-manager-linux-x64`, `remote-file-manager-linux-arm64`, `remote-file-manager-macos-x64`, `remote-file-manager-macos-arm64`
+Available binaries: `remote-file-manager-linux-x64`,
+`remote-file-manager-linux-arm64`, `remote-file-manager-macos-x64`,
+`remote-file-manager-macos-arm64`
 
 ## Usage
 
