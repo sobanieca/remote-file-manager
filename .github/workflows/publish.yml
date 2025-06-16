@@ -1,4 +1,4 @@
-name: Publish
+name: Check and Publish
 
 on:
   push:
@@ -9,8 +9,19 @@ jobs:
   check-version:
     uses: ./.github/workflows/check-version.yml
     
-  publish:
+  check:
     needs: check-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: deno fmt --check
+      - run: deno lint
+    
+  publish:
+    needs: check
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -18,3 +29,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npx jsr publish
+
+  compile:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: deno compile --allow-net --allow-read --allow-write --target x86_64-unknown-linux-gnu -o remote-file-manager-linux src/main.js
+      - run: deno compile --allow-net --allow-read --allow-write --target aarch64-unknown-linux-gnu -o remote-file-manager-linux-arm src/main.js
+      - run: deno compile --allow-net --allow-read --allow-write --target x86_64-apple-darwin -o remote-file-manager-apple src/main.js
+      - run: deno compile --allow-net --allow-read --allow-write --target aarch64-apple-darwin -o remote-file-manager-apple-arm src/main.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compiled-binaries
+          path: |
+            remote-file-manager-linux
+            remote-file-manager-linux-arm
+            remote-file-manager-apple
+            remote-file-manager-apple-arm
