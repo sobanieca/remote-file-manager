@@ -55,3 +55,30 @@ To change port execute:
 ```bash
 rfm -p 5432
 ```
+
+## Remote File Management with SSH Port Forwarding
+
+Remote File Manager is particularly useful when managing files on remote servers through SSH connections. By using SSH port forwarding, you can securely access the web interface from your local machine.
+
+### Setting up SSH Port Forwarding 
+
+To access Remote File Manager running on a remote server from your local machine, use SSH with the `-L` option to forward a local port to the remote server:
+
+1. **Connect to the remote server with port forwarding:**
+   ```bash
+   ssh -L 8000:localhost:8000 user@remote-server.com
+   ```
+
+2. **Navigate to your target directory on the remote server:**
+   ```bash
+   cd /path/to/your/project
+   ```
+
+3. **Start Remote File Manager:**
+   ```bash
+   rfm
+   ```
+
+4. **Access the file manager from your local browser:**
+   Open `http://localhost:8000/file-explorer` in your local web browser
+
