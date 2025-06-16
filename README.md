@@ -50,11 +50,15 @@ rfm
 The server will start and provide access to the file management interface
 through your web browser on default port (8000).
 
+### Custom Port
+
 To change port execute:
 
 ```bash
 rfm -p 5432
 ```
+
+**Note**: The application remembers the last used port, so you don't need to specify it on subsequent runs unless you want to change it again.
 
 ## Remote File Management with SSH Port Forwarding
 
