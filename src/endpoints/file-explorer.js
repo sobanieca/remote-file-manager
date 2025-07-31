@@ -1,5 +1,10 @@
 import { layout } from "./layout/index.js";
-import { combinePaths, getParentPath, normalizePath } from "./utils.js";
+import {
+  combinePaths,
+  getParentPath,
+  isImageFile,
+  normalizePath,
+} from "./utils.js";
 
 export async function fileExplorer(c) {
   try {
@@ -86,30 +91,40 @@ export async function fileExplorer(c) {
           </div>
         </li>`;
       } else {
+        const isImage = isImageFile(entry.name);
+        const thumbnailHtml = isImage
+          ? `<img src="/thumbnail?path=${
+            encodeURIComponent(entry.path)
+          }" alt="${entry.name}" class="thumbnail" loading="lazy">`
+          : "";
+
         filesHtml += `<li>
           <div class="file-item">
-            <a href="/${entry.path}" class="file" target="_blank">${entry.name}</a>
-            <div class="context-menu-trigger" data-path="${entry.path}" data-type="file" data-parent="${normalizedPath}">
-              <span class="dots">⋮</span>
-              <div class="context-menu">
-                <a href="/edit-file?path=${
+            ${thumbnailHtml}
+            <div class="file-info">
+              <a href="/${entry.path}" class="file" target="_blank">${entry.name}</a>
+              <div class="context-menu-trigger" data-path="${entry.path}" data-type="file" data-parent="${normalizedPath}">
+                <span class="dots">⋮</span>
+                <div class="context-menu">
+                  <a href="/edit-file?path=${
           encodeURIComponent(entry.path)
         }" class="context-menu-item">
-                  <span class="icon">✏️</span> Edit
-                </a>
-                <a href="/download-item?path=${
+                    <span class="icon">✏️</span> Edit
+                  </a>
+                  <a href="/download-item?path=${
           encodeURIComponent(entry.path)
         }&type=file" class="context-menu-item">
-                  <span class="icon">📥</span> Download
-                </a>
-                <form action="/delete-item" method="POST" onsubmit="return confirm('Are you sure you want to delete this file? This action cannot be undone.');">
-                  <input type="hidden" name="path" value="${entry.path}">
-                  <input type="hidden" name="type" value="file">
-                  <input type="hidden" name="parentPath" value="${normalizedPath}">
-                  <button type="submit" class="context-menu-item">
-                    <span class="icon">🗑️</span> Delete
-                  </button>
-                </form>
+                    <span class="icon">📥</span> Download
+                  </a>
+                  <form action="/delete-item" method="POST" onsubmit="return confirm('Are you sure you want to delete this file? This action cannot be undone.');">
+                    <input type="hidden" name="path" value="${entry.path}">
+                    <input type="hidden" name="type" value="file">
+                    <input type="hidden" name="parentPath" value="${normalizedPath}">
+                    <button type="submit" class="context-menu-item">
+                      <span class="icon">🗑️</span> Delete
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
           </div>

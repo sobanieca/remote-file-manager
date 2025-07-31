@@ -62,9 +62,24 @@ export const fileExplorerStyles = `
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    gap: 12px;
   }
-  .file-item a {
+  .file-item .file-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  .file-item .file-info a {
     flex-grow: 1;
+  }
+  .thumbnail {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    flex-shrink: 0;
   }
   .context-menu-trigger {
     position: relative;

@@ -37,3 +37,26 @@ export function getParentPath(path) {
   parts.pop();
   return parts.join("/") || ".";
 }
+
+/**
+ * Checks if a file is an image based on its extension
+ * @param {string} filename - The filename to check
+ * @returns {boolean} - True if the file is an image
+ */
+export function isImageFile(filename) {
+  const imageExtensions = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".bmp",
+    ".webp",
+    ".svg",
+    ".tiff",
+    ".tif",
+    ".ico",
+    ".avif",
+  ];
+  const ext = filename.toLowerCase().substring(filename.lastIndexOf("."));
+  return imageExtensions.includes(ext);
+}
