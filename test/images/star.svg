@@ -1,0 +1,22 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="200"
+  height="200"
+  viewBox="0 0 200 200"
+>
+  <polygon
+    points="100,20 120,70 170,70 130,110 140,160 100,130 60,160 70,110 30,70 80,70"
+    fill="#f59e0b"
+    stroke="#d97706"
+    stroke-width="3"
+  />
+  <text
+    x="100"
+    y="180"
+    text-anchor="middle"
+    fill="#92400e"
+    font-family="Arial"
+    font-size="18"
+    font-weight="bold"
+  >Star</text>
+</svg>
