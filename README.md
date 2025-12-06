@@ -42,7 +42,25 @@ deno install -g --allow-write --allow-net --allow-read -f -r -n rfm jsr:@sobanie
 
 To update to the latest version, run the same installation command.
 
-### Option 2: Pre-compiled Binaries
+### Option 2: Quick Install Script (Standalone Binary)
+
+If you don't have Deno installed, you can install the pre-compiled binary with a
+single command:
+
+```bash
+curl -fsSL sobanieca.github.io/remote-file-manager/install.sh | bash
+```
+
+This script automatically detects your OS and architecture (Linux/macOS,
+x64/arm64) and installs the appropriate binary to `/usr/local/bin`.
+
+To install to a custom location:
+
+```bash
+curl -fsSL sobanieca.github.io/remote-file-manager/install.sh | INSTALL_DIR=~/bin bash
+```
+
+### Option 3: Manual Binary Installation
 
 Download the latest pre-compiled binary for your operating system from the
 [releases page](https://github.com/sobanieca/remote-file-manager/releases/latest):

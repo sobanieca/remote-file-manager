@@ -1,6 +1,6 @@
 {
   "name": "@sobanieca/remote-file-manager",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "license": "MIT",
   "exports": "./src/main.js",
   "tasks": {
