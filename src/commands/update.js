@@ -13,6 +13,7 @@ export async function update(args) {
         "--allow-read",
         "--allow-write",
         "--allow-run",
+        "--allow-env=TERM",
         "-f",
         "-r",
         "-n",
@@ -37,7 +38,7 @@ export async function update(args) {
     console.log("To update Remote File Manager to the latest version, run:");
     console.log("");
     console.log(
-      "  deno install -g --allow-net --allow-read --allow-write --allow-run -f -r -n rfm jsr:@sobanieca/remote-file-manager",
+      "  deno install -g --allow-net --allow-read --allow-write --allow-run --allow-env=TERM -f -r -n rfm jsr:@sobanieca/remote-file-manager",
     );
     console.log("");
     console.log("Or use deno updater:");

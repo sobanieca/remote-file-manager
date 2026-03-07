@@ -37,7 +37,7 @@ valuable for remote server administration and development workflows.
 **Install Command:**
 
 ```bash
-deno install -g --allow-write --allow-net --allow-read --allow-run -f -r -n rfm jsr:@sobanieca/remote-file-manager
+deno install -g --allow-write --allow-net --allow-read --allow-run --allow-env=TERM -f -r -n rfm jsr:@sobanieca/remote-file-manager
 ```
 
 To update to the latest version, run the same installation command.
