@@ -1,6 +1,7 @@
 import { baseStyles } from "./base-styles.js";
 import { fileExplorerStyles } from "./file-explorer-styles.js";
 import { fileEditorStyles } from "./file-editor-styles.js";
+import { markdownStyles } from "./markdown-styles.js";
 import { scripts } from "./scripts.js";
 
 export function layout(title, content) {
@@ -15,10 +16,13 @@ export function layout(title, content) {
     ${baseStyles}
     ${fileExplorerStyles}
     ${fileEditorStyles}
+    ${markdownStyles}
   </style>
 </head>
 <body>
+  <div class="main-container">
   ${content}
+  </div>
   <script>
     ${scripts}
   </script>

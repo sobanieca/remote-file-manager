@@ -3,6 +3,7 @@ import {
   combinePaths,
   getParentPath,
   isImageFile,
+  isMarkdownFile,
   normalizePath,
 } from "./utils.js";
 
@@ -92,17 +93,21 @@ export async function fileExplorer(c) {
         </li>`;
       } else {
         const isImage = isImageFile(entry.name);
+        const isMd = isMarkdownFile(entry.name);
         const thumbnailHtml = isImage
           ? `<img src="/thumbnail?path=${
             encodeURIComponent(entry.path)
           }" alt="${entry.name}" class="thumbnail" loading="lazy">`
           : "";
+        const fileHref = isMd
+          ? `/markdown?path=${encodeURIComponent(entry.path)}`
+          : `/${entry.path}`;
 
         filesHtml += `<li>
           <div class="file-item">
             ${thumbnailHtml}
             <div class="file-info">
-              <a href="/${entry.path}" class="file" target="_blank">${entry.name}</a>
+              <a href="${fileHref}" class="file" target="_blank">${entry.name}</a>
               <div class="context-menu-trigger" data-path="${entry.path}" data-type="file" data-parent="${normalizedPath}">
                 <span class="dots">⋮</span>
                 <div class="context-menu">
