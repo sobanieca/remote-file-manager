@@ -8,7 +8,13 @@ import { downloadItem } from "./endpoints/download-item.js";
 import { editFile, saveFile } from "./endpoints/edit-file.js";
 import { pasteContent } from "./endpoints/paste-content.js";
 import { thumbnail } from "./endpoints/thumbnail.js";
+import { update } from "./commands/update.js";
 import { version } from "./version.js";
+
+if (Deno.args[0] === "update") {
+  await update(Deno.args.slice(1));
+  Deno.exit(0);
+}
 
 console.log(`Remote File Manager v${version}`);
 
