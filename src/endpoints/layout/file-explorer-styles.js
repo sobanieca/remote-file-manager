@@ -15,14 +15,16 @@ export const fileExplorerStyles = `
     padding: 0;
   }
   .file-list li {
-    padding: 8px 0;
+    padding: 8px 4px;
     border-bottom: 1px solid #eee;
+    border-radius: 4px;
+  }
+  .file-list li:hover {
+    background-color: #f0f4f8;
   }
   .file-list a {
     text-decoration: none;
     color: #0366d6;
-    display: flex;
-    align-items: center;
   }
   .file-list .folder::before {
     content: "📁";
@@ -66,12 +68,8 @@ export const fileExplorerStyles = `
   }
   .file-item .file-info {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     width: 100%;
-  }
-  .file-item .file-info a {
-    flex-grow: 1;
   }
   .thumbnail {
     width: 48px;
@@ -84,6 +82,7 @@ export const fileExplorerStyles = `
   .context-menu-trigger {
     position: relative;
     cursor: pointer;
+    margin-left: auto;
   }
   .dots {
     font-size: 18px;

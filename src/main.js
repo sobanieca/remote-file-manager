@@ -9,6 +9,7 @@ import { editFile, saveFile } from "./endpoints/edit-file.js";
 import { pasteContent } from "./endpoints/paste-content.js";
 import { thumbnail } from "./endpoints/thumbnail.js";
 import { markdown } from "./endpoints/markdown.js";
+import { renameItem } from "./endpoints/rename-item.js";
 import { update } from "./commands/update.js";
 import { version } from "./version.js";
 
@@ -88,6 +89,7 @@ app.post("/save-file", (c) => saveFile(c));
 app.post("/paste-content", (c) => pasteContent(c));
 app.get("/thumbnail", (c) => thumbnail(c));
 app.get("/markdown", (c) => markdown(c));
+app.post("/rename-item", (c) => renameItem(c));
 
 // Serve static files with proper MIME types
 app.use(

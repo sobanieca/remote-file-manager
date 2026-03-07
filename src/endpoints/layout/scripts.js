@@ -194,6 +194,109 @@ export const scripts = `
     }
   });
 
+  // Rename functionality
+  document.querySelectorAll('.rename-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const path = btn.getAttribute('data-path');
+      const name = btn.getAttribute('data-name');
+      const parentPath = btn.getAttribute('data-parent');
+
+      document.querySelectorAll('.context-menu-trigger.active').forEach(menu => {
+        menu.classList.remove('active');
+      });
+
+      const overlay = document.createElement('div');
+      overlay.className = 'paste-dialog-overlay';
+
+      const dialog = document.createElement('div');
+      dialog.className = 'paste-dialog';
+      dialog.innerHTML = \`
+        <div class="paste-dialog-header">
+          <h3>Rename</h3>
+          <button type="button" class="close-btn">&times;</button>
+        </div>
+        <div class="paste-dialog-body">
+          <label for="rename-input">New name:</label>
+          <input type="text" id="rename-input" value="\${name}" />
+          <div class="paste-dialog-buttons">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="button" class="save-btn">Rename</button>
+          </div>
+        </div>
+      \`;
+
+      overlay.appendChild(dialog);
+      document.body.appendChild(overlay);
+
+      const renameInput = dialog.querySelector('#rename-input');
+      const saveBtn = dialog.querySelector('.save-btn');
+      const cancelBtn = dialog.querySelector('.cancel-btn');
+      const closeBtn = dialog.querySelector('.close-btn');
+
+      renameInput.focus();
+      const lastDot = name.lastIndexOf('.');
+      if (lastDot > 0) {
+        renameInput.setSelectionRange(0, lastDot);
+      } else {
+        renameInput.select();
+      }
+
+      function closeDialog() {
+        document.body.removeChild(overlay);
+      }
+
+      closeBtn.addEventListener('click', closeDialog);
+      cancelBtn.addEventListener('click', closeDialog);
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeDialog();
+      });
+
+      renameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          saveBtn.click();
+        } else if (e.key === 'Escape') {
+          closeDialog();
+        }
+      });
+
+      saveBtn.addEventListener('click', () => {
+        const newName = renameInput.value.trim();
+        if (!newName) {
+          alert('Please enter a name');
+          return;
+        }
+        if (newName === name) {
+          closeDialog();
+          return;
+        }
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/rename-item';
+        form.style.display = 'none';
+
+        const pathInput = document.createElement('input');
+        pathInput.name = 'path';
+        pathInput.value = path;
+        form.appendChild(pathInput);
+
+        const newNameInput = document.createElement('input');
+        newNameInput.name = 'newName';
+        newNameInput.value = newName;
+        form.appendChild(newNameInput);
+
+        const parentInput = document.createElement('input');
+        parentInput.name = 'parentPath';
+        parentInput.value = parentPath;
+        form.appendChild(parentInput);
+
+        document.body.appendChild(form);
+        form.submit();
+      });
+    });
+  });
+
   function showPasteDialog(file, textData) {
     // Create dialog overlay
     const overlay = document.createElement('div');
