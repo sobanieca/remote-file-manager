@@ -43,6 +43,11 @@ export function getParentPath(path) {
  * @param {string} filename - The filename to check
  * @returns {boolean} - True if the file is an image
  */
+export function isMarkdownFile(filename) {
+  const ext = filename.toLowerCase().substring(filename.lastIndexOf("."));
+  return ext === ".md";
+}
+
 export function isImageFile(filename) {
   const imageExtensions = [
     ".jpg",

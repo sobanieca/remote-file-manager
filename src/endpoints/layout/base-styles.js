@@ -5,6 +5,10 @@ export const baseStyles = `
     margin: 0;
     padding: 20px;
   }
+  .main-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
   .status-section {
     margin: 10px 0;
   }

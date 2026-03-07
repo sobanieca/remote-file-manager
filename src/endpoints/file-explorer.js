@@ -3,6 +3,7 @@ import {
   combinePaths,
   getParentPath,
   isImageFile,
+  isMarkdownFile,
   normalizePath,
 } from "./utils.js";
 
@@ -73,6 +74,9 @@ export async function fileExplorer(c) {
             <div class="context-menu-trigger" data-path="${entry.path}" data-type="directory" data-parent="${normalizedPath}">
               <span class="dots">⋮</span>
               <div class="context-menu">
+                <button type="button" class="context-menu-item rename-btn" data-path="${entry.path}" data-name="${entry.name}" data-parent="${normalizedPath}">
+                  <span class="icon">✏️</span> Rename
+                </button>
                 <a href="/download-item?path=${
           encodeURIComponent(entry.path)
         }&type=directory" class="context-menu-item">
@@ -92,24 +96,31 @@ export async function fileExplorer(c) {
         </li>`;
       } else {
         const isImage = isImageFile(entry.name);
+        const isMd = isMarkdownFile(entry.name);
         const thumbnailHtml = isImage
           ? `<img src="/thumbnail?path=${
             encodeURIComponent(entry.path)
           }" alt="${entry.name}" class="thumbnail" loading="lazy">`
           : "";
+        const fileHref = isMd
+          ? `/markdown?path=${encodeURIComponent(entry.path)}`
+          : `/${entry.path}`;
 
         filesHtml += `<li>
           <div class="file-item">
             ${thumbnailHtml}
             <div class="file-info">
-              <a href="/${entry.path}" class="file" target="_blank">${entry.name}</a>
+              <a href="${fileHref}" class="file" target="_blank">${entry.name}</a>
               <div class="context-menu-trigger" data-path="${entry.path}" data-type="file" data-parent="${normalizedPath}">
                 <span class="dots">⋮</span>
                 <div class="context-menu">
+                  <button type="button" class="context-menu-item rename-btn" data-path="${entry.path}" data-name="${entry.name}" data-parent="${normalizedPath}">
+                    <span class="icon">✏️</span> Rename
+                  </button>
                   <a href="/edit-file?path=${
           encodeURIComponent(entry.path)
         }" class="context-menu-item">
-                    <span class="icon">✏️</span> Edit
+                    <span class="icon">📝</span> Edit
                   </a>
                   <a href="/download-item?path=${
           encodeURIComponent(entry.path)
@@ -172,6 +183,9 @@ export async function fileExplorer(c) {
     } else if (success === "file_created") {
       statusMessageHtml =
         '<div class="status-message success">File created from clipboard successfully!</div>';
+    } else if (success === "item_renamed") {
+      statusMessageHtml =
+        '<div class="status-message success">Item renamed successfully!</div>';
     } else if (error) {
       let errorMessage = "An error occurred";
       if (error === "invalid_name") errorMessage = "Invalid folder name";
@@ -186,6 +200,8 @@ export async function fileExplorer(c) {
         errorMessage = "No files were selected for upload";
       } else if (error === "upload_failed") {
         errorMessage = "Failed to upload files";
+      } else if (error === "rename_failed") {
+        errorMessage = "Failed to rename item";
       } else if (error === "save_failed") {
         errorMessage = "Failed to save pasted content";
       } else errorMessage = `Error: ${error}`;

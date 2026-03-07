@@ -99,6 +99,21 @@ rfm -p 5432
 **Note**: The application remembers the last used port, so you don't need to
 specify it on subsequent runs unless you want to change it again.
 
+### Update
+
+To update Remote File Manager to the latest version:
+
+```bash
+rfm update
+```
+
+This will display available update methods. If you installed via Deno, you can
+update automatically:
+
+```bash
+rfm update --deno
+```
+
 ## Remote File Management with SSH Port Forwarding
 
 Remote File Manager is particularly useful when managing files on remote servers
