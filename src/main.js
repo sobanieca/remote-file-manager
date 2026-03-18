@@ -91,14 +91,20 @@ app.get("/thumbnail", (c) => thumbnail(c));
 app.get("/markdown", (c) => markdown(c));
 app.post("/rename-item", (c) => renameItem(c));
 
+app.use("/*", async (c, next) => {
+  const path = c.req.path;
+  if (path.endsWith(".md")) {
+    const filePath = "." + path;
+    return c.redirect(`/markdown?path=${encodeURIComponent(filePath)}`);
+  }
+  await next();
+});
+
 // Serve static files with proper MIME types
 app.use(
   "/*",
   serveStatic({
     root: workingDir,
-    mimes: {
-      md: "text/markdown; charset=utf-8",
-    },
   }),
 );
 
