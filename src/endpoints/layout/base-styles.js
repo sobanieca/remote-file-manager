@@ -4,6 +4,8 @@ export const baseStyles = `
     line-height: 1.6;
     margin: 0;
     padding: 20px;
+    background-color: var(--bg);
+    color: var(--text);
   }
   .main-container {
     max-width: 800px;
@@ -18,15 +20,15 @@ export const baseStyles = `
     width: 100%;
   }
   .status-message.success {
-    background-color: #e6f4ea;
-    color: #137333;
+    background-color: var(--success-bg);
+    color: var(--success-text);
   }
   .status-message.error {
-    background-color: #fce8e6;
-    color: #c5221f;
+    background-color: var(--error-bg);
+    color: var(--error-text);
   }
   .status-message.warning {
-    background-color: #fff7e6;
-    color: #b06000;
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
   }
 `;

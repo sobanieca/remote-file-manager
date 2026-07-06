@@ -2,12 +2,12 @@ export const fileExplorerStyles = `
   .breadcrumb {
     margin-bottom: 20px;
     padding: 8px 16px;
-    background-color: #f8f9fa;
+    background-color: var(--panel-bg);
     border-radius: 4px;
   }
   .breadcrumb a {
     text-decoration: none;
-    color: #0366d6;
+    color: var(--link);
     margin: 0 5px;
   }
   .file-list {
@@ -16,15 +16,15 @@ export const fileExplorerStyles = `
   }
   .file-list li {
     padding: 8px 4px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-subtle);
     border-radius: 4px;
   }
   .file-list li:hover {
-    background-color: #f0f4f8;
+    background-color: var(--panel-hover);
   }
   .file-list a {
     text-decoration: none;
-    color: #0366d6;
+    color: var(--link);
   }
   .file-list .folder::before {
     content: "📁";
@@ -37,27 +37,29 @@ export const fileExplorerStyles = `
   .new-folder-form {
     margin-bottom: 20px;
     padding: 15px;
-    background-color: #f8f9fa;
+    background-color: var(--panel-bg);
     border-radius: 4px;
     display: flex;
   }
   .new-folder-form input[type="text"] {
     padding: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 4px;
     margin-right: 10px;
     flex-grow: 1;
+    background-color: var(--surface);
+    color: var(--text);
   }
   .new-folder-form button {
     padding: 8px 16px;
-    background-color: #0366d6;
-    color: white;
+    background-color: var(--primary);
+    color: var(--on-accent);
     border: none;
     border-radius: 4px;
     cursor: pointer;
   }
   .new-folder-form button:hover {
-    background-color: #0255b3;
+    background-color: var(--primary-hover);
   }
   .file-item {
     display: flex;
@@ -76,7 +78,7 @@ export const fileExplorerStyles = `
     height: 48px;
     object-fit: cover;
     border-radius: 4px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     flex-shrink: 0;
   }
   .context-menu-trigger {
@@ -87,16 +89,16 @@ export const fileExplorerStyles = `
   .dots {
     font-size: 18px;
     padding: 4px 8px;
-    color: #666;
+    color: var(--muted);
   }
   .context-menu {
     position: absolute;
     right: 0;
     top: 24px;
-    background-color: white;
-    border: 1px solid #ddd;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px var(--shadow);
     z-index: 100;
     min-width: 160px;
     display: none;
@@ -114,13 +116,13 @@ export const fileExplorerStyles = `
     width: 100%;
     display: flex;
     align-items: center;
-    color: #333;
+    color: var(--heading);
     text-decoration: none;
     font-size: 14px;
     white-space: nowrap;
   }
   .context-menu-item:hover {
-    background-color: #f5f5f5;
+    background-color: var(--menu-hover);
   }
   .context-menu-item .icon {
     margin-right: 8px;
@@ -133,7 +135,7 @@ export const fileExplorerStyles = `
   .upload-section {
     margin-bottom: 20px;
     padding: 15px;
-    background-color: #f8f9fa;
+    background-color: var(--panel-bg);
     border-radius: 4px;
     display: flex;
     gap: 10px;
@@ -145,8 +147,8 @@ export const fileExplorerStyles = `
   }
   .upload-trigger {
     padding: 8px 16px;
-    background-color: #0366d6;
-    color: white;
+    background-color: var(--primary);
+    color: var(--on-accent);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -155,7 +157,7 @@ export const fileExplorerStyles = `
     gap: 8px;
   }
   .upload-trigger:hover {
-    background-color: #0255b3;
+    background-color: var(--primary-hover);
   }
   .dropdown-arrow {
     font-size: 12px;
@@ -164,10 +166,10 @@ export const fileExplorerStyles = `
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: white;
-    border: 1px solid #ddd;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px var(--shadow);
     z-index: 100;
     min-width: 160px;
     display: none;
@@ -181,20 +183,20 @@ export const fileExplorerStyles = `
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #333;
+    color: var(--heading);
     font-size: 14px;
     white-space: nowrap;
   }
   .upload-option:hover {
-    background-color: #f5f5f5;
+    background-color: var(--menu-hover);
   }
   .upload-option .icon {
     font-size: 16px;
   }
   .paste-button {
     padding: 8px 16px;
-    background-color: #28a745;
-    color: white;
+    background-color: var(--success);
+    color: var(--on-accent);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -205,10 +207,10 @@ export const fileExplorerStyles = `
     white-space: nowrap;
   }
   .paste-button:hover:not(:disabled) {
-    background-color: #218838;
+    background-color: var(--success-hover);
   }
   .paste-button:disabled {
-    background-color: #6c757d;
+    background-color: var(--secondary);
     cursor: not-allowed;
     opacity: 0.6;
   }
@@ -218,16 +220,16 @@ export const fileExplorerStyles = `
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--overlay);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
   }
   .paste-dialog {
-    background-color: white;
+    background-color: var(--surface);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px var(--shadow-strong);
     width: 90%;
     max-width: 400px;
   }
@@ -236,23 +238,23 @@ export const fileExplorerStyles = `
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-subtle);
   }
   .paste-dialog-header h3 {
     margin: 0;
-    color: #333;
+    color: var(--heading);
     font-size: 18px;
   }
   .close-btn {
     background: none;
     border: none;
     font-size: 24px;
-    color: #666;
+    color: var(--muted);
     cursor: pointer;
     padding: 0;
   }
   .close-btn:hover {
-    color: #333;
+    color: var(--heading);
   }
   .paste-dialog-body {
     padding: 20px;
@@ -260,21 +262,23 @@ export const fileExplorerStyles = `
   .paste-dialog-body label {
     display: block;
     margin-bottom: 8px;
-    color: #333;
+    color: var(--heading);
     font-weight: 500;
   }
   .paste-dialog-body input[type="text"] {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 4px;
     font-size: 14px;
     box-sizing: border-box;
+    background-color: var(--surface);
+    color: var(--text);
   }
   .paste-dialog-body input[type="text"]:focus {
     outline: none;
-    border-color: #0366d6;
-    box-shadow: 0 0 5px rgba(3, 102, 214, 0.3);
+    border-color: var(--primary);
+    box-shadow: 0 0 5px var(--focus-ring);
   }
   .paste-dialog-buttons {
     display: flex;
@@ -290,17 +294,17 @@ export const fileExplorerStyles = `
     font-size: 14px;
   }
   .cancel-btn {
-    background-color: #6c757d;
-    color: white;
+    background-color: var(--secondary);
+    color: var(--on-accent);
   }
   .cancel-btn:hover {
-    background-color: #5a6268;
+    background-color: var(--secondary-hover);
   }
   .save-btn {
-    background-color: #28a745;
-    color: white;
+    background-color: var(--success);
+    color: var(--on-accent);
   }
   .save-btn:hover {
-    background-color: #218838;
+    background-color: var(--success-hover);
   }
 `;

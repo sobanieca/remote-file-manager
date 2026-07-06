@@ -38,7 +38,7 @@ export async function markdown(c) {
     }" class="back-button">← Back to Explorer</a>
         </div>
       </div>
-      <div class="markdown-body" data-color-mode="light" data-light-theme="light">
+      <div class="markdown-body" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
         ${renderedHtml}
       </div>
     `;
