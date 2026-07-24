@@ -34,6 +34,11 @@ export const fileExplorerStyles = `
     content: "📄";
     margin-right: 8px;
   }
+  .deleted-file {
+    color: var(--muted);
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
   .new-folder-form {
     margin-bottom: 20px;
     padding: 15px;
@@ -81,6 +86,36 @@ export const fileExplorerStyles = `
     border: 1px solid var(--border);
     flex-shrink: 0;
   }
+  .git-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    margin-left: 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: monospace;
+    flex-shrink: 0;
+  }
+  .git-added {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+  }
+  .git-modified {
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+  }
+  .git-deleted {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+  }
+  .git-renamed {
+    background-color: var(--notice-bg);
+    color: var(--notice-text);
+  }
   .context-menu-trigger {
     position: relative;
     cursor: pointer;
@@ -102,6 +137,11 @@ export const fileExplorerStyles = `
     z-index: 100;
     min-width: 160px;
     display: none;
+    overflow: hidden;
+  }
+  .context-menu-trigger.open-up .context-menu {
+    top: auto;
+    bottom: 24px;
   }
   .context-menu-trigger:hover .context-menu,
   .context-menu-trigger.active .context-menu {

@@ -13,8 +13,26 @@ export const scripts = `
     }
   });
 
+  // Flip the popover menu upward when it would overflow the viewport bottom
+  function updateMenuDirection(trigger) {
+    const menu = trigger.querySelector('.context-menu');
+    if (!menu) return;
+    const triggerRect = trigger.getBoundingClientRect();
+    const menuHeight = menu.offsetHeight || 200;
+    const spaceBelow = window.innerHeight - triggerRect.bottom;
+    if (spaceBelow < menuHeight + 24 && triggerRect.top > menuHeight) {
+      trigger.classList.add('open-up');
+    } else {
+      trigger.classList.remove('open-up');
+    }
+  }
+
   // Toggle context menu on click
   document.querySelectorAll('.context-menu-trigger').forEach(trigger => {
+    trigger.addEventListener('mouseenter', () => {
+      updateMenuDirection(trigger);
+    });
+
     trigger.querySelector('.dots').addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
@@ -27,6 +45,7 @@ export const scripts = `
 
       // Toggle current menu
       if (!isActive) {
+        updateMenuDirection(trigger);
         trigger.classList.add('active');
       }
     });

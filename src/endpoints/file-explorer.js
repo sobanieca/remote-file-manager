@@ -6,6 +6,12 @@ import {
   isMarkdownFile,
   normalizePath,
 } from "./utils.js";
+import {
+  getDeletedEntryNames,
+  getEntryGitStatus,
+  getGitStatusInfo,
+  gitStatusBadge,
+} from "./git-status.js";
 
 export async function fileExplorer(c) {
   try {
@@ -30,6 +36,24 @@ export async function fileExplorer(c) {
       }
     } catch (error) {
       return c.html(`Error reading directory: ${error.message}`, 500);
+    }
+
+    const workingDir = Deno.cwd();
+    const gitInfo = await getGitStatusInfo(workingDir);
+
+    for (
+      const deletedName of getDeletedEntryNames(
+        gitInfo,
+        workingDir,
+        normalizedPath,
+      )
+    ) {
+      entries.push({
+        name: deletedName,
+        isDirectory: false,
+        isDeleted: true,
+        path: combinePaths(normalizedPath, deletedName),
+      });
     }
 
     // Sort entries: directories first, then files, both alphabetically
@@ -65,12 +89,29 @@ export async function fileExplorer(c) {
     }
 
     for (const entry of entries) {
-      if (entry.isDirectory) {
+      const gitStatus = getEntryGitStatus(
+        gitInfo,
+        workingDir,
+        entry.path,
+        entry.isDirectory,
+      );
+      const gitBadgeHtml = gitStatusBadge(gitStatus);
+      if (entry.isDeleted) {
+        filesHtml += `<li>
+          <div class="file-item">
+            <div class="file-info">
+              <span class="file deleted-file">${entry.name}</span>
+              ${gitBadgeHtml}
+            </div>
+          </div>
+        </li>`;
+      } else if (entry.isDirectory) {
         filesHtml += `<li>
           <div class="file-item">
             <a href="/file-explorer?path=${
           encodeURIComponent(entry.path)
         }" class="folder">${entry.name}</a>
+            ${gitBadgeHtml}
             <div class="context-menu-trigger" data-path="${entry.path}" data-type="directory" data-parent="${normalizedPath}">
               <span class="dots">⋮</span>
               <div class="context-menu">
@@ -111,6 +152,7 @@ export async function fileExplorer(c) {
             ${thumbnailHtml}
             <div class="file-info">
               <a href="${fileHref}" class="file" target="_blank">${entry.name}</a>
+              ${gitBadgeHtml}
               <div class="context-menu-trigger" data-path="${entry.path}" data-type="file" data-parent="${normalizedPath}">
                 <span class="dots">⋮</span>
                 <div class="context-menu">
