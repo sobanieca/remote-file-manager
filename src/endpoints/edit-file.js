@@ -1,45 +1,5 @@
 import { layout } from "./layout/index.js";
-import { normalizePath } from "./utils.js";
-
-const BINARY_EXTENSIONS = [
-  ".jpg",
-  ".jpeg",
-  ".png",
-  ".gif",
-  ".bmp",
-  ".ico",
-  ".tiff",
-  ".webp",
-  ".mp3",
-  ".mp4",
-  ".avi",
-  ".mov",
-  ".mkv",
-  ".wav",
-  ".flac",
-  ".ogg",
-  ".pdf",
-  ".doc",
-  ".docx",
-  ".xls",
-  ".xlsx",
-  ".ppt",
-  ".pptx",
-  ".zip",
-  ".rar",
-  ".7z",
-  ".tar",
-  ".gz",
-  ".exe",
-  ".bin",
-  ".dll",
-  ".so",
-];
-
-function isBinaryFile(filePath) {
-  const extension = filePath.toLowerCase().substring(filePath.lastIndexOf("."));
-  return BINARY_EXTENSIONS.includes(extension);
-}
+import { isBinaryFile, normalizePath } from "./utils.js";
 
 export async function editFile(c) {
   try {

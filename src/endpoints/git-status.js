@@ -36,7 +36,7 @@ function resolveStatus(statusCode) {
   return "modified";
 }
 
-export async function getGitStatusInfo(workingDir) {
+async function getRepoRoot(workingDir) {
   const topLevel = await runGit(
     ["rev-parse", "--show-toplevel"],
     workingDir,
@@ -44,7 +44,14 @@ export async function getGitStatusInfo(workingDir) {
   if (!topLevel) {
     return null;
   }
-  const repoRoot = topLevel.trim();
+  return topLevel.trim();
+}
+
+export async function getGitStatusInfo(workingDir) {
+  const repoRoot = await getRepoRoot(workingDir);
+  if (!repoRoot) {
+    return null;
+  }
 
   const output = await runGit(
     ["status", "--porcelain", "-z", "--untracked-files=all"],
@@ -103,6 +110,32 @@ export function getDeletedEntryNames(gitInfo, workingDir, directoryPath) {
     }
   }
   return names;
+}
+
+export async function getFileDiff(workingDir, entryPath) {
+  const repoRoot = await getRepoRoot(workingDir);
+  if (!repoRoot) {
+    return null;
+  }
+  const absolutePath = join(workingDir, entryPath);
+  const gitRelativePath = relative(repoRoot, absolutePath);
+  if (gitRelativePath.startsWith("..")) {
+    return null;
+  }
+  const hasCommits =
+    await runGit(["rev-parse", "--verify", "HEAD"], repoRoot) !== null;
+  const revisionArgs = hasCommits ? ["HEAD"] : [];
+  return await runGit(
+    [
+      "diff",
+      "--no-color",
+      "--no-ext-diff",
+      ...revisionArgs,
+      "--",
+      `:(literal)${gitRelativePath}`,
+    ],
+    repoRoot,
+  );
 }
 
 export function gitStatusBadge(status) {

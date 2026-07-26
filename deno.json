@@ -1,8 +1,12 @@
 {
   "name": "@sobanieca/remote-file-manager",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "license": "MIT",
   "exports": "./src/main.js",
+  "imports": {
+    "prismjs": "npm:prismjs@1.30.0",
+    "prismjs/": "npm:/prismjs@1.30.0/"
+  },
   "tasks": {
     "dev": "cd test && deno run -A ../src/main.js"
   }

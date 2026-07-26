@@ -62,6 +62,75 @@ export function isImageFile(filename) {
     ".ico",
     ".avif",
   ];
-  const ext = filename.toLowerCase().substring(filename.lastIndexOf("."));
-  return imageExtensions.includes(ext);
+  return imageExtensions.includes(getFileExtension(filename));
+}
+
+const BINARY_EXTENSIONS = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".gif",
+  ".bmp",
+  ".ico",
+  ".tiff",
+  ".webp",
+  ".mp3",
+  ".mp4",
+  ".avi",
+  ".mov",
+  ".mkv",
+  ".wav",
+  ".flac",
+  ".ogg",
+  ".pdf",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".xlsx",
+  ".ppt",
+  ".pptx",
+  ".zip",
+  ".rar",
+  ".7z",
+  ".tar",
+  ".gz",
+  ".exe",
+  ".bin",
+  ".dll",
+  ".so",
+];
+
+/**
+ * Returns the lower-cased extension of a file name, including the leading dot
+ * @param {string} filename - The filename to inspect
+ * @returns {string} - The extension or an empty string when there is none
+ */
+export function getFileExtension(filename) {
+  const lastDot = filename.lastIndexOf(".");
+  if (lastDot < 0) {
+    return "";
+  }
+  return filename.toLowerCase().substring(lastDot);
+}
+
+/**
+ * Checks if a file is binary (and therefore not editable/diffable) by extension
+ * @param {string} filename - The filename to check
+ * @returns {boolean} - True if the file is considered binary
+ */
+export function isBinaryFile(filename) {
+  return BINARY_EXTENSIONS.includes(getFileExtension(filename));
+}
+
+/**
+ * Escapes characters that would otherwise be interpreted as HTML markup
+ * @param {string} text - The text to escape
+ * @returns {string} - The escaped text
+ */
+export function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }

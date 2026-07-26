@@ -3,6 +3,7 @@ import { baseStyles } from "./base-styles.js";
 import { fileExplorerStyles } from "./file-explorer-styles.js";
 import { fileEditorStyles } from "./file-editor-styles.js";
 import { markdownStyles } from "./markdown-styles.js";
+import { diffStyles } from "./diff-styles.js";
 import { themeToggle } from "./theme-toggle.js";
 import { themeHeadScript, themeScript } from "./theme-script.js";
 import { scripts } from "./scripts.js";
@@ -24,6 +25,7 @@ export function layout(title, content) {
     ${fileExplorerStyles}
     ${fileEditorStyles}
     ${markdownStyles}
+    ${diffStyles}
   </style>
 </head>
 <body>

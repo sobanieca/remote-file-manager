@@ -10,6 +10,7 @@ import { pasteContent } from "./endpoints/paste-content.js";
 import { thumbnail } from "./endpoints/thumbnail.js";
 import { markdown } from "./endpoints/markdown.js";
 import { renameItem } from "./endpoints/rename-item.js";
+import { gitDiff } from "./endpoints/git-diff.js";
 import { update } from "./commands/update.js";
 import { version } from "./version.js";
 
@@ -44,10 +45,12 @@ for (let i = 0; i < Deno.args.length; i++) {
   }
 }
 
+const PORT_STORAGE_KEY = "rfm-port";
+
 // If no custom port provided, try to read from localStorage
 if (!customPortProvided) {
   try {
-    const savedPort = localStorage.getItem("rmf-port");
+    const savedPort = localStorage.getItem(PORT_STORAGE_KEY);
     if (savedPort) {
       const parsedPort = parseInt(savedPort, 10);
       if (parsedPort && parsedPort !== defaultPort) {
@@ -65,10 +68,10 @@ if (!customPortProvided) {
 if (customPortProvided) {
   try {
     if (port !== defaultPort) {
-      localStorage.setItem("rmf-port", port.toString());
+      localStorage.setItem(PORT_STORAGE_KEY, port.toString());
       console.log(`Port ${port} saved to localStorage for future sessions`);
     } else {
-      localStorage.removeItem("rmf-port");
+      localStorage.removeItem(PORT_STORAGE_KEY);
       console.log(`Default port used, removed saved port from localStorage`);
     }
   } catch (error) {
@@ -90,6 +93,7 @@ app.post("/paste-content", (c) => pasteContent(c));
 app.get("/thumbnail", (c) => thumbnail(c));
 app.get("/markdown", (c) => markdown(c));
 app.post("/rename-item", (c) => renameItem(c));
+app.get("/git-diff", (c) => gitDiff(c));
 
 app.use("/*", async (c, next) => {
   const path = c.req.path;

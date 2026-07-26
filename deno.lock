@@ -19,6 +19,7 @@
     "npm:marked-footnote@^1.4.0": "1.4.0_marked@17.0.3",
     "npm:marked-gfm-heading-id@^4.1.3": "4.1.3_marked@17.0.3",
     "npm:marked@^17.0.1": "17.0.3",
+    "npm:prismjs@1.30.0": "1.30.0",
     "npm:prismjs@^1.30.0": "1.30.0",
     "npm:sanitize-html@^2.17.0": "2.17.1"
   },
@@ -34,7 +35,7 @@
         "npm:marked-alert",
         "npm:marked-footnote",
         "npm:marked-gfm-heading-id",
-        "npm:prismjs",
+        "npm:prismjs@^1.30.0",
         "npm:sanitize-html"
       ]
     },
@@ -185,5 +186,10 @@
     "source-map-js@1.2.1": {
       "integrity": "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA=="
     }
+  },
+  "workspace": {
+    "dependencies": [
+      "npm:prismjs@1.30.0"
+    ]
   }
 }

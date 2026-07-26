@@ -42,6 +42,26 @@ deno install -g --allow-write --allow-net --allow-read --allow-run --allow-env=T
 
 To update to the latest version, run the same installation command.
 
+**Installing a release that is less than 24 hours old:**
+
+Since Deno 2.9, package resolution ignores versions published within the last 24
+hours as a supply chain safeguard. Right after a new release this means the
+command above silently installs the _previous_ version instead of the newest one
+(there is no error message - check the version printed on startup to see which
+one you got).
+
+To opt out of that waiting period and force the freshest release, disable the
+cooldown with `--minimum-dependency-age=0`:
+
+```bash
+deno install -g --minimum-dependency-age=0 --allow-write --allow-net --allow-read --allow-run --allow-env=TERM,CI,FORCE_COLOR,NO_COLOR -f -r -n rfm jsr:@sobanieca/remote-file-manager
+```
+
+The flag also accepts other cutoffs, e.g. `P3D` for three days or `120` for two
+hours, and can be set permanently via `"minimumDependencyAge": 0` in a
+`deno.json` file. Note that this lowers the protection for every dependency
+being resolved, so prefer using it only for this one-off install command.
+
 ### Option 2: Quick Install Script (Standalone Binary)
 
 If you don't have Deno installed, you can install the pre-compiled binary with a

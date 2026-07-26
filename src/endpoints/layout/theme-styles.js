@@ -34,6 +34,19 @@ const lightPalette = `
     --notice-bg: #fff3cd;
     --notice-border: #ffeaa7;
     --notice-text: #856404;
+    --diff-add-bg: #e6ffec;
+    --diff-add-gutter-bg: #ccffd8;
+    --diff-remove-bg: #ffebe9;
+    --diff-remove-gutter-bg: #ffd7d5;
+    --diff-hunk-bg: #f6f8fa;
+    --diff-hunk-text: #57606a;
+    --syntax-keyword: #cf222e;
+    --syntax-string: #0a3069;
+    --syntax-comment: #6e7781;
+    --syntax-constant: #0550ae;
+    --syntax-entity: #8250df;
+    --syntax-variable: #953800;
+    --syntax-punctuation: #24292f;
 `;
 
 const darkPalette = `
@@ -72,6 +85,19 @@ const darkPalette = `
     --notice-bg: #2d2410;
     --notice-border: #473c1a;
     --notice-text: #d29922;
+    --diff-add-bg: #12261e;
+    --diff-add-gutter-bg: #1b4721;
+    --diff-remove-bg: #25171c;
+    --diff-remove-gutter-bg: #542426;
+    --diff-hunk-bg: #161b22;
+    --diff-hunk-text: #8b949e;
+    --syntax-keyword: #ff7b72;
+    --syntax-string: #a5d6ff;
+    --syntax-comment: #8b949e;
+    --syntax-constant: #79c0ff;
+    --syntax-entity: #d2a8ff;
+    --syntax-variable: #ffa657;
+    --syntax-punctuation: #c9d1d9;
 `;
 
 export const themeStyles = `

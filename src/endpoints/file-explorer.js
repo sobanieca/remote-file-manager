@@ -2,6 +2,7 @@ import { layout } from "./layout/index.js";
 import {
   combinePaths,
   getParentPath,
+  isBinaryFile,
   isImageFile,
   isMarkdownFile,
   normalizePath,
@@ -146,6 +147,15 @@ export async function fileExplorer(c) {
         const fileHref = isMd
           ? `/markdown?path=${encodeURIComponent(entry.path)}`
           : `/${entry.path}`;
+        const isDiffable = gitStatus === "modified" &&
+          !isBinaryFile(entry.name);
+        const gitDiffMenuItemHtml = isDiffable
+          ? `<a href="/git-diff?path=${
+            encodeURIComponent(entry.path)
+          }" class="context-menu-item">
+                    <span class="icon">🔀</span> View Git Diff
+                  </a>`
+          : "";
 
         filesHtml += `<li>
           <div class="file-item">
@@ -164,6 +174,7 @@ export async function fileExplorer(c) {
         }" class="context-menu-item">
                     <span class="icon">📝</span> Edit
                   </a>
+                  ${gitDiffMenuItemHtml}
                   <a href="/download-item?path=${
           encodeURIComponent(entry.path)
         }&type=file" class="context-menu-item">
