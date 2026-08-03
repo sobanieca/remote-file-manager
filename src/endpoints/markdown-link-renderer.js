@@ -44,9 +44,43 @@ export class MarkdownLinkRenderer extends MarkdownRenderer {
     return super.link({ ...token, href: this.#toExplorerHref(token.href) });
   }
 
+  image(token) {
+    return super.image({ ...token, href: this.#toServedFileHref(token.href) });
+  }
+
   #toExplorerHref(href) {
-    if (!href || href.startsWith("#") || EXTERNAL_URL_PATTERN.test(href)) {
+    const target = this.#resolveTarget(href);
+
+    if (!target) {
       return href;
+    }
+
+    const encodedPath = encodeURIComponent(target.path || ".");
+
+    if (target.isDirectory) {
+      return `/file-explorer?path=${encodedPath}`;
+    }
+
+    if (isMarkdownFile(target.path)) {
+      return `/markdown?path=${encodedPath}${target.suffix}`;
+    }
+
+    return `/${target.path}${target.suffix}`;
+  }
+
+  #toServedFileHref(href) {
+    const target = this.#resolveTarget(href);
+
+    if (!target) {
+      return href;
+    }
+
+    return `/${target.path}${target.suffix}`;
+  }
+
+  #resolveTarget(href) {
+    if (!href || href.startsWith("#") || EXTERNAL_URL_PATTERN.test(href)) {
+      return null;
     }
 
     const suffixIndex = href.search(QUERY_OR_FRAGMENT_PATTERN);
@@ -54,7 +88,7 @@ export class MarkdownLinkRenderer extends MarkdownRenderer {
     const suffix = suffixIndex === -1 ? "" : href.slice(suffixIndex);
 
     if (!linkPath) {
-      return href;
+      return null;
     }
 
     const baseDirectory = linkPath.startsWith("/")
@@ -63,19 +97,13 @@ export class MarkdownLinkRenderer extends MarkdownRenderer {
     const resolvedPath = resolveWithinRoot(baseDirectory, linkPath);
 
     if (resolvedPath === null) {
-      return href;
+      return null;
     }
 
-    const encodedPath = encodeURIComponent(resolvedPath || ".");
-
-    if (linkPath.endsWith("/") || isDirectory(resolvedPath || ".")) {
-      return `/file-explorer?path=${encodedPath}`;
-    }
-
-    if (isMarkdownFile(resolvedPath)) {
-      return `/markdown?path=${encodedPath}${suffix}`;
-    }
-
-    return `/${resolvedPath}${suffix}`;
+    return {
+      path: resolvedPath,
+      suffix,
+      isDirectory: linkPath.endsWith("/") || isDirectory(resolvedPath || "."),
+    };
   }
 }
