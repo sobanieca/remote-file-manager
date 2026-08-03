@@ -48,6 +48,18 @@ export function isMarkdownFile(filename) {
   return ext === ".md";
 }
 
+const FRONTMATTER_PATTERN =
+  /^(---|\+\+\+)[ \t]*\r?\n(?:[\s\S]*?\r?\n)?\1[ \t]*(?:\r?\n|$)/;
+
+/**
+ * Removes a leading YAML/TOML frontmatter block from markdown content
+ * @param {string} markdownContent - The raw markdown content
+ * @returns {string} - The content without its frontmatter block
+ */
+export function stripFrontmatter(markdownContent) {
+  return markdownContent.replace(FRONTMATTER_PATTERN, "");
+}
+
 export function isImageFile(filename) {
   const imageExtensions = [
     ".jpg",

@@ -1,6 +1,7 @@
 import { markdownCss, renderMarkdown } from "../deps.js";
 import { layout } from "./layout/index.js";
-import { normalizePath } from "./utils.js";
+import { MarkdownLinkRenderer } from "./markdown-link-renderer.js";
+import { getParentPath, normalizePath, stripFrontmatter } from "./utils.js";
 
 export async function markdown(c) {
   try {
@@ -22,8 +23,10 @@ export async function markdown(c) {
       return c.html("File not found", 404);
     }
 
-    const renderedHtml = renderMarkdown(fileContent);
-    const parentPath = filePath.substring(0, filePath.lastIndexOf("/")) || ".";
+    const parentPath = getParentPath(normalizedPath);
+    const renderedHtml = renderMarkdown(stripFrontmatter(fileContent), {
+      renderer: new MarkdownLinkRenderer(parentPath),
+    });
 
     const content = `
       <style>${markdownCss}</style>

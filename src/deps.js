@@ -12,6 +12,7 @@ export { BlobReader, BlobWriter, ZipWriter } from "jsr:@zip-js/zip-js@2.7.62";
 export {
   CSS as markdownCss,
   render as renderMarkdown,
+  Renderer as MarkdownRenderer,
 } from "jsr:@deno/gfm@0.12.0";
 export { default as Prism } from "prismjs";
 import "prismjs/components/prism-typescript.js";
