@@ -1,60 +1,57 @@
-import { normalizePath } from "./utils.js";
 import { dirname, join } from "../deps.js";
+import { normalizePath } from "./utils.js";
+
+function isValidName(name) {
+  return typeof name === "string" &&
+    name.length > 0 &&
+    name !== "." &&
+    name !== ".." &&
+    !name.includes("/") &&
+    !name.includes("\\") &&
+    !name.includes("\0");
+}
 
 export async function renameItem(c) {
   try {
-    const body = await c.req.formData();
-    const oldPath = body.get("path");
-    const newName = body.get("newName");
-    const parentPath = body.get("parentPath");
+    const body = await c.req.json();
+    const newName = typeof body.newName === "string" ? body.newName.trim() : "";
 
-    if (!oldPath || !newName) {
-      return c.html("Missing required fields", 400);
+    if (!isValidName(newName)) {
+      return c.json({ ok: false, message: "Invalid name" }, 400);
     }
 
-    if (newName.includes("/") || newName.includes("\\") || newName === "..") {
-      return c.html("Invalid file name", 400);
+    const currentPath = normalizePath(body.path || "");
+    if (!currentPath || currentPath === ".") {
+      return c.json({ ok: false, message: "Invalid path" }, 400);
     }
 
-    const normalizedOldPath = normalizePath(oldPath);
-    if (!normalizedOldPath) {
-      return c.html("Invalid path", 400);
+    const newPath = normalizePath(join(dirname(currentPath), newName));
+    if (!newPath) {
+      return c.json({ ok: false, message: "Invalid target path" }, 400);
     }
 
-    const parentDir = dirname(normalizedOldPath);
-    const newPath = join(parentDir, newName);
-
-    const normalizedNewPath = normalizePath(newPath);
-    if (!normalizedNewPath) {
-      return c.html("Invalid new path", 400);
+    if (newPath === currentPath) {
+      return c.json({ ok: true, path: newPath, message: "Name unchanged" });
     }
 
     try {
-      await Deno.stat(normalizedNewPath);
-      return c.redirect(
-        `/file-explorer?path=${
-          encodeURIComponent(parentPath || ".")
-        }&error=already_exists`,
-      );
+      await Deno.lstat(newPath);
+      return c.json({
+        ok: false,
+        message: `"${newName}" already exists`,
+      }, 409);
     } catch (_error) {
-      // File doesn't exist, proceed with rename
+      // Target is free, continue with the rename
     }
 
-    try {
-      await Deno.rename(normalizedOldPath, normalizedNewPath);
-      return c.redirect(
-        `/file-explorer?path=${
-          encodeURIComponent(parentPath || ".")
-        }&success=item_renamed`,
-      );
-    } catch (_error) {
-      return c.redirect(
-        `/file-explorer?path=${
-          encodeURIComponent(parentPath || ".")
-        }&error=rename_failed`,
-      );
-    }
+    await Deno.rename(currentPath, newPath);
+
+    return c.json({
+      ok: true,
+      path: newPath,
+      message: `Renamed to "${newName}"`,
+    });
   } catch (error) {
-    return c.html(`An error occurred: ${error.message}`, 500);
+    return c.json({ ok: false, message: error.message }, 500);
   }
 }

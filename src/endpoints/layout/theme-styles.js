@@ -47,6 +47,20 @@ const lightPalette = `
     --syntax-entity: #8250df;
     --syntax-variable: #953800;
     --syntax-punctuation: #24292f;
+    --app-bar-bg: #ffffff;
+    --pane-bg: #ffffff;
+    --row-hover: #f3f6fa;
+    --row-stripe: #fbfcfd;
+    --selected-bg: #ddeaff;
+    --selected-border: #0366d6;
+    --focus-ring-strong: #0366d6;
+    --executable-text: #1a7f37;
+    --executable-bg: #e6f4ea;
+    --symlink-text: #8250df;
+    --symlink-bg: #f3eefc;
+    --toast-bg: #24292f;
+    --toast-text: #ffffff;
+    --scrollbar-thumb: #c8cdd4;
 `;
 
 const darkPalette = `
@@ -98,6 +112,20 @@ const darkPalette = `
     --syntax-entity: #d2a8ff;
     --syntax-variable: #ffa657;
     --syntax-punctuation: #c9d1d9;
+    --app-bar-bg: #0d1117;
+    --pane-bg: #0d1117;
+    --row-hover: #161b22;
+    --row-stripe: #10151c;
+    --selected-bg: #17324f;
+    --selected-border: #58a6ff;
+    --focus-ring-strong: #58a6ff;
+    --executable-text: #3fb950;
+    --executable-bg: #12261a;
+    --symlink-text: #d2a8ff;
+    --symlink-bg: #221a33;
+    --toast-bg: #21262d;
+    --toast-text: #e6edf3;
+    --scrollbar-thumb: #30363d;
 `;
 
 export const themeStyles = `
@@ -113,26 +141,7 @@ export const themeStyles = `
     ${darkPalette}
   }
   .theme-toggle {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background-color: var(--surface);
-    color: var(--text);
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px var(--shadow);
-    z-index: 1100;
-    padding: 0;
-  }
-  .theme-toggle:hover {
-    background-color: var(--panel-hover);
   }
 `;

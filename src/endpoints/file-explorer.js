@@ -1,321 +1,113 @@
 import { layout } from "./layout/index.js";
-import {
-  combinePaths,
-  getParentPath,
-  isBinaryFile,
-  isImageFile,
-  isMarkdownFile,
-  normalizePath,
-} from "./utils.js";
-import {
-  getDeletedEntryNames,
-  getEntryGitStatus,
-  getGitStatusInfo,
-  gitStatusBadge,
-} from "./git-status.js";
+import { normalizePath } from "./utils.js";
+import { readDirectoryEntries } from "./file-entries.js";
+import { renderPane } from "./components/file-pane.js";
+import { icon } from "./components/icons.js";
+
+const COMMAND_BUTTONS = [
+  { label: "Rename", iconName: "pencil", command: "rename-focused" },
+  { label: "View", iconName: "eye", command: "view-focused" },
+  { label: "Edit", iconName: "file-code", command: "edit-focused" },
+  {
+    label: "Copy",
+    iconName: "copy",
+    command: "selection-copy",
+    splitOnly: true,
+  },
+  {
+    label: "Move",
+    iconName: "move",
+    command: "selection-move",
+    splitOnly: true,
+  },
+  { label: "New folder", iconName: "folder-plus", command: "new-folder" },
+  {
+    label: "Delete",
+    iconName: "trash",
+    command: "selection-delete",
+    isDanger: true,
+  },
+];
+
+function renderCommandBar() {
+  const buttons = COMMAND_BUTTONS.map((entry) =>
+    `<button type="button" class="command-button${
+      entry.splitOnly ? " is-split-only" : ""
+    }${entry.isDanger ? " is-danger" : ""}" data-command="${entry.command}">${
+      icon(entry.iconName)
+    }<span>${entry.label}</span></button>`
+  ).join("");
+  return `<div class="command-bar">${buttons}</div>`;
+}
+
+async function buildPane(pane, requestedPath) {
+  const directoryPath = normalizePath(requestedPath) || ".";
+  const { entries, totalSize } = await readDirectoryEntries(directoryPath);
+  return renderPane({ pane, directoryPath, entries, totalSize });
+}
 
 export async function fileExplorer(c) {
   try {
-    const path = c.req.query("path") || ".";
+    const leftPath = c.req.query("path") || ".";
+    const rightPath = c.req.query("right");
+    const isSplit = rightPath !== undefined;
 
-    // Validate path to prevent directory traversal
-    const normalizedPath = normalizePath(path);
-    if (!normalizedPath) {
+    const normalizedLeft = normalizePath(leftPath);
+    if (!normalizedLeft) {
       return c.html("Invalid path", 400);
     }
 
-    const entries = [];
-    const fullPath = normalizedPath;
-
+    let leftPaneHtml;
     try {
-      for await (const entry of Deno.readDir(fullPath)) {
-        entries.push({
-          name: entry.name,
-          isDirectory: entry.isDirectory,
-          path: combinePaths(normalizedPath, entry.name),
-        });
-      }
+      leftPaneHtml = await buildPane("left", normalizedLeft);
     } catch (error) {
       return c.html(`Error reading directory: ${error.message}`, 500);
     }
 
-    const workingDir = Deno.cwd();
-    const gitInfo = await getGitStatusInfo(workingDir);
-
-    for (
-      const deletedName of getDeletedEntryNames(
-        gitInfo,
-        workingDir,
-        normalizedPath,
-      )
-    ) {
-      entries.push({
-        name: deletedName,
-        isDirectory: false,
-        isDeleted: true,
-        path: combinePaths(normalizedPath, deletedName),
-      });
-    }
-
-    // Sort entries: directories first, then files, both alphabetically
-    entries.sort((a, b) => {
-      if (a.isDirectory && !b.isDirectory) return -1;
-      if (!a.isDirectory && b.isDirectory) return 1;
-      return a.name.localeCompare(b.name);
-    });
-
-    // Generate breadcrumb navigation
-    const pathParts = normalizedPath.split("/").filter(Boolean);
-    let breadcrumbHtml = '<div class="breadcrumb">';
-    breadcrumbHtml += '<a href="/file-explorer?path=.">Home</a>';
-
-    let currentPath = "";
-    for (const part of pathParts) {
-      currentPath += "/" + part;
-      breadcrumbHtml += ` / <a href="/file-explorer?path=${
-        encodeURIComponent(currentPath.replace(/^\//, ""))
-      }">${part}</a>`;
-    }
-    breadcrumbHtml += "</div>";
-
-    // Generate file list HTML
-    let filesHtml = '<ul class="file-list">';
-
-    if (normalizedPath !== ".") {
-      // Add parent directory link if not at root
-      const parentPath = getParentPath(normalizedPath);
-      filesHtml += `<li><a href="/file-explorer?path=${
-        encodeURIComponent(parentPath)
-      }" class="folder">.. (Parent Directory)</a></li>`;
-    }
-
-    for (const entry of entries) {
-      const gitStatus = getEntryGitStatus(
-        gitInfo,
-        workingDir,
-        entry.path,
-        entry.isDirectory,
-      );
-      const gitBadgeHtml = gitStatusBadge(gitStatus);
-      if (entry.isDeleted) {
-        filesHtml += `<li>
-          <div class="file-item">
-            <div class="file-info">
-              <span class="file deleted-file">${entry.name}</span>
-              ${gitBadgeHtml}
-            </div>
-          </div>
-        </li>`;
-      } else if (entry.isDirectory) {
-        filesHtml += `<li>
-          <div class="file-item">
-            <a href="/file-explorer?path=${
-          encodeURIComponent(entry.path)
-        }" class="folder">${entry.name}</a>
-            ${gitBadgeHtml}
-            <div class="context-menu-trigger" data-path="${entry.path}" data-type="directory" data-parent="${normalizedPath}">
-              <span class="dots">⋮</span>
-              <div class="context-menu">
-                <button type="button" class="context-menu-item rename-btn" data-path="${entry.path}" data-name="${entry.name}" data-parent="${normalizedPath}">
-                  <span class="icon">✏️</span> Rename
-                </button>
-                <a href="/download-item?path=${
-          encodeURIComponent(entry.path)
-        }&type=directory" class="context-menu-item">
-                  <span class="icon">📥</span> Download as ZIP
-                </a>
-                <form action="/delete-item" method="POST" onsubmit="return confirm('Are you sure you want to delete this folder? This action cannot be undone.');">
-                  <input type="hidden" name="path" value="${entry.path}">
-                  <input type="hidden" name="type" value="directory">
-                  <input type="hidden" name="parentPath" value="${normalizedPath}">
-                  <button type="submit" class="context-menu-item">
-                    <span class="icon">🗑️</span> Delete
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </li>`;
-      } else {
-        const isImage = isImageFile(entry.name);
-        const isMd = isMarkdownFile(entry.name);
-        const thumbnailHtml = isImage
-          ? `<img src="/thumbnail?path=${
-            encodeURIComponent(entry.path)
-          }" alt="${entry.name}" class="thumbnail" loading="lazy">`
-          : "";
-        const fileHref = isMd
-          ? `/markdown?path=${encodeURIComponent(entry.path)}`
-          : `/${entry.path}`;
-        const isDiffable = gitStatus === "modified" &&
-          !isBinaryFile(entry.name);
-        const gitDiffMenuItemHtml = isDiffable
-          ? `<a href="/git-diff?path=${
-            encodeURIComponent(entry.path)
-          }" class="context-menu-item">
-                    <span class="icon">🔀</span> View Git Diff
-                  </a>`
-          : "";
-
-        filesHtml += `<li>
-          <div class="file-item">
-            ${thumbnailHtml}
-            <div class="file-info">
-              <a href="${fileHref}" class="file" target="_blank">${entry.name}</a>
-              ${gitBadgeHtml}
-              <div class="context-menu-trigger" data-path="${entry.path}" data-type="file" data-parent="${normalizedPath}">
-                <span class="dots">⋮</span>
-                <div class="context-menu">
-                  <button type="button" class="context-menu-item rename-btn" data-path="${entry.path}" data-name="${entry.name}" data-parent="${normalizedPath}">
-                    <span class="icon">✏️</span> Rename
-                  </button>
-                  <a href="/edit-file?path=${
-          encodeURIComponent(entry.path)
-        }" class="context-menu-item">
-                    <span class="icon">📝</span> Edit
-                  </a>
-                  ${gitDiffMenuItemHtml}
-                  <a href="/download-item?path=${
-          encodeURIComponent(entry.path)
-        }&type=file" class="context-menu-item">
-                    <span class="icon">📥</span> Download
-                  </a>
-                  <form action="/delete-item" method="POST" onsubmit="return confirm('Are you sure you want to delete this file? This action cannot be undone.');">
-                    <input type="hidden" name="path" value="${entry.path}">
-                    <input type="hidden" name="type" value="file">
-                    <input type="hidden" name="parentPath" value="${normalizedPath}">
-                    <button type="submit" class="context-menu-item">
-                      <span class="icon">🗑️</span> Delete
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>`;
+    let rightPaneHtml = "";
+    if (isSplit) {
+      const normalizedRight = normalizePath(rightPath || ".") || ".";
+      try {
+        rightPaneHtml = await buildPane("right", normalizedRight);
+      } catch (_error) {
+        rightPaneHtml = await buildPane("right", ".");
       }
     }
-    filesHtml += "</ul>";
-
-    // Process success/error messages
-    let statusMessageHtml = "";
-    const success = c.req.query("success");
-    const error = c.req.query("error");
-    const processedFiles = c.req.query("count") || 0;
-    const processedFolders = c.req.query("folders") || 0;
-    const failedFiles = c.req.query("failed") || 0;
-
-    if (success === "folder_created") {
-      statusMessageHtml =
-        '<div class="status-message success">Folder created successfully!</div>';
-    } else if (success === "item_deleted") {
-      statusMessageHtml =
-        '<div class="status-message success">Item deleted successfully!</div>';
-    } else if (success === "files_uploaded") {
-      statusMessageHtml =
-        `<div class="status-message success">${processedFiles} file${
-          processedFiles === "1" ? "" : "s"
-        } uploaded successfully!</div>`;
-    } else if (success === "folders_uploaded") {
-      statusMessageHtml =
-        `<div class="status-message success">${processedFolders} folder${
-          processedFolders === "1" ? "" : "s"
-        } uploaded successfully!</div>`;
-    } else if (success === "partial_upload") {
-      statusMessageHtml =
-        `<div class="status-message warning">Uploaded ${processedFiles} file${
-          processedFiles === "1" ? "" : "s"
-        } and ${processedFolders} folder${
-          processedFolders === "1" ? "" : "s"
-        }, but ${failedFiles} file${
-          failedFiles === "1" ? "" : "s"
-        } failed.</div>`;
-    } else if (success === "file_saved") {
-      statusMessageHtml =
-        '<div class="status-message success">File saved successfully!</div>';
-    } else if (success === "file_created") {
-      statusMessageHtml =
-        '<div class="status-message success">File created from clipboard successfully!</div>';
-    } else if (success === "item_renamed") {
-      statusMessageHtml =
-        '<div class="status-message success">Item renamed successfully!</div>';
-    } else if (error) {
-      let errorMessage = "An error occurred";
-      if (error === "invalid_name") errorMessage = "Invalid folder name";
-      else if (error === "invalid_path") errorMessage = "Invalid path";
-      else if (error === "already_exists") {
-        errorMessage = "A folder with this name already exists";
-      } else if (error === "delete_failed") {
-        errorMessage = "Failed to delete item";
-      } else if (error === "not_empty") {
-        errorMessage = "Directory is not empty";
-      } else if (error === "no_files") {
-        errorMessage = "No files were selected for upload";
-      } else if (error === "upload_failed") {
-        errorMessage = "Failed to upload files";
-      } else if (error === "rename_failed") {
-        errorMessage = "Failed to rename item";
-      } else if (error === "save_failed") {
-        errorMessage = "Failed to save pasted content";
-      } else errorMessage = `Error: ${error}`;
-
-      statusMessageHtml =
-        `<div class="status-message error">${errorMessage}</div>`;
-    }
-
-    // Form for adding a new folder
-    const newFolderFormHtml = `
-    <div class="new-folder-form">
-      <form action="/create-folder" method="POST">
-        <input type="hidden" name="path" value="${normalizedPath}">
-        <input type="text" name="folderName" placeholder="New folder name" required>
-        <button type="submit">Create Folder</button>
-      </form>
-    </div>
-  `;
-
-    // Add status message section if there is a message to show
-    const statusSection = statusMessageHtml
-      ? `<div class="status-section">${statusMessageHtml}</div>`
-      : "";
-
-    // Create upload form HTML
-    const uploadFormHtml = `
-    <div class="upload-section">
-      <div class="upload-dropdown">
-        <button type="button" class="upload-trigger">
-          📤 Upload
-          <span class="dropdown-arrow">▼</span>
-        </button>
-        <div class="upload-menu">
-          <div class="upload-option" data-type="files">
-            <span class="icon">📄</span> Upload Files
-          </div>
-          <div class="upload-option" data-type="folder">
-            <span class="icon">📁</span> Upload Folder
-          </div>
-        </div>
-      </div>
-      <button type="button" id="paste-btn" class="paste-button" disabled>
-        📋 Paste
-      </button>
-      <form id="upload-form" action="/upload-files" method="POST" enctype="multipart/form-data" style="display: none;">
-        <input type="hidden" name="path" value="${normalizedPath}">
-        <input type="file" id="file-input" name="files">
-      </form>
-    </div>
-    `;
 
     const content = `
-      <h1>File Explorer</h1>
-      ${breadcrumbHtml}
-      ${newFolderFormHtml}
-      ${uploadFormHtml}
-      ${statusSection}
-      ${filesHtml}
+      <div class="explorer" data-split="${isSplit}">
+        <div class="explorer-header">
+          <div class="segmented" role="group" aria-label="Pane layout">
+            <button type="button" class="segmented-option${
+      isSplit ? "" : " is-active"
+    }" data-command="set-layout" data-layout="single" title="Single pane">${
+      icon("panel")
+    }<span>Single</span></button>
+            <button type="button" class="segmented-option${
+      isSplit ? " is-active" : ""
+    }" data-command="set-layout" data-layout="split" title="Split panes">${
+      icon("columns")
+    }<span>Split</span></button>
+          </div>
+        </div>
+        <div class="panes">
+          ${leftPaneHtml}
+          ${rightPaneHtml}
+        </div>
+        ${renderCommandBar()}
+      </div>
+      <form id="upload-form" hidden>
+        <input type="file" id="file-input" multiple>
+      </form>
     `;
 
-    return c.html(layout("File Explorer", content));
+    return c.html(
+      await layout("File Explorer", content, {
+        activeSection: "files",
+        wide: true,
+        bodyClass: "is-explorer",
+      }),
+    );
   } catch (error) {
     return c.html(`An error occurred: ${error.message}`, 500);
   }

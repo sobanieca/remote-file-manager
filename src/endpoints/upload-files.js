@@ -1,125 +1,83 @@
-import { combinePaths, normalizePath } from "./utils.js";
 import { dirname, ensureDir, join } from "../deps.js";
+import { combinePaths, normalizePath } from "./utils.js";
+
+function isSafeRelativePath(relativePath) {
+  return !relativePath.split("/").some((segment) =>
+    segment === ".." || segment === "" || segment.includes("\0")
+  );
+}
 
 export async function uploadFiles(c) {
   try {
-    // Get form data with uploaded files
-    const data = await c.req.parseBody();
-    const targetPath = data.path || ".";
-
-    // Validate target path
-    const normalizedPath = normalizePath(targetPath);
-    if (!normalizedPath) {
-      return c.redirect(`/file-explorer?error=invalid_path`);
-    }
-
-    // Process uploaded files
-    let processedFiles = 0;
-    let processedFolders = 0;
-    let failedFiles = 0;
-
-    // Handle both standard file uploads and directory uploads
     const formData = await c.req.formData();
-    const files = formData.getAll("files");
+    const targetPath = formData.get("path") || ".";
 
-    if (!files || files.length === 0) {
-      return c.redirect(
-        `/file-explorer?path=${
-          encodeURIComponent(normalizedPath)
-        }&error=no_files`,
-      );
+    const directoryPath = normalizePath(String(targetPath));
+    if (!directoryPath) {
+      return c.json({ ok: false, message: "Invalid path" }, 400);
     }
 
-    // Track processed directories to avoid duplicates
-    const processedDirs = new Set();
+    const files = formData.getAll("files").filter((file) =>
+      file instanceof File && file.name
+    );
+    if (files.length === 0) {
+      return c.json({ ok: false, message: "No files were selected" }, 400);
+    }
+
+    const createdDirectories = new Set();
+    let uploadedCount = 0;
+    let failedCount = 0;
 
     for (const file of files) {
       try {
-        if (!file.name) {
-          failedFiles++;
+        const relativePath = file.name.replace(/\\/g, "/");
+        if (!isSafeRelativePath(relativePath)) {
+          failedCount++;
           continue;
         }
 
-        // Handle file paths for folder uploads
-        let filePath = file.name;
-        // If the file is part of a folder upload, it will contain path separators
-        if (filePath.includes("/") || filePath.includes("\\")) {
-          // Normalize path separators to forward slashes
-          filePath = filePath.replace(/\\/g, "/");
-
-          // Extract the directory structure
-          const dirPath = dirname(filePath);
-
-          if (!processedDirs.has(dirPath)) {
-            processedDirs.add(dirPath);
-            processedFolders++;
+        let destinationPath;
+        if (relativePath.includes("/")) {
+          const relativeDirectory = dirname(relativePath);
+          const fullDirectory = join(directoryPath, relativeDirectory);
+          if (!createdDirectories.has(fullDirectory)) {
+            await ensureDir(fullDirectory);
+            createdDirectories.add(fullDirectory);
           }
-
-          // Create full directory path
-          const fullDirPath = join(normalizedPath, dirPath);
-          await ensureDir(fullDirPath);
-
-          // Create full file path
-          const fullFilePath = join(normalizedPath, filePath);
-
-          // Read file content
-          const arrayBuffer = await file.arrayBuffer();
-          const fileContent = new Uint8Array(arrayBuffer);
-
-          // Write file
-          await Deno.writeFile(fullFilePath, fileContent);
+          destinationPath = join(directoryPath, relativePath);
         } else {
-          // Regular file upload
-          const fullFilePath = combinePaths(normalizedPath, filePath);
-
-          // Read file content
-          const arrayBuffer = await file.arrayBuffer();
-          const fileContent = new Uint8Array(arrayBuffer);
-
-          // Write file
-          await Deno.writeFile(fullFilePath, fileContent);
-          processedFiles++;
+          destinationPath = combinePaths(directoryPath, relativePath);
         }
-      } catch (fileError) {
-        console.error(`Error processing file ${file.name}:`, fileError);
-        failedFiles++;
+
+        const content = new Uint8Array(await file.arrayBuffer());
+        await Deno.writeFile(destinationPath, content);
+        uploadedCount++;
+      } catch (error) {
+        console.error(`Error uploading ${file.name}:`, error);
+        failedCount++;
       }
     }
 
-    // Generate appropriate success/error message
-    if (failedFiles > 0) {
-      if (processedFiles > 0 || processedFolders > 0) {
-        // Some files succeeded, some failed
-        return c.redirect(
-          `/file-explorer?path=${
-            encodeURIComponent(normalizedPath)
-          }&success=partial_upload&count=${processedFiles}&folders=${processedFolders}&failed=${failedFiles}`,
-        );
-      } else {
-        // All files failed
-        return c.redirect(
-          `/file-explorer?path=${
-            encodeURIComponent(normalizedPath)
-          }&error=upload_failed`,
-        );
-      }
-    } else if (processedFolders > 0) {
-      // Folder(s) uploaded successfully
-      return c.redirect(
-        `/file-explorer?path=${
-          encodeURIComponent(normalizedPath)
-        }&success=folders_uploaded&count=${processedFolders}`,
-      );
-    } else {
-      // File(s) uploaded successfully
-      return c.redirect(
-        `/file-explorer?path=${
-          encodeURIComponent(normalizedPath)
-        }&success=files_uploaded&count=${processedFiles}`,
-      );
+    const folderCount = createdDirectories.size;
+    const messageParts = [
+      `Uploaded ${uploadedCount} file${uploadedCount === 1 ? "" : "s"}`,
+    ];
+    if (folderCount > 0) {
+      messageParts.push(`${folderCount} folder${folderCount === 1 ? "" : "s"}`);
     }
+    if (failedCount > 0) {
+      messageParts.push(`${failedCount} failed`);
+    }
+
+    return c.json({
+      ok: failedCount === 0,
+      uploadedCount,
+      folderCount,
+      failedCount,
+      message: messageParts.join(", "),
+    });
   } catch (error) {
     console.error("Upload error:", error);
-    return c.redirect(`/file-explorer?error=server_error`);
+    return c.json({ ok: false, message: error.message }, 500);
   }
 }

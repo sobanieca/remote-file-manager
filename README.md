@@ -14,17 +14,48 @@ valuable for remote server administration and development workflows.
 
 ## Key Features
 
-- **Web-based File Explorer**: Intuitive interface for browsing directory
-  structures
-- **File Management Operations**: Create, delete, rename, and organize files and
-  folders
-- **Text File Editing**: Built-in editor for modifying text-based files
+- **Web-based File Explorer**: Detail view with file size, Unix permissions,
+  modification time and highlighted executables and symlinks
+- **Dual-pane Mode**: Norton Commander style split view with a command bar for
+  copying and moving between panes
+- **File Management Operations**: Create, delete, rename, copy, move and
+  organize files and folders, with multi-select and bulk actions
+- **Sorting, Filtering and Views**: Sort by name, size or date, filter the
+  listing live, and switch between list and icon grid
+- **Source Code Viewer**: Syntax highlighted, line numbered viewer with line
+  anchors, wrapping and copy
+- **Text File Editing**: Editor with live syntax highlighting, line numbers,
+  auto-indent and `Ctrl+S` saving
+- **Git Integration**: Branch indicator, working tree status overview, commit
+  history, and diffs in inline or side-by-side mode
+- **Commit Comparison**: Pick any two commits and review everything that changed
+  between them
 - **Clipboard Upload**: Paste screenshots and images directly from clipboard to
   upload files
 - **Static File Serving**: Serves HTML files and other static content
 - **Remote Access**: Optimized for SSH port forwarding scenarios
 
 ![screenshot](./file-explorer.png)
+
+> The screenshot above predates the 0.7.0 interface refresh.
+
+### Keyboard Navigation
+
+File actions live in the command bar below the panes and in the per-entry menus.
+The keyboard is used for moving around a listing:
+
+| Key                | Action                        |
+| ------------------ | ----------------------------- |
+| `↑` / `↓`          | Move between entries          |
+| `Enter`            | Open the focused entry        |
+| `Space`            | Toggle selection              |
+| `Shift` + `↑`/`↓`  | Extend the selection          |
+| `Tab`              | Switch pane in split view     |
+| `Backspace`        | Go to the parent directory    |
+| `Delete`           | Delete the selected entries   |
+| `Esc`              | Clear the filter box          |
+| `Ctrl`/`Cmd` + `A` | Select everything in the pane |
+| `Ctrl`/`Cmd` + `S` | Save the file in the editor   |
 
 ## Installation
 

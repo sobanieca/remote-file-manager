@@ -1,6 +1,6 @@
 export { Hono } from "jsr:@hono/hono@4.7.9";
 export { serveStatic } from "jsr:@hono/hono@4.7.9/deno";
-export { ensureDir, walk } from "jsr:@std/fs@1.0.17";
+export { copy, ensureDir, walk } from "jsr:@std/fs@1.0.17";
 export {
   basename,
   dirname,

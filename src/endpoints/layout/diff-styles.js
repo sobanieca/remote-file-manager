@@ -1,34 +1,11 @@
 export const diffStyles = `
-  .diff-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: var(--panel-bg);
-    border-radius: 4px;
-  }
-  .diff-header h2 {
-    margin: 0;
-    font-family: monospace;
-    font-size: 18px;
-    word-break: break-all;
-    color: var(--heading);
-  }
-  .diff-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
   .diff-container {
     border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
+    border-radius: var(--radius);
     background-color: var(--surface);
+    overflow: hidden;
   }
-  .diff-summary {
+  .diff-toolbar {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -36,17 +13,22 @@ export const diffStyles = `
     background-color: var(--panel-bg);
     border-bottom: 1px solid var(--border);
     font-size: 13px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: var(--app-bar-offset, var(--app-bar-height));
+    z-index: 50;
   }
-  .diff-language {
-    padding: 2px 8px;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    color: var(--muted);
-    font-family: monospace;
+  .diff-toolbar-spacer {
+    flex: 1;
+  }
+  .diff-summary-text {
+    font-weight: 600;
+    color: var(--heading);
   }
   .diff-stat {
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-weight: 600;
+    font-size: 12px;
   }
   .diff-stat-added {
     color: var(--success-text);
@@ -54,142 +36,197 @@ export const diffStyles = `
   .diff-stat-removed {
     color: var(--error-text);
   }
+
+  .diff-file {
+    border-bottom: 1px solid var(--border);
+  }
+  .diff-file:last-child {
+    border-bottom: none;
+  }
+  .diff-file-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: var(--panel-bg);
+    border-bottom: 1px solid var(--border-subtle);
+    position: sticky;
+    top: calc(var(--app-bar-offset, var(--app-bar-height)) + 37px);
+    z-index: 40;
+  }
+  .diff-file-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .diff-file-toggle:hover {
+    background-color: var(--panel-hover);
+  }
+  .diff-file-toggle[aria-expanded="false"] .icon {
+    transform: rotate(-90deg);
+  }
+  .diff-file-status {
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .diff-status-added {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+  }
+  .diff-status-modified {
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+  }
+  .diff-status-deleted {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+  }
+  .diff-status-renamed {
+    background-color: var(--notice-bg);
+    color: var(--notice-text);
+  }
+  .diff-file-path {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--heading);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .diff-file-rename {
+    color: var(--muted);
+  }
+  .diff-file-rename .icon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    vertical-align: -2px;
+    margin: 0 2px;
+  }
+  .diff-file-stats {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .diff-file-link {
+    display: flex;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .diff-file-link:hover {
+    color: var(--link);
+  }
+  .diff-file.is-collapsed .diff-file-body {
+    display: none;
+  }
+
   .diff-scroll {
     overflow-x: auto;
   }
+  .diff-container[data-diff-mode="unified"] .diff-mode-split,
+  .diff-container[data-diff-mode="split"] .diff-mode-unified {
+    display: none;
+  }
+  @media (max-width: 800px) {
+    .diff-container[data-diff-mode="split"] .diff-mode-split {
+      display: none;
+    }
+    .diff-container[data-diff-mode="split"] .diff-mode-unified {
+      display: block;
+    }
+  }
   .diff-table {
-    border-collapse: collapse;
     width: 100%;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
     font-size: 12.5px;
-    line-height: 20px;
-    tab-size: 2;
+    line-height: 1.5;
+  }
+  .diff-table-split {
+    table-layout: fixed;
+  }
+  .diff-table-split .diff-content {
+    width: 50%;
+    overflow: hidden;
   }
   .diff-gutter {
     width: 1%;
-    min-width: 40px;
-    padding: 0 10px;
+    min-width: 44px;
+    padding: 0 8px;
     text-align: right;
     vertical-align: top;
-    color: var(--muted);
+    user-select: none;
+    color: var(--diff-hunk-text);
     background-color: var(--panel-bg);
     border-right: 1px solid var(--border-subtle);
-    user-select: none;
     white-space: nowrap;
   }
   .diff-content {
-    padding: 0 10px 0 0;
-    white-space: pre;
+    padding: 0 10px 0 4px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
     vertical-align: top;
-    color: var(--text);
+    tab-size: 2;
   }
   .diff-marker {
     display: inline-block;
-    width: 16px;
-    padding-left: 6px;
-    color: var(--muted);
+    width: 12px;
+    color: var(--diff-hunk-text);
     user-select: none;
   }
-  .diff-added {
+  .diff-row.diff-added,
+  .diff-content.diff-added {
     background-color: var(--diff-add-bg);
   }
-  .diff-added .diff-gutter {
+  .diff-row.diff-added .diff-gutter {
     background-color: var(--diff-add-gutter-bg);
-    color: var(--text);
   }
-  .diff-added .diff-marker {
-    color: var(--success-text);
-  }
-  .diff-removed {
+  .diff-row.diff-removed,
+  .diff-content.diff-removed {
     background-color: var(--diff-remove-bg);
   }
-  .diff-removed .diff-gutter {
+  .diff-row.diff-removed .diff-gutter {
     background-color: var(--diff-remove-gutter-bg);
-    color: var(--text);
   }
-  .diff-removed .diff-marker {
-    color: var(--error-text);
-  }
-  .diff-hunk .diff-gutter,
-  .diff-hunk .diff-content {
+  .diff-hunk {
     background-color: var(--diff-hunk-bg);
     color: var(--diff-hunk-text);
-    padding-top: 4px;
-    padding-bottom: 4px;
-    border-top: 1px solid var(--border-subtle);
-    border-bottom: 1px solid var(--border-subtle);
   }
   .diff-hunk .diff-content {
-    padding-left: 22px;
+    font-size: 12px;
+  }
+  .diff-hunk-gutter {
+    text-align: center;
   }
   .diff-hunk-heading {
     color: var(--muted);
   }
-  .diff-note .diff-content {
-    padding-left: 22px;
+  .diff-note {
     color: var(--muted);
     font-style: italic;
   }
-  .diff-empty {
-    padding: 20px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+  .diff-empty-cell {
     background-color: var(--panel-bg);
+    opacity: 0.5;
+  }
+  .diff-empty {
+    padding: 32px 20px;
+    text-align: center;
     color: var(--muted);
-  }
-  .diff-code .token.comment,
-  .diff-code .token.prolog,
-  .diff-code .token.cdata {
-    color: var(--syntax-comment);
-  }
-  .diff-code .token.keyword,
-  .diff-code .token.rule,
-  .diff-code .token.atrule,
-  .diff-code .token.important {
-    color: var(--syntax-keyword);
-  }
-  .diff-code .token.string,
-  .diff-code .token.char,
-  .diff-code .token.attr-value,
-  .diff-code .token.regex {
-    color: var(--syntax-string);
-  }
-  .diff-code .token.number,
-  .diff-code .token.boolean,
-  .diff-code .token.constant,
-  .diff-code .token.symbol {
-    color: var(--syntax-constant);
-  }
-  .diff-code .token.function,
-  .diff-code .token.class-name,
-  .diff-code .token.selector {
-    color: var(--syntax-entity);
-  }
-  .diff-code .token.tag,
-  .diff-code .token.attr-name,
-  .diff-code .token.property,
-  .diff-code .token.variable {
-    color: var(--syntax-variable);
-  }
-  .diff-code .token.operator,
-  .diff-code .token.punctuation,
-  .diff-code .token.entity,
-  .diff-code .token.url {
-    color: var(--syntax-punctuation);
-  }
-  .diff-code .token.deleted {
-    color: var(--error-text);
-  }
-  .diff-code .token.inserted {
-    color: var(--success-text);
-  }
-  @media (max-width: 600px) {
-    .diff-table {
-      font-size: 11.5px;
-    }
-    .diff-gutter {
-      min-width: 28px;
-      padding: 0 6px;
-    }
+    font-size: 13px;
   }
 `;

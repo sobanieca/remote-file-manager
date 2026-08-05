@@ -1,82 +1,21 @@
-import { Prism } from "../deps.js";
-import { escapeHtml, getFileExtension } from "./utils.js";
+import { escapeHtml } from "./utils.js";
+import { highlightLine, resolveLanguage } from "./code-highlight.js";
+import { icon } from "./components/icons.js";
 
-const LANGUAGE_BY_EXTENSION = {
-  ".js": "javascript",
-  ".mjs": "javascript",
-  ".cjs": "javascript",
-  ".jsx": "jsx",
-  ".ts": "typescript",
-  ".mts": "typescript",
-  ".cts": "typescript",
-  ".tsx": "tsx",
-  ".json": "json",
-  ".jsonc": "json",
-  ".html": "markup",
-  ".htm": "markup",
-  ".xml": "markup",
-  ".svg": "markup",
-  ".vue": "markup",
-  ".css": "css",
-  ".scss": "scss",
-  ".sass": "scss",
-  ".md": "markdown",
-  ".markdown": "markdown",
-  ".yml": "yaml",
-  ".yaml": "yaml",
-  ".sh": "bash",
-  ".bash": "bash",
-  ".zsh": "bash",
-  ".py": "python",
-  ".go": "go",
-  ".rs": "rust",
-  ".java": "java",
-  ".cs": "csharp",
-  ".c": "c",
-  ".h": "c",
-  ".cpp": "cpp",
-  ".cc": "cpp",
-  ".cxx": "cpp",
-  ".hpp": "cpp",
-  ".php": "php",
-  ".rb": "ruby",
-  ".sql": "sql",
-  ".toml": "toml",
-  ".ini": "ini",
-  ".cfg": "ini",
-  ".conf": "ini",
-};
-
-const LANGUAGE_BY_FILENAME = {
-  "dockerfile": "docker",
-  "containerfile": "docker",
-  ".gitignore": "bash",
-  ".env": "bash",
-};
-
-function resolveLanguage(filePath) {
-  const fileName = filePath.substring(filePath.lastIndexOf("/") + 1)
-    .toLowerCase();
-  return LANGUAGE_BY_FILENAME[fileName] ||
-    LANGUAGE_BY_EXTENSION[getFileExtension(fileName)] || null;
-}
-
-function highlightLine(code, language) {
-  const grammar = language ? Prism.languages[language] : null;
-  if (!grammar) {
-    return escapeHtml(code);
-  }
-  try {
-    return Prism.highlight(code, grammar, language);
-  } catch (_error) {
-    return escapeHtml(code);
-  }
+function createFile(path) {
+  return {
+    path,
+    originalPath: null,
+    status: "modified",
+    isBinary: false,
+    hunks: [],
+    added: 0,
+    removed: 0,
+  };
 }
 
 function parseHunkHeader(line) {
-  const match = line.match(
-    /^@@ (-(\d+)(?:,\d+)? \+(\d+)(?:,\d+)?) @@(.*)$/,
-  );
+  const match = line.match(/^@@+ (-(\d+)(?:,\d+)? \+(\d+)(?:,\d+)?) @@+(.*)$/);
   if (!match) {
     return null;
   }
@@ -88,18 +27,70 @@ function parseHunkHeader(line) {
   };
 }
 
-function parseDiff(diffText) {
-  const hunks = [];
+function parseGitHeaderPaths(line) {
+  const match = line.match(/^diff --git a\/(.+) b\/(.+)$/);
+  return match ? { original: match[1], target: match[2] } : null;
+}
+
+/**
+ * Parses a unified diff into per-file hunks
+ * @param {string} diffText - The raw diff produced by git
+ * @returns {object[]} - One descriptor per changed file
+ */
+export function parseDiff(diffText) {
+  const files = [];
+  let currentFile = null;
   let currentHunk = null;
   let oldLineNumber = 0;
   let newLineNumber = 0;
-  let isBinary = false;
 
   for (const line of diffText.replace(/\n$/, "").split("\n")) {
-    if (line.startsWith("Binary files ") || line.startsWith("GIT binary ")) {
-      isBinary = true;
+    const headerPaths = parseGitHeaderPaths(line);
+    if (headerPaths) {
+      currentFile = createFile(headerPaths.target);
+      currentFile.originalPath = headerPaths.original !== headerPaths.target
+        ? headerPaths.original
+        : null;
+      currentHunk = null;
+      files.push(currentFile);
       continue;
     }
+    if (!currentFile) {
+      continue;
+    }
+    if (line.startsWith("new file mode")) {
+      currentFile.status = "added";
+      continue;
+    }
+    if (line.startsWith("deleted file mode")) {
+      currentFile.status = "deleted";
+      continue;
+    }
+    if (line.startsWith("rename from ")) {
+      currentFile.status = "renamed";
+      currentFile.originalPath = line.substring("rename from ".length);
+      continue;
+    }
+    if (line.startsWith("rename to ")) {
+      currentFile.status = "renamed";
+      currentFile.path = line.substring("rename to ".length);
+      continue;
+    }
+    if (line.startsWith("Binary files ") || line.startsWith("GIT binary ")) {
+      currentFile.isBinary = true;
+      continue;
+    }
+    if (line.startsWith("--- ") || line.startsWith("+++ ")) {
+      const path = line.substring(4);
+      if (path !== "/dev/null") {
+        const stripped = path.replace(/^[ab]\//, "");
+        if (line.startsWith("+++ ")) {
+          currentFile.path = stripped;
+        }
+      }
+      continue;
+    }
+
     const hunkHeader = parseHunkHeader(line);
     if (hunkHeader) {
       currentHunk = {
@@ -107,7 +98,7 @@ function parseDiff(diffText) {
         heading: hunkHeader.heading,
         lines: [],
       };
-      hunks.push(currentHunk);
+      currentFile.hunks.push(currentHunk);
       oldLineNumber = hunkHeader.oldLineNumber;
       newLineNumber = hunkHeader.newLineNumber;
       continue;
@@ -119,6 +110,7 @@ function parseDiff(diffText) {
       currentHunk.lines.push({ type: "note", content: line.substring(2) });
       continue;
     }
+
     const marker = line.charAt(0);
     const content = line.substring(1);
     if (marker === "+") {
@@ -127,12 +119,14 @@ function parseDiff(diffText) {
         content,
         newLineNumber: newLineNumber++,
       });
+      currentFile.added++;
     } else if (marker === "-") {
       currentHunk.lines.push({
         type: "removed",
         content,
         oldLineNumber: oldLineNumber++,
       });
+      currentFile.removed++;
     } else if (marker === " " || line === "") {
       currentHunk.lines.push({
         type: "context",
@@ -143,80 +137,208 @@ function parseDiff(diffText) {
     }
   }
 
-  return { hunks, isBinary };
+  return files;
 }
 
-const MARKERS = {
-  added: "+",
-  removed: "-",
-  context: " ",
-};
+const MARKERS = { added: "+", removed: "-", context: " " };
 
-function renderLineRow(line, language) {
+function renderUnifiedRow(line, language) {
   if (line.type === "note") {
-    return `<tr class="diff-row diff-note">
-      <td class="diff-gutter"></td>
-      <td class="diff-gutter"></td>
-      <td class="diff-content">${escapeHtml(line.content)}</td>
-    </tr>`;
+    return `<tr class="diff-row diff-note"><td class="diff-gutter"></td><td class="diff-gutter"></td><td class="diff-content">${
+      escapeHtml(line.content)
+    }</td></tr>`;
   }
-  return `<tr class="diff-row diff-${line.type}">
-    <td class="diff-gutter">${line.oldLineNumber || ""}</td>
-    <td class="diff-gutter">${line.newLineNumber || ""}</td>
-    <td class="diff-content"><span class="diff-marker">${
+  return `<tr class="diff-row diff-${line.type}"><td class="diff-gutter">${
+    line.oldLineNumber || ""
+  }</td><td class="diff-gutter">${
+    line.newLineNumber || ""
+  }</td><td class="diff-content"><span class="diff-marker">${
     MARKERS[line.type]
   }</span><span class="diff-code">${
     highlightLine(line.content, language)
-  }</span></td>
-  </tr>`;
+  }</span></td></tr>`;
 }
 
-function renderHunk(hunk, language) {
+function renderUnifiedHunk(hunk, language) {
   const headingHtml = hunk.heading
     ? ` <span class="diff-hunk-heading">${escapeHtml(hunk.heading)}</span>`
     : "";
-  const hunkRow = `<tr class="diff-row diff-hunk">
-    <td class="diff-gutter diff-hunk-gutter" colspan="2">⋯</td>
-    <td class="diff-content">@@ ${escapeHtml(hunk.range)} @@${headingHtml}</td>
-  </tr>`;
-  const lineRows = hunk.lines
-    .map((line) => renderLineRow(line, language))
-    .join("");
-  return hunkRow + lineRows;
+  const hunkRow =
+    `<tr class="diff-row diff-hunk"><td class="diff-gutter diff-hunk-gutter" colspan="2">⋯</td><td class="diff-content">@@ ${
+      escapeHtml(hunk.range)
+    } @@${headingHtml}</td></tr>`;
+  return hunkRow +
+    hunk.lines.map((line) => renderUnifiedRow(line, language)).join("");
 }
 
-export function diffView(filePath, diffText) {
-  const { hunks, isBinary } = parseDiff(diffText);
+// Turns a sequence of hunk lines into left/right pairs for side-by-side display
+function pairHunkLines(lines) {
+  const pairs = [];
+  let index = 0;
 
-  if (isBinary) {
-    return `<div class="diff-empty">This is a binary file, no diff to show.</div>`;
-  }
-  if (hunks.length === 0) {
-    return `<div class="diff-empty">No changes to show for this file.</div>`;
-  }
+  while (index < lines.length) {
+    const line = lines[index];
+    if (line.type === "context" || line.type === "note") {
+      pairs.push({ left: line, right: line });
+      index++;
+      continue;
+    }
 
-  const language = resolveLanguage(filePath);
-  let addedCount = 0;
-  let removedCount = 0;
-  for (const hunk of hunks) {
-    for (const line of hunk.lines) {
-      if (line.type === "added") addedCount++;
-      if (line.type === "removed") removedCount++;
+    const removed = [];
+    const added = [];
+    while (index < lines.length && lines[index].type === "removed") {
+      removed.push(lines[index++]);
+    }
+    while (index < lines.length && lines[index].type === "added") {
+      added.push(lines[index++]);
+    }
+    const pairCount = Math.max(removed.length, added.length);
+    for (let offset = 0; offset < pairCount; offset++) {
+      pairs.push({
+        left: removed[offset] || null,
+        right: added[offset] || null,
+      });
     }
   }
 
-  const rows = hunks.map((hunk) => renderHunk(hunk, language)).join("");
+  return pairs;
+}
 
-  return `<div class="diff-container">
-    <div class="diff-summary">
-      <span class="diff-language">${language || "text"}</span>
-      <span class="diff-stat diff-stat-added">+${addedCount}</span>
-      <span class="diff-stat diff-stat-removed">-${removedCount}</span>
+function renderSplitCell(line, side, language) {
+  if (!line) {
+    return `<td class="diff-gutter"></td><td class="diff-content diff-empty-cell"></td>`;
+  }
+  if (line.type === "note") {
+    return `<td class="diff-gutter"></td><td class="diff-content diff-note">${
+      escapeHtml(line.content)
+    }</td>`;
+  }
+  const lineNumber = side === "left" ? line.oldLineNumber : line.newLineNumber;
+  return `<td class="diff-gutter">${
+    lineNumber || ""
+  }</td><td class="diff-content diff-${line.type}"><span class="diff-code">${
+    highlightLine(line.content, language)
+  }</span></td>`;
+}
+
+function renderSplitHunk(hunk, language) {
+  const headingHtml = hunk.heading
+    ? ` <span class="diff-hunk-heading">${escapeHtml(hunk.heading)}</span>`
+    : "";
+  const hunkRow =
+    `<tr class="diff-row diff-hunk"><td class="diff-gutter diff-hunk-gutter">⋯</td><td class="diff-content">@@ ${
+      escapeHtml(hunk.range)
+    } @@${headingHtml}</td><td class="diff-gutter diff-hunk-gutter">⋯</td><td class="diff-content"></td></tr>`;
+  const rows = pairHunkLines(hunk.lines)
+    .map((pair) =>
+      `<tr class="diff-row">${renderSplitCell(pair.left, "left", language)}${
+        renderSplitCell(pair.right, "right", language)
+      }</tr>`
+    )
+    .join("");
+  return hunkRow + rows;
+}
+
+const STATUS_LABELS = {
+  added: "added",
+  deleted: "deleted",
+  renamed: "renamed",
+  modified: "modified",
+};
+
+function renderFileBody(file, language) {
+  if (file.isBinary) {
+    return `<div class="diff-empty">Binary file — no textual diff to show.</div>`;
+  }
+  if (file.hunks.length === 0) {
+    return `<div class="diff-empty">No changes to show for this file.</div>`;
+  }
+  const unifiedRows = file.hunks
+    .map((hunk) => renderUnifiedHunk(hunk, language))
+    .join("");
+  const splitRows = file.hunks
+    .map((hunk) => renderSplitHunk(hunk, language))
+    .join("");
+  return `<div class="diff-scroll diff-mode-unified">
+      <table class="diff-table"><tbody>${unifiedRows}</tbody></table>
     </div>
-    <div class="diff-scroll">
-      <table class="diff-table">
-        <tbody>${rows}</tbody>
-      </table>
+    <div class="diff-scroll diff-mode-split">
+      <table class="diff-table diff-table-split"><tbody>${splitRows}</tbody></table>
+    </div>`;
+}
+
+function renderFile(file, options) {
+  const language = resolveLanguage(file.path);
+  const renamedFrom = file.originalPath
+    ? `<span class="diff-file-rename">${escapeHtml(file.originalPath)} ${
+      icon("arrow-right")
+    }</span>`
+    : "";
+  const viewLink = options.linkToFiles && file.status !== "deleted"
+    ? `<a class="diff-file-link" href="/view-file?path=${
+      encodeURIComponent(file.path)
+    }" title="Open file">${icon("eye")}</a>`
+    : "";
+
+  return `<section class="diff-file" data-path="${escapeHtml(file.path)}">
+    <header class="diff-file-header">
+      <button type="button" class="diff-file-toggle" aria-expanded="true">${
+    icon("chevron-down")
+  }</button>
+      <span class="diff-file-status diff-status-${file.status}">${
+    STATUS_LABELS[file.status]
+  }</span>
+      <span class="diff-file-path">${renamedFrom}${escapeHtml(file.path)}</span>
+      <span class="diff-file-stats">
+        <span class="diff-stat diff-stat-added">+${file.added}</span>
+        <span class="diff-stat diff-stat-removed">-${file.removed}</span>
+      </span>
+      ${viewLink}
+    </header>
+    <div class="diff-file-body">${renderFileBody(file, language)}</div>
+  </section>`;
+}
+
+/**
+ * Renders a complete diff, with unified and side-by-side layouts
+ * @param {string} diffText - The raw diff produced by git
+ * @param {object} options - Rendering options, notably linkToFiles
+ * @returns {string} - The diff markup
+ */
+export function diffView(diffText, options = {}) {
+  const files = parseDiff(diffText);
+
+  if (files.length === 0) {
+    return `<div class="diff-empty">No changes to show.</div>`;
+  }
+
+  const totals = files.reduce(
+    (sum, file) => ({
+      added: sum.added + file.added,
+      removed: sum.removed + file.removed,
+    }),
+    { added: 0, removed: 0 },
+  );
+
+  const fileCountLabel = `${files.length} file${
+    files.length === 1 ? "" : "s"
+  } changed`;
+
+  return `<div class="diff-container" data-diff-mode="unified">
+    <div class="diff-toolbar">
+      <span class="diff-summary-text">${fileCountLabel}</span>
+      <span class="diff-stat diff-stat-added">+${totals.added}</span>
+      <span class="diff-stat diff-stat-removed">-${totals.removed}</span>
+      <div class="diff-toolbar-spacer"></div>
+      <div class="segmented" role="group" aria-label="Diff layout">
+        <button type="button" class="segmented-option is-active" data-diff-layout="unified" title="Unified view">${
+    icon("list")
+  }<span>Unified</span></button>
+        <button type="button" class="segmented-option" data-diff-layout="split" title="Side by side view">${
+    icon("columns")
+  }<span>Split</span></button>
+      </div>
     </div>
+    ${files.map((file) => renderFile(file, options)).join("")}
   </div>`;
 }

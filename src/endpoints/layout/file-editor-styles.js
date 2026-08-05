@@ -1,89 +1,94 @@
 export const fileEditorStyles = `
-  .editor-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: var(--panel-bg);
-    border-radius: 4px;
-  }
-  .editor-header h2 {
-    margin: 0;
-    color: var(--heading);
-    font-size: 18px;
-  }
-  .back-button {
-    padding: 8px 16px;
-    background-color: var(--secondary);
-    color: var(--on-accent);
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-  .back-button:hover {
-    background-color: var(--secondary-hover);
-  }
-  .editor-form {
-    margin-bottom: 20px;
-  }
-  .file-editor {
-    width: 100%;
-    padding: 16px;
+  .editor {
     border: 1px solid var(--border);
-    border-radius: 4px;
-    font-family: 'Courier New', Monaco, monospace;
-    font-size: 14px;
-    line-height: 1.4;
-    resize: vertical;
+    border-radius: var(--radius);
     background-color: var(--editor-bg);
-    color: var(--text);
-    box-sizing: border-box;
+    overflow: hidden;
   }
-  .file-editor:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 5px var(--focus-ring);
-  }
-  .editor-actions {
-    margin-top: 15px;
+  .editor-toolbar {
     display: flex;
+    align-items: center;
     gap: 10px;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--panel-bg);
+    flex-wrap: wrap;
   }
-  .save-button {
-    padding: 10px 20px;
-    background-color: var(--success);
-    color: var(--on-accent);
+  .editor-status {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .editor-status.is-dirty {
+    color: var(--warning-text);
+  }
+  .editor-surface {
+    display: flex;
+    align-items: stretch;
+    max-height: 74vh;
+    overflow: auto;
+  }
+  .editor-gutter {
+    margin: 0;
+    padding: 12px 10px 12px 14px;
+    border-right: 1px solid var(--border-subtle);
+    background-color: var(--panel-bg);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.55;
+    text-align: right;
+    user-select: none;
+    white-space: pre;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+  }
+  .editor-code {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+  .editor-highlight,
+  .editor-input {
+    margin: 0;
+    padding: 12px 16px;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.55;
+    tab-size: 2;
+    white-space: pre;
+    overflow-wrap: normal;
+    word-break: normal;
   }
-  .save-button:hover {
-    background-color: var(--success-hover);
+  .editor-highlight {
+    min-height: 60vh;
+    pointer-events: none;
+    background: transparent;
+    color: var(--text);
+    overflow: visible;
   }
-  .cancel-button {
-    padding: 10px 20px;
-    background-color: var(--danger);
-    color: var(--on-accent);
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
+  .editor-highlight code {
+    font: inherit;
   }
-  .cancel-button:hover {
-    background-color: var(--danger-hover);
+  .editor-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    overflow: hidden;
+    background: transparent;
+    color: transparent;
+    caret-color: var(--text);
+    outline: none;
   }
-  .binary-file-message {
-    padding: 20px;
-    background-color: var(--notice-bg);
-    border: 1px solid var(--notice-border);
-    border-radius: 4px;
-    margin: 20px 0;
-    text-align: center;
+  .editor-input::selection {
+    background-color: var(--selected-bg);
   }
-  .binary-file-message p {
-    margin: 10px 0;
-    color: var(--notice-text);
+  .editor.is-wrapped .editor-highlight,
+  .editor.is-wrapped .editor-input {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
 `;
