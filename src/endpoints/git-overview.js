@@ -1,3 +1,4 @@
+import { relative } from "../deps.js";
 import { layout } from "./layout/index.js";
 import { escapeHtml, formatRelativeTime, isBinaryFile } from "./utils.js";
 import { icon } from "./components/icons.js";
@@ -27,12 +28,17 @@ function renderChangeRow(record, repoRoot, workingDir, mode) {
   // files have no textual diff to render
   const canDiff = servedPath !== null && !record.isUntracked &&
     !isBinaryFile(record.path);
-  const renamedFrom = record.originalPath
-    ? `<span class="change-rename">${escapeHtml(record.originalPath)} ${
+  const displayPath = servedPath || record.path;
+  const originalDisplayPath = record.originalPath
+    ? toServedPath(repoRoot, workingDir, record.originalPath) ||
+      record.originalPath
+    : null;
+  const renamedFrom = originalDisplayPath
+    ? `<span class="change-rename">${escapeHtml(originalDisplayPath)} ${
       icon("arrow-right")
     }</span>`
     : "";
-  const label = `${renamedFrom}${escapeHtml(record.path)}`;
+  const label = `${renamedFrom}${escapeHtml(displayPath)}`;
 
   let pathHtml;
   let actionsHtml = "";
@@ -140,10 +146,15 @@ export async function gitOverview(c) {
          <div class="meta-item"><span class="meta-label">Ahead / behind</span><span class="meta-value">↑${branchInfo.ahead} ↓${branchInfo.behind}</span></div>`
       : `<div class="meta-item"><span class="meta-label">Upstream</span><span class="meta-value">none</span></div>`;
 
+    const scopePath = relative(repoRoot, workingDir);
+    const headerSubtitle = scopePath
+      ? `${repoRoot} · changes in ${scopePath}/ only`
+      : repoRoot;
+
     const cleanState = totalChanges === 0
-      ? `<div class="git-clean">${
-        icon("check")
-      }<span>Working tree is clean</span></div>`
+      ? `<div class="git-clean">${icon("check")}<span>${
+        scopePath ? "No changes in this directory" : "Working tree is clean"
+      }</span></div>`
       : "";
 
     const workingTreeAction =
@@ -161,7 +172,7 @@ export async function gitOverview(c) {
           <span class="page-title-icon">${icon("branch")}</span>
           <div>
             <h1>${escapeHtml(branchInfo.branch)}</h1>
-            <span class="page-subtitle">${escapeHtml(repoRoot)}</span>
+            <span class="page-subtitle">${escapeHtml(headerSubtitle)}</span>
           </div>
         </div>
         <a class="button" href="/git-log">${

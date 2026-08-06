@@ -7,6 +7,9 @@ import {
 } from "./git-command.js";
 
 const DIFF_BASE_ARGS = ["--no-color", "--no-ext-diff", "-M"];
+// Working tree diffs run in the served directory so that they cover the same
+// files as the status page and report paths the file explorer can open
+const WORKING_TREE_DIFF_ARGS = [...DIFF_BASE_ARGS, "--relative"];
 
 function toRepoRelativePath(repoRoot, workingDir, entryPath) {
   const absolutePath = join(workingDir, entryPath);
@@ -30,21 +33,29 @@ export async function getFileDiff(workingDir, entryPath, mode) {
   if (!repoRoot) {
     return null;
   }
-  const repoRelativePath = toRepoRelativePath(repoRoot, workingDir, entryPath);
-  if (repoRelativePath === null) {
+  if (toRepoRelativePath(repoRoot, workingDir, entryPath) === null) {
     return null;
   }
 
-  const pathArgs = ["--", `:(literal)${repoRelativePath}`];
+  const pathArgs = ["--", `:(literal)${entryPath}`];
   if (mode === "unstaged") {
-    return await runGit(["diff", ...DIFF_BASE_ARGS, ...pathArgs], repoRoot);
+    return await runGit(
+      ["diff", ...WORKING_TREE_DIFF_ARGS, ...pathArgs],
+      workingDir,
+    );
   }
 
   const revisionArgs = await hasCommits(repoRoot) ? ["HEAD"] : [];
   const stagedArgs = mode === "staged" ? ["--cached"] : [];
   return await runGit(
-    ["diff", ...DIFF_BASE_ARGS, ...stagedArgs, ...revisionArgs, ...pathArgs],
-    repoRoot,
+    [
+      "diff",
+      ...WORKING_TREE_DIFF_ARGS,
+      ...stagedArgs,
+      ...revisionArgs,
+      ...pathArgs,
+    ],
+    workingDir,
   );
 }
 
@@ -63,11 +74,11 @@ export async function getWorkingTreeDiff(workingDir, stagedOnly) {
   return await runGit(
     [
       "diff",
-      ...DIFF_BASE_ARGS,
+      ...WORKING_TREE_DIFF_ARGS,
       ...(stagedOnly ? ["--cached"] : []),
       ...revisionArgs,
     ],
-    repoRoot,
+    workingDir,
   );
 }
 

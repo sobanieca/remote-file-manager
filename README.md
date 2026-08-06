@@ -37,8 +37,6 @@ valuable for remote server administration and development workflows.
 
 ![screenshot](./file-explorer.png)
 
-> The screenshot above predates the 0.7.0 interface refresh.
-
 ### Keyboard Navigation
 
 File actions live in the command bar below the panes and in the per-entry menus.

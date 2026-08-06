@@ -57,9 +57,12 @@ export async function getGitStatusInfo(workingDir) {
     return null;
   }
 
+  // Running git in the served directory with a "." pathspec keeps changes from
+  // unrelated parts of the repository out of the report while still yielding
+  // repository relative paths
   const output = await runGit(
-    ["status", "--porcelain", "-z", "--untracked-files=all"],
-    repoRoot,
+    ["status", "--porcelain", "-z", "--untracked-files=all", "--", "."],
+    workingDir,
   );
   if (output === null) {
     return null;
