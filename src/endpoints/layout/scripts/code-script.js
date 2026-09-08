@@ -1,6 +1,12 @@
 export const codeScript = `
 (function () {
-  // Source viewer: wrapping, copying and line anchors
+  function copyToClipboard(text) {
+    RFM.copyText(text).then((copied) => {
+      RFM.toast(copied ? 'Copied to clipboard' : 'Could not copy', copied ? 'success' : 'error');
+    });
+  }
+
+  // Source viewer: wrapping, copying, previewing and line anchors
   document.addEventListener('click', (event) => {
     const wrapButton = event.target.closest('[data-command="toggle-wrap"]');
     if (wrapButton) {
@@ -16,10 +22,33 @@ export const codeScript = `
       const view = copyButton.closest('.code-view');
       if (!view) return;
       const lines = Array.prototype.slice.call(view.querySelectorAll('.code-line-content'));
-      const text = lines.map((line) => line.textContent.replace(/\\u200b/g, '')).join('\\n');
-      RFM.copyText(text).then((copied) => {
-        RFM.toast(copied ? 'Copied to clipboard' : 'Could not copy', copied ? 'success' : 'error');
-      });
+      copyToClipboard(lines.map((line) => line.textContent.replace(/\\u200b/g, '')).join('\\n'));
+      return;
+    }
+
+    const copyEditorButton = event.target.closest('[data-command="copy-editor"]');
+    if (copyEditorButton) {
+      event.preventDefault();
+      const editor = copyEditorButton.closest('.editor');
+      const input = editor ? editor.querySelector('[data-editor-input]') : null;
+      if (input) copyToClipboard(input.value);
+      return;
+    }
+
+    const previewButton = event.target.closest('[data-command="toggle-preview"]');
+    if (previewButton) {
+      event.preventDefault();
+      const view = previewButton.closest('.code-view');
+      const preview = view ? view.querySelector('.code-preview') : null;
+      if (!preview) return;
+      const isPreviewing = view.classList.toggle('is-previewing');
+      preview.hidden = !isPreviewing;
+      previewButton.classList.toggle('is-active', isPreviewing);
+      previewButton.setAttribute('aria-pressed', String(isPreviewing));
+      const frame = preview.querySelector('iframe[data-src]');
+      if (frame && isPreviewing && !frame.getAttribute('src')) {
+        frame.setAttribute('src', frame.dataset.src);
+      }
       return;
     }
 

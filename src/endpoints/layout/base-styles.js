@@ -472,6 +472,29 @@ export const baseStyles = `
     margin: 0 auto;
     border-radius: var(--radius-sm);
   }
+  .video-preview {
+    display: block;
+    width: 100%;
+    max-height: 70vh;
+    margin: 0 auto;
+    border-radius: var(--radius-sm);
+    background-color: #000;
+  }
+  .audio-preview {
+    display: block;
+    width: 100%;
+  }
+  .preview-document {
+    padding: 0;
+    overflow: hidden;
+  }
+  .preview-frame {
+    display: block;
+    width: 100%;
+    height: 78vh;
+    border: 0;
+    background-color: #fff;
+  }
 
   .toast-stack {
     position: fixed;

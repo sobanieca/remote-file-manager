@@ -14,6 +14,10 @@ import { renderCodeView } from "./components/code-view.js";
 import { renderEntryActionBar } from "./components/entry-actions.js";
 import { getEntryIconName, icon } from "./components/icons.js";
 import { gitStatusBadge } from "../git/git-status.js";
+import {
+  renderMediaPreview,
+  renderTextPreview,
+} from "./components/file-preview.js";
 
 const MAX_TEXT_BYTES = 5_000_000;
 
@@ -74,6 +78,11 @@ function renderPreview(entry, fileContent) {
     </div>`;
   }
 
+  const mediaPreview = renderMediaPreview(entry);
+  if (mediaPreview) {
+    return mediaPreview;
+  }
+
   if (fileContent === null) {
     return `<div class="preview-panel preview-unavailable">
       ${icon("info")}
@@ -84,7 +93,12 @@ function renderPreview(entry, fileContent) {
     </div>`;
   }
 
-  return renderCodeView(entry.path, fileContent, entry.size ?? 0);
+  return renderCodeView(
+    entry.path,
+    fileContent,
+    entry.size ?? 0,
+    renderTextPreview(entry, fileContent),
+  );
 }
 
 export async function viewFile(c) {

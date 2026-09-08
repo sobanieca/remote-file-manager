@@ -86,14 +86,23 @@ const BINARY_EXTENSIONS = [
   ".ico",
   ".tiff",
   ".webp",
+  ".avif",
   ".mp3",
   ".mp4",
   ".avi",
   ".mov",
   ".mkv",
+  ".webm",
+  ".wmv",
+  ".flv",
+  ".m4v",
   ".wav",
   ".flac",
   ".ogg",
+  ".aac",
+  ".m4a",
+  ".opus",
+  ".wma",
   ".pdf",
   ".doc",
   ".docx",
@@ -399,6 +408,24 @@ export function getFileKind(filename) {
     return KIND_BY_FILENAME[lowerCaseName];
   }
   return KIND_BY_EXTENSION.get(getFileExtension(lowerCaseName)) || "file";
+}
+
+/**
+ * Checks if a file is a video based on its extension
+ * @param {string} filename - The filename to check
+ * @returns {boolean} - True if the file is a video
+ */
+export function isVideoFile(filename) {
+  return EXTENSIONS_BY_KIND.video.includes(getFileExtension(filename));
+}
+
+/**
+ * Checks if a file is an audio track based on its extension
+ * @param {string} filename - The filename to check
+ * @returns {boolean} - True if the file is audio
+ */
+export function isAudioFile(filename) {
+  return EXTENSIONS_BY_KIND.audio.includes(getFileExtension(filename));
 }
 
 /**

@@ -134,6 +134,9 @@ export async function editFile(c) {
           <button type="button" class="button button-small button-ghost" data-command="toggle-wrap">${
       icon("wrap")
     }<span>Wrap</span></button>
+          <button type="button" class="button button-small button-ghost" data-command="copy-editor" title="Copy the whole file to the clipboard">${
+      icon("clipboard")
+    }<span>Copy all</span></button>
           <a class="button button-small button-ghost" href="/view-file?path=${
       encodeURIComponent(filePath)
     }">${icon("eye")}<span>View</span></a>

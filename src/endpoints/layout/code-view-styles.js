@@ -75,6 +75,20 @@ export const codeViewStyles = `
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
+  .code-view.is-previewing .code-scroll {
+    display: none;
+  }
+  .code-preview {
+    max-height: 78vh;
+    overflow: auto;
+  }
+  .code-preview .markdown-body {
+    padding: 24px 32px;
+  }
+  .code-toolbar .button.is-active {
+    background-color: var(--panel-hover);
+    color: var(--text);
+  }
   .code-line:target,
   .code-line.is-highlighted {
     background-color: var(--notice-bg);

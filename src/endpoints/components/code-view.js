@@ -21,9 +21,10 @@ function renderLines(lines) {
  * @param {string} filePath - The path of the file, used to pick a language
  * @param {string} content - The file contents
  * @param {number} byteSize - The size of the file on disk
+ * @param {string} previewHtml - Optional rendered preview shown in place of the code
  * @returns {string} - The code view markup
  */
-export function renderCodeView(filePath, content, byteSize) {
+export function renderCodeView(filePath, content, byteSize, previewHtml = "") {
   const rawLines = content.replace(/\n$/, "").split("\n");
   const isTooLarge = byteSize > MAX_HIGHLIGHT_BYTES ||
     rawLines.length > MAX_HIGHLIGHT_LINES;
@@ -38,6 +39,14 @@ export function renderCodeView(filePath, content, byteSize) {
       icon("info")
     }highlighting off</span>`
     : "";
+  const previewButton = previewHtml
+    ? `<button type="button" class="button button-small button-ghost" data-command="toggle-preview" aria-pressed="false" title="Toggle rendered preview">${
+      icon("eye")
+    }<span>Preview</span></button>`
+    : "";
+  const previewPanel = previewHtml
+    ? `<div class="code-preview" hidden>${previewHtml}</div>`
+    : "";
 
   return `<div class="code-view" data-language="${escapeHtml(languageLabel)}">
     <div class="code-toolbar">
@@ -47,15 +56,17 @@ export function renderCodeView(filePath, content, byteSize) {
   } · ${formatFileSize(byteSize)}</span>
       ${highlightNotice}
       <div class="code-toolbar-spacer"></div>
+      ${previewButton}
       <button type="button" class="button button-small button-ghost" data-command="toggle-wrap" title="Toggle line wrapping">${
     icon("wrap")
   }<span>Wrap</span></button>
-      <button type="button" class="button button-small button-ghost" data-command="copy-code" title="Copy file contents">${
+      <button type="button" class="button button-small button-ghost" data-command="copy-code" title="Copy the whole file to the clipboard">${
     icon("clipboard")
-  }<span>Copy</span></button>
+  }<span>Copy all</span></button>
     </div>
     <div class="code-scroll">
       <table class="code-table"><tbody>${renderLines(lines)}</tbody></table>
     </div>
+    ${previewPanel}
   </div>`;
 }
