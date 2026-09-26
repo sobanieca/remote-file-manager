@@ -86,9 +86,9 @@ export function renderAppBar({ activeSection, branchInfo } = {}) {
   }<span>Remote File Manager</span></a>
     <nav class="app-nav">${navItems}</nav>
     <div class="app-bar-spacer"></div>
-    <button type="button" class="search-trigger" data-search-open title="Search files in the whole directory (Ctrl+K)">${
+    <button type="button" class="search-trigger" data-search-open title="Search files in the whole directory (Ctrl+P)">${
     icon("search")
-  }<span>Search files</span><kbd>Ctrl K</kbd></button>
+  }<span>Search files</span><kbd>Ctrl P</kbd></button>
     ${renderBranchChip(branchInfo)}
     <button type="button" id="theme-toggle" class="icon-button theme-toggle" aria-label="Toggle theme"></button>
   </header>`;

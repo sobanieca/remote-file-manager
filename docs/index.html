@@ -192,7 +192,7 @@
     .scene {
       margin-top: 28px;
       display: grid;
-      grid-template-columns: minmax(0, 1.6fr) 150px minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1.6fr) 200px minmax(0, 1fr);
       gap: 16px;
       align-items: center;
     }
@@ -362,8 +362,8 @@
     .ssh::before {
       content: "";
       position: absolute;
-      left: 0;
-      right: 0;
+      left: -16px;
+      right: -16px;
       top: 50%;
       height: 2px;
       background: repeating-linear-gradient(90deg, var(--accent) 0 8px, transparent
@@ -373,11 +373,11 @@
     .ssh .tag {
       position: relative;
       font-family: var(--mono);
-      font-size: 11.5px;
-      background: var(--bg);
+      font-size: 11px;
       color: var(--muted);
       padding: 2px 6px;
       white-space: nowrap;
+      transform: translateY(16px);
     }
     .ssh .pk {
       position: absolute;
@@ -387,7 +387,7 @@
       margin: -4.5px 0 0 -4.5px;
       border-radius: 50%;
       background: var(--accent);
-      left: 0;
+      left: -16px;
       opacity: 0;
       animation: pk 2.6s linear infinite;
     }
@@ -397,7 +397,7 @@
     }
     @keyframes pk {
       0% {
-        left: 0;
+        left: -16px;
         opacity: 0;
       }
       10% {
@@ -407,7 +407,7 @@
         opacity: 1;
       }
       100% {
-        left: 100%;
+        left: calc(100% + 16px);
         opacity: 0;
       }
     }
@@ -421,6 +421,10 @@
         height: auto;
         background: repeating-linear-gradient(180deg, var(--accent) 0 8px,
           transparent 8px 14px);
+      }
+      .ssh .tag {
+        transform: none;
+        background: var(--bg);
       }
       .ssh .pk {
         display: none;
@@ -683,7 +687,7 @@
             <span class="lbl">remote server</span>
             <pre><span class="dim">$</span> cd /srv/app
 <span class="dim">$</span> rfm
-Remote File Manager v0.9.0
+Remote File Manager v0.9.1
 <span class="dim">Listening on</span> http://localhost:8000</pre>
             <span class="live"><i></i>serving /srv/app</span>
           </div>
@@ -705,7 +709,7 @@ Remote File Manager v0.9.0
         </div>
         <div class="point">
           <h3>Find anything</h3>
-          <p><code>Ctrl+K</code> opens a fuzzy search over every file below the served directory. <code>Enter</code> opens it, <code>Shift+Enter</code> reveals it in the explorer.</p>
+          <p><code>Ctrl+P</code> opens a fuzzy search over every file below the served directory. <code>Enter</code> opens it, <code>Shift+Enter</code> reveals it in the explorer.</p>
         </div>
         <div class="point">
           <h3>Worktrees</h3>

@@ -146,7 +146,7 @@ function renderToolbar(directoryPath) {
     ${renderBreadcrumb(directoryPath)}
     <label class="pane-filter">
       ${icon("search")}
-      <input type="search" class="filter-input" placeholder="Filter this folder" aria-label="Filter entries in this folder" title="Filter the entries of this folder. Press Ctrl+K to search the whole directory tree">
+      <input type="search" class="filter-input" placeholder="Filter this folder" aria-label="Filter entries in this folder" title="Filter the entries of this folder. Press Ctrl+P to search the whole directory tree">
     </label>
   </div>`;
 }

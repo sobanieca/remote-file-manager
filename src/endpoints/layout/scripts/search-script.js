@@ -220,7 +220,7 @@ export const searchScript = `
   // keyboard handling such as the file list navigation
   document.addEventListener('keydown', (event) => {
     const isShortcut = (event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey &&
-      (event.key === 'k' || event.key === 'K' || event.key === 'p' || event.key === 'P');
+      (event.key === 'p' || event.key === 'P');
     if (isShortcut) {
       event.preventDefault();
       event.stopPropagation();

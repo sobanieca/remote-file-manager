@@ -2,15 +2,26 @@
 
 All notable changes to Remote File Manager are documented here.
 
+## 0.9.1
+
+### Changed
+
+- The file search shortcut is now `Ctrl`/`Cmd` + `P`. `Ctrl`/`Cmd` + `K` no
+  longer opens it.
+
+### Fixed
+
+- Landing page: the SSH tunnel label in the hero diagram overlapped the server
+  box and hid the connector line on desktop layouts.
+
 ## 0.9.0
 
 ### Added
 
 - Fuzzy file search across the whole served directory. Open it with the **Search
-  files** button in the app bar or `Ctrl`/`Cmd` + `K` (also `P`). `Enter` opens
-  a file or folder, `Shift` + `Enter` reveals it in the explorer. The index
-  skips `.git`, refreshes in the background and is invalidated by every file
-  operation.
+  files** button in the app bar or `Ctrl`/`Cmd` + `P`. `Enter` opens a file or
+  folder, `Shift` + `Enter` reveals it in the explorer. The index skips `.git`,
+  refreshes in the background and is invalidated by every file operation.
 - Git worktree support. The status page lists every worktree of the repository
   with its branch and HEAD, and the branch chip in the app bar becomes a
   worktree switcher when there is more than one. Switching serves the selected
