@@ -40,3 +40,8 @@ machine. It allows to serve files as well as manage them and edit (text files).
 - Validate all user inputs, especially file paths
 - Avoid directory traversal vulnerabilities
 - Don't expose sensitive system information/files
+
+## Landing Page
+
+- When you add a feature or change existing behavior, update the landing page
+  in `docs/index.html` as well, so it always reflects the current feature set
