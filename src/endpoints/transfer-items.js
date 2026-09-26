@@ -1,5 +1,6 @@
 import { basename, copy } from "../deps.js";
 import { combinePaths, normalizePath } from "./utils.js";
+import { invalidateFileIndex } from "../search/file-index.js";
 
 async function pathExists(path) {
   try {
@@ -98,6 +99,7 @@ export async function transferItems({ paths, targetPath, isMove, overwrite }) {
     }
   }
 
+  invalidateFileIndex();
   const verb = isMove ? "Moved" : "Copied";
   const messageParts = [];
   if (processed > 0) {

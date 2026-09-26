@@ -1,4 +1,5 @@
 import { combinePaths, normalizePath } from "./utils.js";
+import { invalidateFileIndex } from "../search/file-index.js";
 
 function isValidName(name) {
   return typeof name === "string" &&
@@ -47,6 +48,7 @@ export async function createItem(c) {
       throw error;
     }
 
+    invalidateFileIndex();
     return c.json({
       ok: true,
       path: newItemPath,

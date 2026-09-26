@@ -6,22 +6,30 @@ import { markdownStyles } from "./markdown-styles.js";
 import { diffStyles } from "./diff-styles.js";
 import { codeViewStyles } from "./code-view-styles.js";
 import { gitStyles } from "./git-styles.js";
+import { searchStyles } from "./search-styles.js";
 import { themeHeadScript, themeScript } from "./theme-script.js";
 import { scripts } from "./scripts/index.js";
 import { iconSprite } from "../components/icons.js";
 import { renderAppBar } from "../components/app-bar.js";
+import { renderSearchPalette } from "../components/search-palette.js";
 import { getBranchInfo, getGitStatusInfo } from "../../git/git-status.js";
+import { listWorktrees } from "../../git/git-worktree.js";
+import { getWorkingDir } from "../../workspace.js";
 
 async function resolveBranchInfo() {
-  const workingDir = Deno.cwd();
+  const workingDir = getWorkingDir();
   const branchInfo = await getBranchInfo(workingDir);
   if (!branchInfo) {
     return null;
   }
-  const statusInfo = await getGitStatusInfo(workingDir);
+  const [statusInfo, worktrees] = await Promise.all([
+    getGitStatusInfo(workingDir),
+    listWorktrees(workingDir),
+  ]);
   return {
     ...branchInfo,
     changeCount: statusInfo ? statusInfo.records.length : 0,
+    worktrees: worktrees || [],
   };
 }
 
@@ -57,6 +65,7 @@ export async function layout(title, content, options = {}) {
     ${markdownStyles}
     ${diffStyles}
     ${gitStyles}
+    ${searchStyles}
   </style>
 </head>
 <body class="${options.bodyClass || ""}">
@@ -65,6 +74,7 @@ export async function layout(title, content, options = {}) {
   <div class="${containerClass}">
   ${content}
   </div>
+  ${renderSearchPalette()}
   <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
   <script>
     ${themeScript}

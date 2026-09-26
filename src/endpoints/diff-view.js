@@ -267,6 +267,13 @@ function renderFileBody(file, language) {
     </div>`;
 }
 
+function resolveServedPath(file, options) {
+  if (!options.linkToFiles || file.status === "deleted") {
+    return null;
+  }
+  return options.resolvePath ? options.resolvePath(file.path) : file.path;
+}
+
 function renderFile(file, options) {
   const language = resolveLanguage(file.path);
   const renamedFrom = file.originalPath
@@ -274,9 +281,10 @@ function renderFile(file, options) {
       icon("arrow-right")
     }</span>`
     : "";
-  const viewLink = options.linkToFiles && file.status !== "deleted"
+  const servedPath = resolveServedPath(file, options);
+  const viewLink = servedPath
     ? `<a class="diff-file-link" href="/view-file?path=${
-      encodeURIComponent(file.path)
+      encodeURIComponent(servedPath)
     }" title="Open file">${icon("eye")}</a>`
     : "";
 
@@ -302,7 +310,8 @@ function renderFile(file, options) {
 /**
  * Renders a complete diff, with unified and side-by-side layouts
  * @param {string} diffText - The raw diff produced by git
- * @param {object} options - Rendering options, notably linkToFiles
+ * @param {object} options - Rendering options: linkToFiles adds a link to
+ *   every file, resolvePath maps a diff path to the served path for that link
  * @returns {string} - The diff markup
  */
 export function diffView(diffText, options = {}) {

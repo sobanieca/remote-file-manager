@@ -123,6 +123,21 @@ export async function getCommitDiff(workingDir, revision) {
   if (!repoRoot || !isValidRevision(revision)) {
     return null;
   }
+  // Merge commits are shown against their first parent, which older git
+  // versions cannot express, so the plain form remains as a fallback
+  const firstParentDiff = await runGit(
+    [
+      "show",
+      ...DIFF_BASE_ARGS,
+      "--format=",
+      "--diff-merges=first-parent",
+      revision,
+    ],
+    repoRoot,
+  );
+  if (firstParentDiff !== null) {
+    return firstParentDiff;
+  }
   return await runGit(
     ["show", ...DIFF_BASE_ARGS, "--format=", revision],
     repoRoot,

@@ -1,17 +1,41 @@
 // Helper functions for file and path operations
 
 /**
- * Normalizes a path to prevent directory traversal attacks
+ * Normalizes a path relative to the served directory and rejects anything that
+ * could escape it, such as absolute paths or parent directory segments
  * @param {string} path - The path to normalize
  * @returns {string|null} - The normalized path or null if invalid
  */
 export function normalizePath(path) {
-  if (!path || path.includes("..")) {
+  if (typeof path !== "string" || path.length === 0 || path.includes("\0")) {
     return null;
   }
+  const unixPath = path.replace(/\\/g, "/");
+  if (unixPath.startsWith("/")) {
+    return null;
+  }
+  const segments = [];
+  for (const segment of unixPath.split("/")) {
+    if (segment === "" || segment === ".") {
+      continue;
+    }
+    if (segment === "..") {
+      return null;
+    }
+    segments.push(segment);
+  }
+  return segments.join("/") || ".";
+}
 
-  // Convert "./" or just "." to empty string for clean paths
-  return path.replace(/^\.\//, "").replace(/^\.$/, ".");
+/**
+ * Encodes a served path for use inside a URL, keeping the slashes intact
+ * @param {string} path - The path relative to the served directory
+ * @returns {string} - The path with every segment percent encoded
+ */
+export function toUrlPath(path) {
+  return path.split("/").map((segment) => encodeURIComponent(segment)).join(
+    "/",
+  );
 }
 
 /**

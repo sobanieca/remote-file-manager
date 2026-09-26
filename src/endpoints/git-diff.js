@@ -9,17 +9,21 @@ import {
   getWorkingTreeDiff,
 } from "../git/git-diff.js";
 import { getCommit } from "../git/git-log.js";
-import { getBranchInfo } from "../git/git-status.js";
+import { getBranchInfo, toServedPath } from "../git/git-status.js";
+import { getWorkingDir } from "../workspace.js";
 
-async function resolveDiffRequest(c, workingDir) {
+async function resolveDiffRequest(c, workingDir, repoRoot) {
   const commit = c.req.query("commit");
   if (commit) {
     const [diffText, commitInfo] = await Promise.all([
       getCommitDiff(workingDir, commit),
       getCommit(workingDir, commit),
     ]);
+    // Commit diffs are produced at the repository root, so their paths have
+    // to be mapped back onto the served directory
     return {
       diffText,
+      resolvePath: (path) => toServedPath(repoRoot, workingDir, path),
       title: commitInfo ? commitInfo.subject : "Commit",
       subtitle: commitInfo
         ? `${commitInfo.shortHash} · ${commitInfo.author} · ${
@@ -84,7 +88,7 @@ async function resolveDiffRequest(c, workingDir) {
 
 export async function gitDiff(c) {
   try {
-    const workingDir = Deno.cwd();
+    const workingDir = getWorkingDir();
     const branchInfo = await getBranchInfo(workingDir);
 
     if (!branchInfo) {
@@ -99,7 +103,11 @@ export async function gitDiff(c) {
       );
     }
 
-    const request = await resolveDiffRequest(c, workingDir);
+    const request = await resolveDiffRequest(
+      c,
+      workingDir,
+      branchInfo.repoRoot,
+    );
     if (!request) {
       return c.html("Nothing to diff", 400);
     }
@@ -139,7 +147,12 @@ export async function gitDiff(c) {
     }<span>${request.backLabel}</span></a>
         </div>
       </div>
-      ${diffView(request.diffText, { linkToFiles: true })}
+      ${
+      diffView(request.diffText, {
+        linkToFiles: true,
+        resolvePath: request.resolvePath,
+      })
+    }
     `;
 
     return c.html(

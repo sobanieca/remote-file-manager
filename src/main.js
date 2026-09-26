@@ -20,6 +20,9 @@ import { gitDiff } from "./endpoints/git-diff.js";
 import { gitOverview } from "./endpoints/git-overview.js";
 import { gitLog } from "./endpoints/git-log.js";
 import { gitCompare } from "./endpoints/git-compare.js";
+import { searchFiles } from "./endpoints/search-files.js";
+import { switchWorktree } from "./endpoints/switch-worktree.js";
+import { getWorkingDir } from "./workspace.js";
 import { update } from "./commands/update.js";
 import { version } from "./version.js";
 
@@ -88,10 +91,11 @@ if (customPortProvided) {
     console.error(error);
   }
 }
-const workingDir = Deno.cwd();
+const workingDir = getWorkingDir();
 
 // File explorer endpoints
 app.get("/file-explorer", (c) => fileExplorer(c));
+app.get("/search-files", (c) => searchFiles(c));
 app.get("/file-pane", (c) => filePane(c));
 app.get("/view-file", (c) => viewFile(c));
 app.get("/edit-file", (c) => editFile(c));
@@ -116,6 +120,7 @@ app.get("/git", (c) => gitOverview(c));
 app.get("/git-log", (c) => gitLog(c));
 app.get("/git-compare", (c) => gitCompare(c));
 app.get("/git-diff", (c) => gitDiff(c));
+app.post("/switch-worktree", (c) => switchWorktree(c));
 
 app.use("/*", async (c, next) => {
   const path = c.req.path;
@@ -126,13 +131,9 @@ app.use("/*", async (c, next) => {
   await next();
 });
 
-// Serve static files with proper MIME types
-app.use(
-  "/*",
-  serveStatic({
-    root: workingDir,
-  }),
-);
+// Serve static files with proper MIME types. The root follows the served
+// directory, which changes when another worktree is selected
+app.use("/*", (c, next) => serveStatic({ root: getWorkingDir() })(c, next));
 
 console.log(`Remote File Manager server running at http://localhost:${port}`);
 console.log(`Use --port or -p to change port (current: ${port})`);

@@ -3,6 +3,8 @@ import { normalizePath } from "./utils.js";
 import { readDirectoryEntries } from "./file-entries.js";
 import { renderPane } from "./components/file-pane.js";
 import { icon } from "./components/icons.js";
+import { getGitStatusInfo } from "../git/git-status.js";
+import { getWorkingDir } from "../workspace.js";
 
 const COMMAND_BUTTONS = [
   { label: "Rename", iconName: "pencil", command: "rename-focused" },
@@ -40,10 +42,21 @@ function renderCommandBar() {
   return `<div class="command-bar">${buttons}</div>`;
 }
 
-async function buildPane(pane, requestedPath) {
+async function buildPane(pane, requestedPath, gitInfo) {
   const directoryPath = normalizePath(requestedPath) || ".";
-  const { entries, totalSize } = await readDirectoryEntries(directoryPath);
+  const { entries, totalSize } = await readDirectoryEntries(
+    directoryPath,
+    gitInfo,
+  );
   return renderPane({ pane, directoryPath, entries, totalSize });
+}
+
+async function isFile(path) {
+  try {
+    return (await Deno.stat(path)).isFile;
+  } catch (_error) {
+    return false;
+  }
 }
 
 export async function fileExplorer(c) {
@@ -56,10 +69,17 @@ export async function fileExplorer(c) {
     if (!normalizedLeft) {
       return c.html("Invalid path", 400);
     }
+    if (await isFile(normalizedLeft)) {
+      return c.redirect(
+        `/view-file?path=${encodeURIComponent(normalizedLeft)}`,
+      );
+    }
+
+    const gitInfo = await getGitStatusInfo(getWorkingDir());
 
     let leftPaneHtml;
     try {
-      leftPaneHtml = await buildPane("left", normalizedLeft);
+      leftPaneHtml = await buildPane("left", normalizedLeft, gitInfo);
     } catch (error) {
       return c.html(`Error reading directory: ${error.message}`, 500);
     }
@@ -68,9 +88,9 @@ export async function fileExplorer(c) {
     if (isSplit) {
       const normalizedRight = normalizePath(rightPath || ".") || ".";
       try {
-        rightPaneHtml = await buildPane("right", normalizedRight);
+        rightPaneHtml = await buildPane("right", normalizedRight, gitInfo);
       } catch (_error) {
-        rightPaneHtml = await buildPane("right", ".");
+        rightPaneHtml = await buildPane("right", ".", gitInfo);
       }
     }
 

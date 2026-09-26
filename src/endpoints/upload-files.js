@@ -1,5 +1,6 @@
 import { dirname, ensureDir, join } from "../deps.js";
 import { combinePaths, normalizePath } from "./utils.js";
+import { invalidateFileIndex } from "../search/file-index.js";
 
 function isSafeRelativePath(relativePath) {
   return !relativePath.split("/").some((segment) =>
@@ -58,6 +59,7 @@ export async function uploadFiles(c) {
       }
     }
 
+    invalidateFileIndex();
     const folderCount = createdDirectories.size;
     const messageParts = [
       `Uploaded ${uploadedCount} file${uploadedCount === 1 ? "" : "s"}`,

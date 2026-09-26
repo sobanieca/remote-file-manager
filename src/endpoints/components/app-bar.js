@@ -1,37 +1,60 @@
 import { escapeHtml } from "../utils.js";
 import { icon } from "./icons.js";
+import { renderWorktreeMenuItems } from "./worktree-list.js";
 
-function renderBranchChip(branchInfo) {
-  if (!branchInfo) {
-    return "";
-  }
-
-  const trackingParts = [];
+function renderTrackingBadges(branchInfo) {
+  const parts = [];
   if (branchInfo.ahead > 0) {
-    trackingParts.push(
+    parts.push(
       `<span class="branch-ahead" title="${branchInfo.ahead} commit(s) ahead of ${
         escapeHtml(branchInfo.upstream || "upstream")
       }">↑${branchInfo.ahead}</span>`,
     );
   }
   if (branchInfo.behind > 0) {
-    trackingParts.push(
+    parts.push(
       `<span class="branch-behind" title="${branchInfo.behind} commit(s) behind ${
         escapeHtml(branchInfo.upstream || "upstream")
       }">↓${branchInfo.behind}</span>`,
     );
   }
-
   const changeCount = branchInfo.changeCount || 0;
-  const dirtyBadge = changeCount > 0
-    ? `<span class="branch-dirty" title="${changeCount} uncommitted change(s)">${changeCount}</span>`
-    : "";
+  if (changeCount > 0) {
+    parts.push(
+      `<span class="branch-dirty" title="${changeCount} uncommitted change(s)">${changeCount}</span>`,
+    );
+  }
+  return parts.join("");
+}
 
-  return `<a class="branch-chip${
-    branchInfo.isDetached ? " is-detached" : ""
-  }" href="/git" title="Git status">${icon("branch")}<span>${
+function renderBranchChip(branchInfo) {
+  if (!branchInfo) {
+    return "";
+  }
+
+  const chipClass = `branch-chip${branchInfo.isDetached ? " is-detached" : ""}`;
+  const chipContent = `${icon("branch")}<span>${
     escapeHtml(branchInfo.branch || "unknown")
-  }</span>${trackingParts.join("")}${dirtyBadge}</a>`;
+  }</span>${renderTrackingBadges(branchInfo)}`;
+
+  const worktrees = branchInfo.worktrees || [];
+  if (worktrees.length < 2) {
+    return `<a class="${chipClass}" href="/git" title="Git status">${chipContent}</a>`;
+  }
+
+  return `<div class="dropdown worktree-dropdown">
+    <button type="button" class="${chipClass} dropdown-trigger" title="Switch worktree" aria-haspopup="true">${chipContent}${
+    icon("chevron-down", "icon-small")
+  }</button>
+    <div class="menu-popover worktree-menu" role="menu">
+      <div class="menu-heading">Worktrees</div>
+      ${renderWorktreeMenuItems(worktrees)}
+      <div class="menu-separator"></div>
+      <a class="menu-item" href="/git">${
+    icon("git-status")
+  }<span>Git status</span></a>
+    </div>
+  </div>`;
 }
 
 const NAV_ITEMS = [
@@ -63,6 +86,9 @@ export function renderAppBar({ activeSection, branchInfo } = {}) {
   }<span>Remote File Manager</span></a>
     <nav class="app-nav">${navItems}</nav>
     <div class="app-bar-spacer"></div>
+    <button type="button" class="search-trigger" data-search-open title="Search files in the whole directory (Ctrl+K)">${
+    icon("search")
+  }<span>Search files</span><kbd>Ctrl K</kbd></button>
     ${renderBranchChip(branchInfo)}
     <button type="button" id="theme-toggle" class="icon-button theme-toggle" aria-label="Toggle theme"></button>
   </header>`;

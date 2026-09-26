@@ -10,6 +10,7 @@ import { renderNotARepository } from "./git-overview.js";
 import { getCommits } from "../git/git-log.js";
 import { getBranchInfo } from "../git/git-status.js";
 import { join, relative } from "../deps.js";
+import { getWorkingDir } from "../workspace.js";
 
 const PAGE_SIZE = 40;
 
@@ -79,7 +80,7 @@ function buildPageHref(basePath, skip) {
 
 export async function gitLog(c) {
   try {
-    const workingDir = Deno.cwd();
+    const workingDir = getWorkingDir();
     const branchInfo = await getBranchInfo(workingDir);
 
     if (!branchInfo) {

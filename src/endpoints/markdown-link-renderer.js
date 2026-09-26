@@ -1,5 +1,5 @@
 import { MarkdownRenderer } from "../deps.js";
-import { isMarkdownFile } from "./utils.js";
+import { isMarkdownFile, toUrlPath } from "./utils.js";
 
 const EXTERNAL_URL_PATTERN = /^([a-z][a-z0-9+.-]*:|\/\/)/i;
 const QUERY_OR_FRAGMENT_PATTERN = /[?#]/;
@@ -65,7 +65,7 @@ export class MarkdownLinkRenderer extends MarkdownRenderer {
       return `/markdown?path=${encodedPath}${target.suffix}`;
     }
 
-    return `/${target.path}${target.suffix}`;
+    return `/${toUrlPath(target.path)}${target.suffix}`;
   }
 
   #toServedFileHref(href) {
@@ -75,7 +75,7 @@ export class MarkdownLinkRenderer extends MarkdownRenderer {
       return href;
     }
 
-    return `/${target.path}${target.suffix}`;
+    return `/${toUrlPath(target.path)}${target.suffix}`;
   }
 
   #resolveTarget(href) {

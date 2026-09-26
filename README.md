@@ -24,12 +24,16 @@ valuable for remote server administration and development workflows.
   organize files and folders, with multi-select and bulk actions
 - **Sorting, Filtering and Views**: Sort by name, size or date, filter the
   listing live, and switch between list and icon grid
+- **Fuzzy Search**: Find any file or folder below the served directory with
+  `Ctrl`/`Cmd` + `K`, open it or reveal it in the explorer
 - **Source Code Viewer**: Syntax highlighted, line numbered viewer with line
   anchors, wrapping and copy
 - **Text File Editing**: Editor with live syntax highlighting, line numbers,
   auto-indent and `Ctrl+S` saving
 - **Git Integration**: Branch indicator, working tree status overview, commit
   history, and diffs in inline or side-by-side mode
+- **Worktrees**: See every worktree of the repository and switch the served
+  directory to any of them from the app bar or the status page
 - **Commit Comparison**: Pick any two commits and review everything that changed
   between them
 - **Clipboard Upload**: Paste screenshots and images directly from clipboard to
@@ -56,6 +60,23 @@ The keyboard is used for moving around a listing:
 | `Esc`              | Clear the filter box          |
 | `Ctrl`/`Cmd` + `A` | Select everything in the pane |
 | `Ctrl`/`Cmd` + `S` | Save the file in the editor   |
+| `Ctrl`/`Cmd` + `K` | Search files everywhere       |
+
+### Search
+
+The filter box in a pane narrows the current folder. To find something anywhere
+below the served directory press `Ctrl`/`Cmd` + `K` (or `P`) or click **Search
+files** in the app bar. Matching is fuzzy, so `fexp` finds
+`src/endpoints/file-explorer.js`, and several words can be combined. `Enter`
+opens the entry, `Shift` + `Enter` reveals it in the file explorer.
+
+### Git Worktrees
+
+When the repository has more than one worktree, the branch chip in the app bar
+opens a list of them and the git status page shows them with their branch and
+HEAD. Switching makes the server serve that worktree instead. If you started
+`rfm` in a sub directory of the repository, the same sub directory of the other
+worktree is served when it exists.
 
 ## Installation
 

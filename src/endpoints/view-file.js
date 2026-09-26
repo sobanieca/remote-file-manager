@@ -8,6 +8,7 @@ import {
   formatTimestamp,
   getParentPath,
   normalizePath,
+  toUrlPath,
 } from "./utils.js";
 import { describePath } from "./file-entries.js";
 import { renderCodeView } from "./components/code-view.js";
@@ -72,7 +73,7 @@ function renderMetaStrip(entry) {
 function renderPreview(entry, fileContent) {
   if (entry.isImage) {
     return `<div class="preview-panel">
-      <img class="image-preview" src="/${entry.path}" alt="${
+      <img class="image-preview" src="/${toUrlPath(entry.path)}" alt="${
       escapeHtml(entry.name)
     }">
     </div>`;

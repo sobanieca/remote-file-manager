@@ -8,6 +8,9 @@ import {
   toServedPath,
 } from "../git/git-status.js";
 import { getCommits } from "../git/git-log.js";
+import { listWorktrees } from "../git/git-worktree.js";
+import { renderWorktreeList } from "./components/worktree-list.js";
+import { getWorkingDir } from "../workspace.js";
 
 const STATUS_ORDER = ["added", "modified", "renamed", "deleted"];
 
@@ -115,7 +118,7 @@ function renderCommitRow(commit) {
 
 export async function gitOverview(c) {
   try {
-    const workingDir = Deno.cwd();
+    const workingDir = getWorkingDir();
     const branchInfo = await getBranchInfo(workingDir);
 
     if (!branchInfo) {
@@ -130,14 +133,14 @@ export async function gitOverview(c) {
       );
     }
 
-    const overview = await getStatusOverview(workingDir);
-    const recent = await getCommits(workingDir, { limit: 5 });
+    const [overview, recent, worktrees] = await Promise.all([
+      getStatusOverview(workingDir),
+      getCommits(workingDir, { limit: 5 }),
+      listWorktrees(workingDir),
+    ]);
     const repoRoot = branchInfo.repoRoot;
 
-    const totalChanges = overview
-      ? overview.staged.length + overview.unstaged.length +
-        overview.untracked.length
-      : 0;
+    const totalChanges = overview ? overview.changeCount : 0;
 
     const trackingSummary = branchInfo.upstream
       ? `<div class="meta-item"><span class="meta-label">Upstream</span><span class="meta-value">${
@@ -187,6 +190,7 @@ export async function gitOverview(c) {
         <div class="meta-item"><span class="meta-label">Changes</span><span class="meta-value">${totalChanges}</span></div>
       </div>
       ${cleanState}
+      ${renderWorktreeList(worktrees || [])}
       ${
       renderChangeGroup({
         title: "Staged changes",

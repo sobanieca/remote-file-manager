@@ -4,6 +4,8 @@ import { clipboardScript } from "./clipboard-script.js";
 import { codeScript } from "./code-script.js";
 import { editorScript } from "./editor-script.js";
 import { gitScript } from "./git-script.js";
+import { searchScript } from "./search-script.js";
+import { worktreeScript } from "./worktree-script.js";
 
 export const scripts = [
   coreScript,
@@ -12,4 +14,6 @@ export const scripts = [
   codeScript,
   editorScript,
   gitScript,
+  searchScript,
+  worktreeScript,
 ].join("\n");

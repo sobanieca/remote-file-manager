@@ -5,7 +5,8 @@ import { diffView } from "./diff-view.js";
 import { renderNotARepository } from "./git-overview.js";
 import { getChangedFiles, getCommit } from "../git/git-log.js";
 import { getRevisionDiff } from "../git/git-diff.js";
-import { getBranchInfo } from "../git/git-status.js";
+import { getBranchInfo, toServedPath } from "../git/git-status.js";
+import { getWorkingDir } from "../workspace.js";
 
 function renderRevisionCard(label, revision, commit) {
   const details = commit
@@ -65,7 +66,7 @@ function renderChangedFileList(changes) {
 
 export async function gitCompare(c) {
   try {
-    const workingDir = Deno.cwd();
+    const workingDir = getWorkingDir();
     const branchInfo = await getBranchInfo(workingDir);
 
     if (!branchInfo) {
@@ -142,7 +143,13 @@ export async function gitCompare(c) {
         ${renderRevisionCard("To (B)", toRevision, toCommit)}
       </div>
       ${renderChangedFileList(changes)}
-      ${diffView(diffText, { linkToFiles: true })}
+      ${
+      diffView(diffText, {
+        linkToFiles: true,
+        resolvePath: (path) =>
+          toServedPath(branchInfo.repoRoot, workingDir, path),
+      })
+    }
     `;
 
     return c.html(

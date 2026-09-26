@@ -39,7 +39,7 @@ export const clipboardScript = `
         formData.append('file', blob, name);
         const result = await RFM.request('/paste-content', { method: 'POST', body: formData });
         RFM.toast(result.message, result.ok ? 'success' : 'error');
-        if (result.ok && window.RFM_EXPLORER) window.RFM_EXPLORER.refreshPane(pane);
+        if (result.ok && window.RFM_EXPLORER) window.RFM_EXPLORER.refreshAllPanes();
       }
     });
   }

@@ -1,5 +1,6 @@
 import { dirname, join } from "../deps.js";
 import { normalizePath } from "./utils.js";
+import { invalidateFileIndex } from "../search/file-index.js";
 
 function isValidName(name) {
   return typeof name === "string" &&
@@ -44,6 +45,7 @@ export async function renameItem(c) {
       // Target is free, continue with the rename
     }
 
+    invalidateFileIndex();
     await Deno.rename(currentPath, newPath);
 
     return c.json({

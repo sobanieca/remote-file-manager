@@ -1,5 +1,6 @@
 import { basename } from "../deps.js";
 import { normalizePath } from "./utils.js";
+import { invalidateFileIndex } from "../search/file-index.js";
 
 // Deno no longer exposes a dedicated error class for this case
 function isNotEmptyError(error) {
@@ -39,6 +40,7 @@ export async function deleteItems(c) {
       }
     }
 
+    invalidateFileIndex();
     const messageParts = [];
     if (deleted > 0) {
       messageParts.push(`Deleted ${deleted} item${deleted === 1 ? "" : "s"}`);

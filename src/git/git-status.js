@@ -1,5 +1,5 @@
-import { basename, dirname, join, relative } from "../deps.js";
-import { getRepoRoot, hasCommits, runGit } from "./git-command.js";
+import { join, relative } from "../deps.js";
+import { getRepoRoot, runGit } from "./git-command.js";
 
 function resolveStatus(statusCode) {
   if (statusCode === "??") {
@@ -58,8 +58,8 @@ export async function getGitStatusInfo(workingDir) {
   }
 
   // Running git in the served directory with a "." pathspec keeps changes from
-  // unrelated parts of the repository out of the report while still yielding
-  // repository relative paths
+  // unrelated parts of the repository out of the report. The porcelain format
+  // always reports paths relative to the repository root
   const output = await runGit(
     ["status", "--porcelain", "-z", "--untracked-files=all", "--", "."],
     workingDir,
@@ -69,12 +69,67 @@ export async function getGitStatusInfo(workingDir) {
   }
 
   const records = parsePorcelain(output);
-  const statusMap = new Map();
+  const recordsByPath = new Map();
   for (const record of records) {
-    statusMap.set(record.path, record.status);
+    recordsByPath.set(record.path, record);
   }
 
-  return { repoRoot, statusMap, records };
+  return { repoRoot, recordsByPath, records };
+}
+
+function toRepoRelativePath(gitInfo, workingDir, entryPath) {
+  const absolutePath = entryPath === "."
+    ? workingDir
+    : join(workingDir, entryPath);
+  return relative(gitInfo.repoRoot, absolutePath);
+}
+
+function summarizeStatuses(statuses) {
+  if (statuses.size === 0) {
+    return null;
+  }
+  if (statuses.size === 1) {
+    const [only] = statuses;
+    return only === "renamed" ? "modified" : only;
+  }
+  return "modified";
+}
+
+/**
+ * Resolves the git change of a directory entry. A directory reports the
+ * combined state of everything below it
+ * @param {object|null} gitInfo - The status info from getGitStatusInfo
+ * @param {string} workingDir - The served working directory
+ * @param {string} entryPath - The entry path relative to the working directory
+ * @param {boolean} isDirectory - Whether the entry is a directory
+ * @returns {object|null} - The status and whether a diff exists, or null
+ */
+export function getEntryGitChange(gitInfo, workingDir, entryPath, isDirectory) {
+  if (!gitInfo) {
+    return null;
+  }
+  const gitRelativePath = toRepoRelativePath(gitInfo, workingDir, entryPath);
+
+  if (!isDirectory) {
+    const record = gitInfo.recordsByPath.get(gitRelativePath);
+    if (!record) {
+      return null;
+    }
+    return { status: record.status, hasDiff: !record.isUntracked };
+  }
+
+  const prefix = gitRelativePath === "" ? "" : gitRelativePath + "/";
+  const statuses = new Set();
+  let hasDiff = false;
+  for (const record of gitInfo.records) {
+    if (!record.path.startsWith(prefix)) {
+      continue;
+    }
+    statuses.add(record.status);
+    hasDiff = hasDiff || !record.isUntracked;
+  }
+  const status = summarizeStatuses(statuses);
+  return status ? { status, hasDiff } : null;
 }
 
 /**
@@ -86,43 +141,49 @@ export async function getGitStatusInfo(workingDir) {
  * @returns {string|null} - The status name, or null when unchanged
  */
 export function getEntryGitStatus(gitInfo, workingDir, entryPath, isDirectory) {
-  if (!gitInfo) {
-    return null;
-  }
-  const absolutePath = join(workingDir, entryPath);
-  const gitRelativePath = relative(gitInfo.repoRoot, absolutePath);
-  if (!isDirectory) {
-    return gitInfo.statusMap.get(gitRelativePath) || null;
-  }
-  const prefix = gitRelativePath + "/";
-  for (const key of gitInfo.statusMap.keys()) {
-    if (key.startsWith(prefix)) {
-      return "modified";
-    }
-  }
-  return null;
+  const change = getEntryGitChange(gitInfo, workingDir, entryPath, isDirectory);
+  return change ? change.status : null;
 }
 
 /**
- * Lists names of files git reports as deleted inside a directory
+ * Lists entries git reports as deleted directly inside a directory. A
+ * directory whose files were all deleted no longer exists on disk, so it is
+ * reported as a deleted directory
  * @param {object|null} gitInfo - The status info from getGitStatusInfo
  * @param {string} workingDir - The served working directory
  * @param {string} directoryPath - The directory to inspect
- * @returns {string[]} - The deleted file names
+ * @param {Set<string>} existingNames - Names that still exist on disk
+ * @returns {object[]} - Deleted entries with name and isDirectory
  */
-export function getDeletedEntryNames(gitInfo, workingDir, directoryPath) {
+export function getDeletedEntries(
+  gitInfo,
+  workingDir,
+  directoryPath,
+  existingNames,
+) {
   if (!gitInfo) {
     return [];
   }
-  const absoluteDir = join(workingDir, directoryPath);
-  const relativeDir = relative(gitInfo.repoRoot, absoluteDir) || ".";
-  const names = [];
-  for (const [key, status] of gitInfo.statusMap.entries()) {
-    if (status === "deleted" && dirname(key) === relativeDir) {
-      names.push(basename(key));
+  const relativeDir = toRepoRelativePath(gitInfo, workingDir, directoryPath);
+  const prefix = relativeDir === "" ? "" : relativeDir + "/";
+  const deleted = new Map();
+
+  for (const record of gitInfo.records) {
+    if (record.status !== "deleted" || !record.path.startsWith(prefix)) {
+      continue;
     }
+    const remainder = record.path.slice(prefix.length);
+    const separatorIndex = remainder.indexOf("/");
+    const name = separatorIndex === -1
+      ? remainder
+      : remainder.slice(0, separatorIndex);
+    if (!name || existingNames.has(name) || deleted.has(name)) {
+      continue;
+    }
+    deleted.set(name, { name, isDirectory: separatorIndex !== -1 });
   }
-  return names;
+
+  return [...deleted.values()];
 }
 
 /**
@@ -152,25 +213,25 @@ export async function getBranchInfo(workingDir) {
     return null;
   }
 
-  const branchOutput = await runGit(
-    ["rev-parse", "--abbrev-ref", "HEAD"],
-    repoRoot,
-  );
-  const branch = branchOutput ? branchOutput.trim() : null;
-  const isDetached = branch === "HEAD" || branch === null;
+  // The symbolic ref resolves on a branch without commits too, where
+  // rev-parse would fail and misreport the repository as detached
+  const [symbolicRef, headOutput, upstreamOutput] = await Promise.all([
+    runGit(["symbolic-ref", "--short", "-q", "HEAD"], repoRoot),
+    runGit(["rev-parse", "--short", "--verify", "-q", "HEAD"], repoRoot),
+    runGit(
+      ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}"],
+      repoRoot,
+    ),
+  ]);
 
-  const headOutput = await runGit(["rev-parse", "--short", "HEAD"], repoRoot);
+  const branch = symbolicRef ? symbolicRef.trim() : null;
   const head = headOutput ? headOutput.trim() : null;
-
-  const upstreamOutput = await runGit(
-    ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}"],
-    repoRoot,
-  );
   const upstream = upstreamOutput ? upstreamOutput.trim() : null;
+  const isDetached = branch === null;
 
   let ahead = 0;
   let behind = 0;
-  if (upstream) {
+  if (upstream && head) {
     const counts = await runGit(
       ["rev-list", "--left-right", "--count", `${upstream}...HEAD`],
       repoRoot,
@@ -190,7 +251,7 @@ export async function getBranchInfo(workingDir) {
     upstream,
     ahead,
     behind,
-    hasCommits: await hasCommits(repoRoot),
+    hasCommits: head !== null,
   };
 }
 
@@ -222,7 +283,13 @@ export async function getStatusOverview(workingDir) {
     }
   }
 
-  return { repoRoot: gitInfo.repoRoot, staged, unstaged, untracked };
+  return {
+    repoRoot: gitInfo.repoRoot,
+    staged,
+    unstaged,
+    untracked,
+    changeCount: gitInfo.records.length,
+  };
 }
 
 const STATUS_LABELS = {

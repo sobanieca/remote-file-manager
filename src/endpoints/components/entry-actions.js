@@ -1,4 +1,4 @@
-import { escapeHtml } from "../utils.js";
+import { escapeHtml, toUrlPath } from "../utils.js";
 import { icon } from "./icons.js";
 
 /**
@@ -32,6 +32,11 @@ export function getEntryActions(entry, options = {}) {
       label: "View git diff",
       iconName: "diff",
       href: `/git-diff?path=${encodedPath}`,
+    }, {
+      id: "history",
+      label: entry.isDirectory ? "Folder history" : "File history",
+      iconName: "history",
+      href: `/git-log?path=${encodedPath}`,
     }];
   }
 
@@ -79,7 +84,7 @@ export function getEntryActions(entry, options = {}) {
       id: "raw",
       label: "Open raw",
       iconName: "external-link",
-      href: `/${entry.path}`,
+      href: `/${toUrlPath(entry.path)}`,
       newTab: true,
     });
     actions.push({
@@ -90,7 +95,7 @@ export function getEntryActions(entry, options = {}) {
     });
   }
 
-  if (entry.gitStatus && entry.gitStatus !== "added" && entry.isText) {
+  if (entry.hasGitDiff && (entry.isDirectory || entry.isText)) {
     actions.push({
       id: "diff",
       label: "View git diff",
@@ -100,7 +105,7 @@ export function getEntryActions(entry, options = {}) {
   }
   actions.push({
     id: "history",
-    label: "File history",
+    label: entry.isDirectory ? "Folder history" : "File history",
     iconName: "history",
     href: `/git-log?path=${encodedPath}`,
   });

@@ -8,10 +8,11 @@ import {
   isTextFile,
 } from "./utils.js";
 import {
-  getDeletedEntryNames,
-  getEntryGitStatus,
+  getDeletedEntries,
+  getEntryGitChange,
   getGitStatusInfo,
 } from "../git/git-status.js";
+import { getWorkingDir } from "../workspace.js";
 
 async function describeEntry(directoryPath, name, isDirectory, isSymlink) {
   const path = combinePaths(directoryPath, name);
@@ -30,6 +31,8 @@ async function describeEntry(directoryPath, name, isDirectory, isSymlink) {
     isMarkdown: !isDirectory && isMarkdownFile(name),
     isText: !isDirectory && isTextFile(name),
     isBroken: false,
+    gitStatus: null,
+    hasGitDiff: false,
   };
 
   try {
@@ -40,12 +43,48 @@ async function describeEntry(directoryPath, name, isDirectory, isSymlink) {
     entry.isExecutable = !stat.isDirectory && isExecutableMode(stat.mode);
     if (isSymlink && stat.isDirectory) {
       entry.isDirectory = true;
+      entry.kind = "folder";
     }
   } catch (_error) {
     entry.isBroken = true;
   }
 
   return entry;
+}
+
+function describeDeletedEntry(directoryPath, name, isDirectory) {
+  return {
+    name,
+    path: combinePaths(directoryPath, name),
+    isDirectory,
+    isSymlink: false,
+    isDeleted: true,
+    size: null,
+    mode: null,
+    modifiedAt: null,
+    isExecutable: false,
+    kind: isDirectory ? "folder" : getFileKind(name),
+    isImage: false,
+    isMarkdown: false,
+    isText: false,
+    isBroken: false,
+    gitStatus: "deleted",
+    hasGitDiff: true,
+  };
+}
+
+function applyGitChange(entry, gitInfo, workingDir) {
+  if (entry.isDeleted) {
+    return;
+  }
+  const change = getEntryGitChange(
+    gitInfo,
+    workingDir,
+    entry.path,
+    entry.isDirectory,
+  );
+  entry.gitStatus = change ? change.status : null;
+  entry.hasGitDiff = change ? change.hasDiff : false;
 }
 
 /**
@@ -62,14 +101,9 @@ export async function describePath(path) {
     linkStat.isSymlink,
   );
 
-  const workingDir = Deno.cwd();
+  const workingDir = getWorkingDir();
   const gitInfo = await getGitStatusInfo(workingDir);
-  entry.gitStatus = getEntryGitStatus(
-    gitInfo,
-    workingDir,
-    entry.path,
-    entry.isDirectory,
-  );
+  applyGitChange(entry, gitInfo, workingDir);
 
   return entry;
 }
@@ -87,11 +121,14 @@ function compareEntries(first, second) {
 /**
  * Reads a directory and returns rich descriptors for every entry
  * @param {string} directoryPath - The normalized directory path to read
+ * @param {object|null} [gitInfo] - Status info to reuse instead of reading it
  * @returns {Promise<{entries: object[], totalSize: number}>} - The listing
  */
-export async function readDirectoryEntries(directoryPath) {
-  const workingDir = Deno.cwd();
-  const gitInfo = await getGitStatusInfo(workingDir);
+export async function readDirectoryEntries(directoryPath, gitInfo) {
+  const workingDir = getWorkingDir();
+  const statusInfo = gitInfo === undefined
+    ? await getGitStatusInfo(workingDir)
+    : gitInfo;
   const pendingEntries = [];
 
   for await (const entry of Deno.readDir(directoryPath)) {
@@ -106,39 +143,23 @@ export async function readDirectoryEntries(directoryPath) {
   }
 
   const entries = await Promise.all(pendingEntries);
+  const existingNames = new Set(entries.map((entry) => entry.name));
 
   for (
-    const deletedName of getDeletedEntryNames(
-      gitInfo,
+    const deleted of getDeletedEntries(
+      statusInfo,
       workingDir,
       directoryPath,
+      existingNames,
     )
   ) {
-    entries.push({
-      name: deletedName,
-      path: combinePaths(directoryPath, deletedName),
-      isDirectory: false,
-      isSymlink: false,
-      isDeleted: true,
-      size: null,
-      mode: null,
-      modifiedAt: null,
-      isExecutable: false,
-      kind: getFileKind(deletedName),
-      isImage: false,
-      isMarkdown: false,
-      isText: false,
-      isBroken: false,
-    });
+    entries.push(
+      describeDeletedEntry(directoryPath, deleted.name, deleted.isDirectory),
+    );
   }
 
   for (const entry of entries) {
-    entry.gitStatus = entry.isDeleted ? "deleted" : getEntryGitStatus(
-      gitInfo,
-      workingDir,
-      entry.path,
-      entry.isDirectory,
-    );
+    applyGitChange(entry, statusInfo, workingDir);
   }
 
   entries.sort(compareEntries);

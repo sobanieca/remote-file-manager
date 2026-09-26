@@ -7,6 +7,7 @@ import {
   isAudioFile,
   isVideoFile,
   stripFrontmatter,
+  toUrlPath,
 } from "../utils.js";
 
 const HTML_EXTENSIONS = [".html", ".htm"];
@@ -46,7 +47,7 @@ export function getMediaPreviewKind(entry) {
 
 function renderRawFrame(entry) {
   return `<iframe class="preview-frame" data-src="/${
-    escapeHtml(entry.path)
+    toUrlPath(entry.path)
   }" title="${escapeHtml(entry.name)}"></iframe>`;
 }
 
@@ -78,7 +79,7 @@ export function renderTextPreview(entry, fileContent) {
  */
 export function renderMediaPreview(entry) {
   const previewKind = getMediaPreviewKind(entry);
-  const source = `/${escapeHtml(entry.path)}`;
+  const source = `/${toUrlPath(entry.path)}`;
   if (previewKind === "video") {
     return `<div class="preview-panel preview-media">
       <video class="video-preview" controls preload="metadata" src="${source}"></video>

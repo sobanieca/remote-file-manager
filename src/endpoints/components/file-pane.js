@@ -42,17 +42,21 @@ function renderParentRow(directoryPath) {
   </div>`;
 }
 
-function renderEntryRow(entry) {
-  if (entry.isDeleted) {
-    return `<div class="file-row is-deleted" data-path="${
-      escapeHtml(entry.path)
-    }" data-name="${
-      escapeHtml(entry.name)
-    }" data-directory="false" data-size="-1" data-modified="0">
+function renderDeletedRow(entry) {
+  const diffHref = `/git-diff?path=${encodeURIComponent(entry.path)}`;
+  return `<div class="file-row is-deleted${
+    entry.isDirectory ? " is-directory" : " is-file"
+  }" data-path="${escapeHtml(entry.path)}" data-name="${
+    escapeHtml(entry.name)
+  }" data-directory="${entry.isDirectory}" data-deleted="true" data-size="-1" data-modified="0">
       <span class="cell cell-select"></span>
       <span class="cell cell-name">
-        <span class="entry-visual">${icon("file")}</span>
-        <span class="entry-link entry-deleted">${escapeHtml(entry.name)}</span>
+        <span class="entry-visual${
+    entry.isDirectory ? " entry-visual-folder" : ""
+  }">${icon(entry.isDirectory ? "folder" : "file")}</span>
+        <a class="entry-link entry-deleted" href="${diffHref}" title="${
+    escapeHtml(entry.name)
+  } was deleted, open the diff">${escapeHtml(entry.name)}</a>
         ${gitStatusBadge("deleted")}
       </span>
       <span class="cell cell-size">—</span>
@@ -60,6 +64,11 @@ function renderEntryRow(entry) {
       <span class="cell cell-modified">deleted</span>
       <span class="cell cell-actions">${renderEntryMenu(entry)}</span>
     </div>`;
+}
+
+function renderEntryRow(entry) {
+  if (entry.isDeleted) {
+    return renderDeletedRow(entry);
   }
 
   const permissions = formatPermissions(
@@ -137,7 +146,7 @@ function renderToolbar(directoryPath) {
     ${renderBreadcrumb(directoryPath)}
     <label class="pane-filter">
       ${icon("search")}
-      <input type="search" class="filter-input" placeholder="Filter" aria-label="Filter entries">
+      <input type="search" class="filter-input" placeholder="Filter this folder" aria-label="Filter entries in this folder" title="Filter the entries of this folder. Press Ctrl+K to search the whole directory tree">
     </label>
   </div>`;
 }

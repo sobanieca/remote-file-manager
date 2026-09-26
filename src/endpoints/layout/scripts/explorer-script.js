@@ -359,7 +359,7 @@ export const explorerScript = `
           type: isDirectory ? 'directory' : 'file'
         });
         RFM.toast(result.message, result.ok ? 'success' : 'error');
-        if (result.ok) refreshPane(pane);
+        if (result.ok) refreshAllPanes();
       }
     });
   }
@@ -380,7 +380,7 @@ export const explorerScript = `
         if (!newName || newName === row.dataset.name) return;
         const result = await RFM.postJson('/rename-item', { path: row.dataset.path, newName: newName });
         RFM.toast(result.message, result.ok ? 'success' : 'error');
-        if (result.ok) refreshPane(pane);
+        if (result.ok) refreshAllPanes();
       }
     });
   }
@@ -427,7 +427,7 @@ export const explorerScript = `
       RFM.toast('Uploading ' + fileInput.files.length + ' file(s)…');
       const result = await RFM.request('/upload-files', { method: 'POST', body: formData });
       RFM.toast(result.message, result.ok ? 'success' : 'error');
-      refreshPane(pane);
+      refreshAllPanes();
     });
   }
 
@@ -443,12 +443,37 @@ export const explorerScript = `
 
   function openRow(pane, row) {
     if (!row) return;
-    if (row.dataset.directory === 'true') {
+    if (row.dataset.directory === 'true' && row.dataset.deleted !== 'true') {
       navigate(pane, row.dataset.path);
       return;
     }
     const link = row.querySelector('.entry-link');
     if (link && link.href) window.location.href = link.href;
+  }
+
+  function revealRow(pane, path) {
+    const row = getRows(pane).find((candidate) => candidate.dataset.path === path);
+    if (!row) return false;
+    clearSelection(pane);
+    setRowSelected(row, true);
+    getState(pane).anchorIndex = getVisibleRows(pane).indexOf(row);
+    updateSelectionUi(pane);
+    setFocusedRow(pane, row);
+    return true;
+  }
+
+  function parentOf(path) {
+    const slash = path.lastIndexOf('/');
+    return slash === -1 ? '.' : path.slice(0, slash);
+  }
+
+  async function revealPath(path) {
+    const pane = getActivePane();
+    const parent = parentOf(path);
+    if (pane.dataset.path !== parent) {
+      await navigate(pane, parent);
+    }
+    if (!revealRow(pane, path)) RFM.toast('Could not find ' + path, 'error');
   }
 
   function selectRange(pane, row) {
@@ -623,7 +648,7 @@ export const explorerScript = `
 
   // List navigation only, actions are triggered from the command bar and menus
   document.addEventListener('keydown', (event) => {
-    if (document.querySelector('.dialog-overlay')) return;
+    if (document.querySelector('.dialog-overlay, .search-overlay:not([hidden])')) return;
     const isTyping = /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName);
     const pane = getActivePane();
     if (!pane) return;
@@ -694,10 +719,22 @@ export const explorerScript = `
     }
   });
 
-  window.RFM_EXPLORER = { refreshPane: refreshPane, refreshAllPanes: refreshAllPanes, getActivePane: getActivePane };
+  window.RFM_EXPLORER = {
+    refreshPane: refreshPane,
+    refreshAllPanes: refreshAllPanes,
+    getActivePane: getActivePane,
+    navigateActive: (path) => navigate(getActivePane(), path),
+    revealPath: revealPath
+  };
 
   const panes = getPanes();
   setActivePane(panes[0]);
   panes.forEach(applyPaneState);
+
+  const revealTarget = new URLSearchParams(window.location.search).get('reveal');
+  if (revealTarget) {
+    revealRow(panes[0], revealTarget);
+    updateUrl();
+  }
 })();
 `;

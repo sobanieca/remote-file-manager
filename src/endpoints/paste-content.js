@@ -1,4 +1,5 @@
 import { combinePaths, normalizePath } from "./utils.js";
+import { invalidateFileIndex } from "../search/file-index.js";
 
 export async function pasteContent(c) {
   try {
@@ -38,6 +39,7 @@ export async function pasteContent(c) {
     const content = new Uint8Array(await file.arrayBuffer());
     await Deno.writeFile(destinationPath, content);
 
+    invalidateFileIndex();
     return c.json({
       ok: true,
       path: destinationPath,
