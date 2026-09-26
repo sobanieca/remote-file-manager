@@ -43,5 +43,5 @@ machine. It allows to serve files as well as manage them and edit (text files).
 
 ## Landing Page
 
-- When you add a feature or change existing behavior, update the landing page
-  in `docs/index.html` as well, so it always reflects the current feature set
+- When you add a feature or change existing behavior, update the landing page in
+  `docs/index.html` as well, so it always reflects the current feature set
