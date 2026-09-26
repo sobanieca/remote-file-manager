@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Remote File Manager</title>
+    <meta name="description"
+      content="rfm serves a dual-pane file manager from any folder on a remote machine. Browse, edit, move and diff files in your browser over an SSH port forward.">
+    <link rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f4fb0'/%3E%3Crect x='6' y='9' width='9' height='14' rx='1.5' fill='white'/%3E%3Crect x='17' y='9' width='9' height='14' rx='1.5' fill='white' opacity='.6'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Fira+Code:wght@400;500;600&display=swap">
+    <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6fa;
+      --surface: #ffffff;
+      --surface-2: #e9edf5;
+      --ink: #151a26;
+      --muted: #5f6878;
+      --line: #d9dfeb;
+      --accent: #1f4fb0;
+      --accent-soft: #dfe8fa;
+      --sel: #ffe9a8;
+      --sel-ink: #5a4200;
+      --ok: #1f8a4c;
+      --sans: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+      --mono: "Fira Code", ui-monospace, "SF Mono", Menlo, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0f131b;
+        --surface: #161b25;
+        --surface-2: #1f2634;
+        --ink: #e6eaf2;
+        --muted: #97a1b3;
+        --line: #2a3242;
+        --accent: #7aa2f7;
+        --accent-soft: #1b2b4d;
+        --sel: #4a3d12;
+        --sel-ink: #ffe08a;
+        --ok: #5ccc85;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0f131b;
+      --surface: #161b25;
+      --surface-2: #1f2634;
+      --ink: #e6eaf2;
+      --muted: #97a1b3;
+      --line: #2a3242;
+      --accent: #7aa2f7;
+      --accent-soft: #1b2b4d;
+      --sel: #4a3d12;
+      --sel-ink: #ffe08a;
+      --ok: #5ccc85;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    code,
+    pre,
+    .mono {
+      font-family: var(--mono);
+    }
+    code.name {
+      font-weight: 600;
+      font-size: 0.94em;
+    }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      text-wrap: balance;
+      line-height: 1.12;
+    }
+    p {
+      margin: 0;
+    }
+
+    .wrap {
+      width: min(1060px, 100%);
+      margin: 0 auto;
+      padding-inline: 20px;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-block: 22px;
+    }
+    .brand {
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: 19px;
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand i {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: var(--accent);
+      position: relative;
+      display: inline-block;
+    }
+    .brand i::before,
+    .brand i::after {
+      content: "";
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      width: 6px;
+      background: var(--surface);
+      border-radius: 1px;
+    }
+    .brand i::before {
+      left: 4px;
+    }
+    .brand i::after {
+      right: 4px;
+      opacity: 0.6;
+    }
+    .gh {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      font-size: 14.5px;
+      color: var(--ink);
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+    .gh:hover {
+      text-decoration: none;
+      border-color: var(--accent);
+    }
+    .gh svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .hero {
+      padding-block: 30px 10px;
+      display: grid;
+      gap: 16px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5.2vw, 50px);
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      max-width: 19ch;
+    }
+    .hero .lead {
+      font-size: 18.5px;
+      color: var(--muted);
+      max-width: 56ch;
+    }
+
+    /* diagram */
+    .scene {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) 150px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+    }
+    @media (max-width: 800px) {
+      .scene {
+        grid-template-columns: 1fr;
+      }
+      .scene .ssh {
+        min-height: 64px;
+      }
+    }
+    .browser {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      min-width: 0;
+    }
+    .browser .chrome {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+    .browser .chrome .url {
+      flex: 1;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--surface);
+      border-radius: 6px;
+      padding: 4px 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .browser .chrome i {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--line);
+      display: inline-block;
+    }
+    .panes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .pane {
+      padding: 10px 12px 8px;
+      min-width: 0;
+    }
+    .pane + .pane {
+      border-left: 1px solid var(--line);
+    }
+    .pane .path {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pane ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-family: var(--mono);
+      font-size: 12.5px;
+    }
+    .pane li {
+      display: grid;
+      grid-template-columns: 16px 1fr auto;
+      gap: 8px;
+      padding: 3px 6px;
+      border-radius: 5px;
+      align-items: center;
+      transition: background 0.3s, color 0.3s, opacity 0.4s, transform 0.4s;
+    }
+    .pane li .sz {
+      color: var(--muted);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+    .pane li svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      color: var(--muted);
+    }
+    .pane li.dir {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .pane li.dir svg {
+      color: var(--accent);
+    }
+    .pane li.exe {
+      color: var(--ok);
+    }
+    .pane li.sel {
+      background: var(--sel);
+      color: var(--sel-ink);
+    }
+    .pane li.sel svg {
+      color: var(--sel-ink);
+    }
+    .pane li.ghost {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    .pane li.ghost.in {
+      opacity: 1;
+      transform: none;
+    }
+    .cmdbar {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px;
+      border-top: 1px solid var(--line);
+      background: var(--surface-2);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+    .cmdbar span {
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      transition: background 0.3s, color 0.3s;
+    }
+    .cmdbar span.hot {
+      background: var(--accent);
+      color: #fff;
+    }
+    .browser .status {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 6px 12px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+    .browser .status b {
+      color: var(--ok);
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .browser .status b.show {
+      opacity: 1;
+    }
+
+    .ssh {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 90px;
+    }
+    .ssh::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, var(--accent) 0 8px, transparent
+        8px 14px);
+      opacity: 0.6;
+    }
+    .ssh .tag {
+      position: relative;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      background: var(--bg);
+      color: var(--muted);
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+    .ssh .pk {
+      position: absolute;
+      top: 50%;
+      width: 9px;
+      height: 9px;
+      margin: -4.5px 0 0 -4.5px;
+      border-radius: 50%;
+      background: var(--accent);
+      left: 0;
+      opacity: 0;
+      animation: pk 2.6s linear infinite;
+    }
+    .ssh .pk.b {
+      animation-delay: 1.3s;
+      animation-direction: reverse;
+    }
+    @keyframes pk {
+      0% {
+        left: 0;
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        left: 100%;
+        opacity: 0;
+      }
+    }
+    @media (max-width: 800px) {
+      .ssh::before {
+        left: 50%;
+        right: auto;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        height: auto;
+        background: repeating-linear-gradient(180deg, var(--accent) 0 8px,
+          transparent 8px 14px);
+      }
+      .ssh .pk {
+        display: none;
+      }
+    }
+
+    .server {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      min-width: 0;
+      display: grid;
+      gap: 8px;
+    }
+    .server .lbl {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .server pre {
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 1.7;
+      white-space: pre;
+      overflow-x: auto;
+      color: var(--ink);
+    }
+    .server .dim {
+      color: var(--muted);
+    }
+    .server .live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--ok);
+      font-family: var(--mono);
+    }
+    .server .live i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    .points {
+      padding-block: 52px 8px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 26px 30px;
+    }
+    .point h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .point p {
+      color: var(--muted);
+      font-size: 15.5px;
+    }
+    .point code {
+      font-size: 13px;
+      background: var(--surface-2);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .how {
+      padding-block: 52px 10px;
+    }
+    .how h2 {
+      font-size: clamp(24px, 3.5vw, 32px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .how .lead {
+      color: var(--muted);
+      max-width: 56ch;
+      margin-bottom: 22px;
+    }
+    .how ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+      counter-reset: s;
+    }
+    .how li {
+      counter-increment: s;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .how li::before {
+      content: counter(s);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .how li b {
+      font-weight: 600;
+    }
+    .how li code {
+      display: block;
+      font-size: 12.5px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+    .how .note {
+      font-size: 14.5px;
+      color: var(--muted);
+      margin-top: 16px;
+      max-width: 64ch;
+    }
+
+    .install {
+      padding-block: 52px 20px;
+    }
+    .install h2 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .cmd-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 12px 12px 16px;
+    }
+    .cmd-box code {
+      flex: 1;
+      font-size: 14px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .cmd-box button {
+      font: 500 13px var(--sans);
+      color: var(--ink);
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .cmd-box button:hover {
+      border-color: var(--accent);
+    }
+    .install p {
+      font-size: 14.5px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    footer {
+      padding-block: 30px 40px;
+      font-size: 14px;
+      color: var(--muted);
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--line);
+      margin-top: 30px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ssh .pk,
+      .server .live i {
+        animation: none !important;
+      }
+      .pane li,
+      .cmdbar span,
+      .browser .status b {
+        transition: none;
+      }
+    }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <a class="brand"
+          href="https://sobanieca.github.io/remote-file-manager/"><i aria-hidden="true"></i> remote-file-manager</a>
+        <a class="gh" href="https://github.com/sobanieca/remote-file-manager"
+          target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+      </header>
+
+      <section class="hero">
+        <h1>A two-pane file manager for the server you are SSH'd into.</h1>
+        <p
+          class="lead">Run <code class="name">rfm</code> in any folder on a remote machine and get a browser UI for browsing, editing, moving and diffing files. No agent, no daemon, no account.</p>
+
+        <div class="scene" id="scene">
+          <div class="browser"
+            aria-label="Browser window showing the file explorer">
+            <div
+              class="chrome"><i></i><i></i><i></i><span class="url">localhost:8000/file-explorer</span></div>
+            <div class="panes">
+              <div class="pane">
+                <div class="path">/srv/app/config</div>
+                <ul id="left">
+                  <li
+                    class="dir"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/></svg><span>..</span><span class="sz"></span></li>
+                  <li
+                    class="dir"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/></svg><span>certs</span><span class="sz">dir</span></li>
+                  <li
+                    data-file="1"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg><span>nginx.conf</span><span class="sz">2.1 KB</span></li>
+                  <li><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg><span>app.env</span><span class="sz">412 B</span></li>
+                  <li
+                    class="exe"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg><span>reload.sh</span><span class="sz">318 B</span></li>
+                </ul>
+              </div>
+              <div class="pane">
+                <div class="path">/srv/app/backup/2026-09-26</div>
+                <ul id="right">
+                  <li
+                    class="dir"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/></svg><span>..</span><span class="sz"></span></li>
+                  <li><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg><span>app.env</span><span class="sz">412 B</span></li>
+                  <li class="ghost"
+                    id="copied"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg><span>nginx.conf</span><span class="sz">2.1 KB</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="cmdbar" id="cmdbar">
+          <span>View</span><span>Edit</span><span data-op="copy">Copy →</span><span data-op="move">Move →</span><span>Rename</span><span>Delete</span>
+        </div>
+            <div
+              class="status"><span>main · 2 changed</span><b id="toast">Copied 1 item</b></div>
+          </div>
+
+          <div class="ssh" aria-hidden="true">
+        <span class="pk"></span><span class="pk b"></span>
+        <span class="tag">ssh -L 8000:localhost:8000</span>
+      </div>
+
+          <div class="server" aria-label="Remote server terminal">
+            <span class="lbl">remote server</span>
+            <pre><span class="dim">$</span> cd /srv/app
+<span class="dim">$</span> rfm
+Remote File Manager v0.8.0
+<span class="dim">Listening on</span> http://localhost:8000</pre>
+            <span class="live"><i></i>serving /srv/app</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="points">
+        <div class="point">
+          <h3>Dual pane, keyboard first</h3>
+          <p>Arrow keys, <code>Space</code> to select, <code>Tab</code> to switch panes, one command bar to copy or move between them.</p>
+        </div>
+        <div class="point">
+          <h3>Edit in place</h3>
+          <p>Syntax highlighted editor with line numbers and auto indent. <code>Ctrl+S</code> writes the file back to disk.</p>
+        </div>
+        <div class="point">
+          <h3>Git built in</h3>
+          <p>Branch and working tree status, commit log, and diffs inline or side by side. Compare any two commits.</p>
+        </div>
+        <div class="point">
+          <h3>Paste to upload</h3>
+          <p>Paste a screenshot from the clipboard or drop files onto a pane. Download single files or a zip of a selection.</p>
+        </div>
+      </section>
+
+      <section class="how">
+        <h2>Meant to sit behind SSH, not on the open internet.</h2>
+        <p
+          class="lead"><code class="name">rfm</code> has no accounts or passwords of its own. Keep its port closed to the outside world and reach it through the port you forward, so the SSH key you already use is the whole login.</p>
+        <ol>
+          <li><b>Forward a port</b><code>ssh -L 8000:localhost:8000 user@server</code></li>
+          <li><b>Start it where the files are</b><code>cd /srv/app &amp;&amp; rfm</code></li>
+          <li><b>Open it locally</b><code>http://localhost:8000/file-explorer</code></li>
+        </ol>
+        <p
+          class="note">Every path is resolved inside the folder you started in. Requests that try to climb out of it are rejected. Stop the process and the interface is gone.</p>
+      </section>
+
+      <section class="install">
+        <h2>Install</h2>
+        <div class="cmd-box">
+          <code
+            id="install-cmd">curl -fsSL sobanieca.github.io/remote-file-manager/install.sh | bash</code>
+          <button type="button" id="copy-btn">Copy</button>
+        </div>
+        <p>Or with Deno: <code>deno install -g -f -r -n rfm --allow-net --allow-read --allow-write --allow-run --allow-env=TERM,CI,FORCE_COLOR,NO_COLOR jsr:@sobanieca/remote-file-manager</code>. Change the port with <code>rfm -p 5432</code>.</p>
+      </section>
+
+      <footer>
+        <span><code class="name">remote-file-manager</code> · MIT license</span>
+        <a href="https://jsr.io/@sobanieca/remote-file-manager" target="_blank"
+          rel="noopener">jsr:@sobanieca/remote-file-manager</a>
+        <a
+          href="https://github.com/sobanieca/remote-file-manager/releases/latest"
+          target="_blank" rel="noopener">Binaries for Linux and macOS</a>
+      </footer>
+    </div>
+
+    <script>
+    (function () {
+      var file = document.querySelector("#left [data-file]");
+      var copied = document.getElementById("copied");
+      var copyBtnBar = document.querySelector('#cmdbar [data-op="copy"]');
+      var toast = document.getElementById("toast");
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var timers = [];
+      function later(fn, ms) {
+        timers.push(setTimeout(fn, ms));
+      }
+
+      function finalState() {
+        file.classList.add("sel");
+        copied.classList.add("in");
+        toast.classList.add("show");
+      }
+
+      function loop() {
+        timers.forEach(clearTimeout);
+        timers = [];
+        file.classList.remove("sel");
+        copied.classList.remove("in");
+        copyBtnBar.classList.remove("hot");
+        toast.classList.remove("show");
+
+        later(function () {
+          file.classList.add("sel");
+        }, 900);
+        later(function () {
+          copyBtnBar.classList.add("hot");
+        }, 1900);
+        later(function () {
+          copied.classList.add("in");
+          toast.classList.add("show");
+        }, 2500);
+        later(function () {
+          copyBtnBar.classList.remove("hot");
+        }, 3100);
+        later(function () {
+          file.classList.remove("sel");
+        }, 3600);
+        later(loop, 7000);
+      }
+
+      if (reduce) finalState();
+      else loop();
+
+      var btn = document.getElementById("copy-btn");
+      var cmd = document.getElementById("install-cmd");
+      btn.addEventListener("click", function () {
+        var text = cmd.textContent;
+        function done() {
+          btn.textContent = "Copied";
+          setTimeout(function () {
+            btn.textContent = "Copy";
+          }, 1600);
+        }
+        function fallback() {
+          var range = document.createRange();
+          range.selectNodeContents(cmd);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, fallback);
+        } else fallback();
+      });
+    })();
+    </script>
+  </body>
+</html>

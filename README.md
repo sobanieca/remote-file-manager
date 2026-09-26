@@ -1,5 +1,7 @@
 # Remote File Manager
 
+Website: https://sobanieca.github.io/remote-file-manager/
+
 A web-based file management system that provides HTTP server functionality for
 browsing and managing files on remote machines. The application creates a
 `/file-explorer` endpoint that enables comprehensive file operations within the

@@ -1,4 +1,4 @@
-# CLAUDE.md - Project Guidelines
+# AGENTS.md - Project Guidelines
 
 ## Project Overview
 
