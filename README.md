@@ -26,8 +26,10 @@ valuable for remote server administration and development workflows.
   listing live, and switch between list and icon grid
 - **Fuzzy Search**: Find any file or folder below the served directory with
   `Ctrl`/`Cmd` + `P`, open it or reveal it in the explorer
-- **Source Code Viewer**: Syntax highlighted, line numbered viewer with line
-  anchors, wrapping and copy
+- **Source Code Viewer**: Syntax highlighted, line numbered viewer with linkable
+  lines and copy
+- **Previews**: Rendered markdown (including tables), HTML, images, video, audio
+  and PDF files
 - **Text File Editing**: Editor with live syntax highlighting, line numbers,
   auto-indent and `Ctrl+S` saving
 - **Git Integration**: Branch indicator, working tree status overview, commit
@@ -37,9 +39,11 @@ valuable for remote server administration and development workflows.
 - **Commit Comparison**: Pick any two commits and review everything that changed
   between them
 - **Clipboard Upload**: Paste screenshots and images directly from clipboard to
-  upload files
+  upload files, or drop files into the upload dialog
 - **Static File Serving**: Serves HTML files and other static content
 - **Remote Access**: Optimized for SSH port forwarding scenarios
+- **Light and Dark Themes**: Follows the system preference, switchable from the
+  app bar
 
 ![screenshot](./file-explorer.png)
 
@@ -215,3 +219,28 @@ server:
 
 4. **Access the file manager from your local browser:** Open
    `http://localhost:8000/file-explorer` in your local web browser
+
+## Development
+
+The repository holds two parts:
+
+- `src/` - the Deno server (Hono). It serves the files of the working directory
+  and a JSON API under `/api`.
+- `ui/` - the browser app, a single page application built with imp. It is
+  served at `/file-explorer` and routes in the URL fragment, for example
+  `/file-explorer#/view?path=README.md`.
+
+The built app is embedded into the server as `src/ui-assets.js`, so the
+published package and the compiled binaries need nothing else at runtime.
+
+| Command                 | Does                                                                     |
+| ----------------------- | ------------------------------------------------------------------------ |
+| `deno task dev`         | Starts the server in `test/` and lets the UI dev server call it          |
+| `deno task ui`          | Serves `ui/` with live reload at `http://localhost:4507`                 |
+| `deno task build-ui`    | Builds `ui/` with imp and regenerates `src/ui-assets.js`                 |
+| `imp test --unit`       | Runs the unit tests of the UI (from `ui/`)                               |
+| `imp test --e2e --mock` | Runs the browser tests of the UI against mocked API answers (from `ui/`) |
+
+Run `imp skill` inside `ui/` to learn the framework, and `imp lint` and
+`imp fmt` after changing the UI. Commit the regenerated `src/ui-assets.js`
+together with the UI change.

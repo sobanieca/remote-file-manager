@@ -1,13 +1,28 @@
 {
   "name": "@sobanieca/remote-file-manager",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "license": "MIT",
   "exports": "./src/main.js",
-  "imports": {
-    "prismjs": "npm:prismjs@1.30.0",
-    "prismjs/": "npm:/prismjs@1.30.0/"
-  },
   "tasks": {
-    "dev": "cd test && deno run -A ../src/main.js"
+    "dev": "cd test && RFM_DEV_UI_ORIGIN=http://localhost:4507 deno run -A ../src/main.js",
+    "ui": "cd ui && imp start --env dev",
+    "build-ui": "cd ui && imp build --env prod && cd .. && deno run --allow-read --allow-write scripts/bundle-ui.js"
+  },
+  "fmt": {
+    "exclude": [
+      "ui/",
+      "src/ui-assets.js"
+    ]
+  },
+  "lint": {
+    "exclude": [
+      "ui/",
+      "src/ui-assets.js"
+    ]
+  },
+  "publish": {
+    "exclude": [
+      "ui/"
+    ]
   }
 }

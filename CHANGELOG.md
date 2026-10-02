@@ -2,6 +2,34 @@
 
 All notable changes to Remote File Manager are documented here.
 
+## 0.10.0
+
+### Changed
+
+- The user interface is now a single page application built with imp in `ui/`,
+  served at `/file-explorer`. Navigating between files, the viewer, the editor
+  and the git pages no longer reloads the page, and the app routes in the URL
+  fragment (`/file-explorer#/view?path=README.md`). Old
+  `/file-explorer?path=...` links are redirected.
+- The server no longer renders HTML. It serves a JSON API under `/api`, and the
+  built app is embedded in the package as `src/ui-assets.js`.
+- Markdown files open in the file viewer, with a Rendered and a Source tab. HTML
+  files get the same two tabs.
+- The theme follows the system preference and can be set to light, dark or
+  system from the app bar.
+
+### Added
+
+- Markdown tables render as tables.
+- The upload dialog accepts dropped files.
+- Renaming or deleting a file from the file viewer now works and returns to the
+  renamed file or its folder.
+
+### Removed
+
+- The line wrapping toggle of the code viewer and the editor.
+- The server side Prism and GFM dependencies.
+
 ## 0.9.1
 
 ### Changed

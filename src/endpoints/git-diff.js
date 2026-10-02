@@ -1,8 +1,5 @@
-import { layout } from "./layout/index.js";
-import { escapeHtml, formatRelativeTime, normalizePath } from "./utils.js";
-import { icon } from "./components/icons.js";
-import { diffView } from "./diff-view.js";
-import { renderNotARepository } from "./git-overview.js";
+import { normalizePath } from "./utils.js";
+import { parseDiff } from "../git/diff-parser.js";
 import {
   getCommitDiff,
   getFileDiff,
@@ -11,6 +8,11 @@ import {
 import { getCommit } from "../git/git-log.js";
 import { getBranchInfo, toServedPath } from "../git/git-status.js";
 import { getWorkingDir } from "../workspace.js";
+
+const FILE_DIFF_SUBTITLES = {
+  staged: "Staged changes, index against HEAD",
+  unstaged: "Unstaged changes, working tree against the index",
+};
 
 async function resolveDiffRequest(c, workingDir, repoRoot) {
   const commit = c.req.query("commit");
@@ -25,13 +27,8 @@ async function resolveDiffRequest(c, workingDir, repoRoot) {
       diffText,
       resolvePath: (path) => toServedPath(repoRoot, workingDir, path),
       title: commitInfo ? commitInfo.subject : "Commit",
-      subtitle: commitInfo
-        ? `${commitInfo.shortHash} · ${commitInfo.author} · ${
-          formatRelativeTime(commitInfo.date)
-        }`
-        : commit,
-      backHref: "/git-log",
-      backLabel: "Back to history",
+      commit: commitInfo,
+      back: "history",
     };
   }
 
@@ -40,8 +37,7 @@ async function resolveDiffRequest(c, workingDir, repoRoot) {
       diffText: await getWorkingTreeDiff(workingDir, true),
       title: "Staged changes",
       subtitle: "Differences between the index and HEAD",
-      backHref: "/git",
-      backLabel: "Back to status",
+      back: "status",
     };
   }
 
@@ -50,40 +46,30 @@ async function resolveDiffRequest(c, workingDir, repoRoot) {
       diffText: await getWorkingTreeDiff(workingDir, false),
       title: "Working tree changes",
       subtitle: "All uncommitted changes",
-      backHref: "/git",
-      backLabel: "Back to status",
+      back: "status",
     };
   }
 
-  const requestedPath = c.req.query("path");
-  if (!requestedPath) {
-    return null;
-  }
-
-  const filePath = normalizePath(requestedPath);
+  const filePath = normalizePath(c.req.query("path") || "");
   if (!filePath) {
     return null;
   }
 
   const mode = c.req.query("mode");
-  const isFromStatusPage = mode === "staged" || mode === "unstaged";
-  const subtitles = {
-    staged: "Staged changes, index against HEAD",
-    unstaged: "Unstaged changes, working tree against the index",
-  };
-
   return {
     diffText: await getFileDiff(workingDir, filePath, mode),
     title: filePath,
-    subtitle: subtitles[mode] || "Uncommitted changes",
-    backHref: isFromStatusPage
-      ? "/git"
-      : `/file-explorer?path=${
-        encodeURIComponent(filePath.split("/").slice(0, -1).join("/") || ".")
-      }`,
-    backLabel: isFromStatusPage ? "Back to status" : "Back to files",
+    subtitle: FILE_DIFF_SUBTITLES[mode] || "Uncommitted changes",
+    back: mode === "staged" || mode === "unstaged" ? "status" : "files",
     filePath,
   };
+}
+
+function resolveServedPath(file, resolvePath) {
+  if (file.status === "deleted") {
+    return null;
+  }
+  return resolvePath ? resolvePath(file.path) : file.path;
 }
 
 export async function gitDiff(c) {
@@ -92,15 +78,7 @@ export async function gitDiff(c) {
     const branchInfo = await getBranchInfo(workingDir);
 
     if (!branchInfo) {
-      return c.html(
-        await layout(
-          "Git diff",
-          renderNotARepository(
-            "The served directory is not inside a git repository.",
-          ),
-          { activeSection: "git" },
-        ),
-      );
+      return c.json({ ok: true, repository: null });
     }
 
     const request = await resolveDiffRequest(
@@ -109,59 +87,26 @@ export async function gitDiff(c) {
       branchInfo.repoRoot,
     );
     if (!request) {
-      return c.html("Nothing to diff", 400);
+      return c.json({ ok: false, message: "Nothing to diff" }, 400);
     }
-
     if (request.diffText === null) {
-      return c.html(
-        await layout(
-          "Git diff",
-          renderNotARepository("Unable to read this diff."),
-          { activeSection: "git" },
-        ),
-      );
+      return c.json({ ok: false, message: "Unable to read this diff" }, 404);
     }
 
-    const fileActions = request.filePath
-      ? `<a class="button" href="/edit-file?path=${
-        encodeURIComponent(request.filePath)
-      }">${icon("pencil")}<span>Edit</span></a>
-         <a class="button" href="/git-log?path=${
-        encodeURIComponent(request.filePath)
-      }">${icon("history")}<span>History</span></a>`
-      : "";
-
-    const content = `
-      <div class="page-header">
-        <div class="page-title">
-          <span class="page-title-icon">${icon("diff")}</span>
-          <div>
-            <h1>${escapeHtml(request.title)}</h1>
-            <span class="page-subtitle">${escapeHtml(request.subtitle)}</span>
-          </div>
-        </div>
-        <div class="page-header-actions">
-          ${fileActions}
-          <a class="button" href="${request.backHref}">${
-      icon("arrow-left")
-    }<span>${request.backLabel}</span></a>
-        </div>
-      </div>
-      ${
-      diffView(request.diffText, {
-        linkToFiles: true,
-        resolvePath: request.resolvePath,
-      })
-    }
-    `;
-
-    return c.html(
-      await layout(`Diff · ${request.title}`, content, {
-        activeSection: request.filePath ? "files" : "git",
-        wide: true,
-      }),
-    );
+    return c.json({
+      ok: true,
+      repository: branchInfo,
+      title: request.title,
+      subtitle: request.subtitle || null,
+      commit: request.commit || null,
+      back: request.back,
+      filePath: request.filePath || null,
+      files: parseDiff(request.diffText).map((file) => ({
+        ...file,
+        servedPath: resolveServedPath(file, request.resolvePath),
+      })),
+    });
   } catch (error) {
-    return c.html(`An error occurred: ${error.message}`, 500);
+    return c.json({ ok: false, message: error.message }, 500);
   }
 }

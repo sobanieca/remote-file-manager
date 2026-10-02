@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0",
+  "map": "src/app-map.js",
+  "environments": {
+    "default": "env/dev.json",
+    "dev": "env/dev.json",
+    "prod": "env/prod.json"
+  },
+  "mocks": {
+    "folder": "mocks",
+    "enabled": false
+  }
+}
