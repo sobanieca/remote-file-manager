@@ -4,7 +4,7 @@
   "license": "MIT",
   "exports": "./src/main.js",
   "tasks": {
-    "dev": "cd test && RFM_DEV_UI_ORIGIN=http://localhost:4507 deno run -A ../src/main.js",
+    "dev": "cd test && RFM_DEV_UI_ORIGIN=http://localhost:4507 deno run -A ../src/main.js --port 8000",
     "ui": "cd ui && imp start --env dev",
     "build-ui": "cd ui && imp build --env prod && cd .. && deno run --allow-read --allow-write scripts/bundle-ui.js"
   },
