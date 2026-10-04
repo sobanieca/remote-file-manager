@@ -2,6 +2,14 @@
 
 All notable changes to Remote File Manager are documented here.
 
+## 0.10.1
+
+### Fixed
+
+- On a phone, or in a narrow pane, the list view shows one compact row per entry
+  again (checkbox, name, size and actions) instead of a tall card per file. The
+  grid view is unchanged.
+
 ## 0.10.0
 
 ### Changed

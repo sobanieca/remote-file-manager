@@ -29,11 +29,14 @@ import {
 } from 'imp/icons'
 import { fileTable } from './file-table.js'
 import { fileGrid } from './file-grid.js'
+import { fileList } from './file-list.js'
 import { uploadDialog } from './upload-dialog.js'
 import { entryActions } from '../lib/entry-actions.js'
 import { formatFileSize, pluralize } from '../lib/format.js'
 import { ROOT_PATH, segmentsOf } from '../lib/paths.js'
 import { downloadArchive, downloadUrl, startDownload } from '../lib/server.js'
+
+const COMPACT_LIST_MAX_REM = 30
 
 const VIEW_MODES = [
   { value: 'list', label: 'List view', icon: luList },
@@ -278,13 +281,20 @@ export const filePane = component('rfm-file-pane', {
       ),
     )
 
+    const isNarrow = initState(
+      self,
+      'rfm.pane-narrow',
+      matchMedia(`(max-width: ${COMPACT_LIST_MAX_REM}rem)`).matches,
+    )
+
     const contentState = computed(
-      [model.listing, model.visible, viewMode],
-      (listing, visible, mode) => {
+      [model.listing, model.visible, viewMode, isNarrow],
+      (listing, visible, mode, narrow) => {
         if (listing === undefined) return 'loading'
         if (listing.error) return 'error'
         if (listing.entries.length === 0) return 'empty'
         if (visible.length === 0) return 'no-matches'
+        if (mode === 'list' && narrow) return 'compact'
         return mode
       },
     )
@@ -322,10 +332,18 @@ export const filePane = component('rfm-file-pane', {
           emptyState({ variant: 'noResults', description: 'No entries match the filter' }),
         )
       }
-      return state === 'grid'
-        ? fileGrid({ model, isSplit, actionsFor })
-        : fileTable({ model, isSplit, actionsFor })
+      if (state === 'grid') return fileGrid({ model, isSplit, actionsFor })
+      if (state === 'compact') return fileList({ model, actionsFor })
+      return fileTable({ model, isSplit, actionsFor })
     })
+
+    const body = div({ class: 'body' }, content)
+    const resizeObserver = new ResizeObserver(([observed]) => {
+      const remSize = parseFloat(getComputedStyle(document.documentElement).fontSize)
+      isNarrow.set(observed.contentRect.width <= COMPACT_LIST_MAX_REM * remSize)
+    })
+    resizeObserver.observe(body)
+    self.abortSignal.addEventListener('abort', () => resizeObserver.disconnect())
 
     return div(
       {
@@ -335,7 +353,7 @@ export const filePane = component('rfm-file-pane', {
       toolbar,
       actions,
       selectionBar,
-      div({ class: 'body' }, content),
+      body,
       div(
         { class: 'status' },
         text(

@@ -223,6 +223,7 @@ export const createPane = (self, { side, path, api, onNavigate }) => {
     listing,
     loading,
     filter,
+    sort,
     selected,
     cursor,
     visible,

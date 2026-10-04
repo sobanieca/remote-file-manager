@@ -12,7 +12,7 @@ import {
 } from '../lib/format.js'
 import { describePath } from '../lib/paths.js'
 
-const sizeCell = ({ entry }) =>
+export const sizeCell = ({ entry }) =>
   entry.isDirectory || entry.isDeleted
     ? '—'
     : span({ title: `${entry.size ?? 0} bytes` }, formatFileSize(entry.size))
