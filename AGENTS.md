@@ -15,14 +15,13 @@ The project has two parts:
 
 ## Build Commands
 
-- Start server: `deno task dev` (don't try to run this command to avoid infinite
-  loop)
+- Start server: `deno task dev`, builds the UI and serves `test/` (don't try to
+  run this command to avoid infinite loop)
 
 > Ensure that watch is not set for this command.
 
 - Format code: `deno fmt` (server) and `imp fmt` (inside `ui/`)
 - Lint code: `deno lint` (server) and `imp lint` (inside `ui/`)
-- UI dev server: `deno task ui` (long running, start it in the background)
 - UI tests: `imp test --unit` and `imp test --e2e --mock` inside `ui/`
 - Build the UI into the server: `deno task build-ui`. Run it after every UI
   change and commit the regenerated `src/ui-assets.js`

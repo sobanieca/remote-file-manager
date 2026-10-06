@@ -1,6 +1,6 @@
 import { expect, test } from 'imp/test'
 import { describePath, nameOf, parentOf, segmentsOf, toUrlPath } from '../src/lib/paths.js'
-import { languageOf, previewKindOf } from '../src/lib/files.js'
+import { languageOf, previewKindOf, rendersInBrowser } from '../src/lib/files.js'
 import { pairHunkLines } from '../src/lib/diff.js'
 
 test('walks served paths', () => {
@@ -24,6 +24,15 @@ test('picks a preview by file type', () => {
   expect(previewKindOf({ name: 'a.mp4', isImage: false })).toEqual('video')
   expect(previewKindOf({ name: 'a.md', isImage: false, isMarkdown: true })).toEqual('markdown')
   expect(previewKindOf({ name: 'a.txt', isImage: false, isMarkdown: false })).toEqual(null)
+})
+
+test('offers the raw file only when the browser renders it', () => {
+  expect(rendersInBrowser({ name: 'index.HTML' })).toEqual(true)
+  expect(rendersInBrowser({ name: 'report.pdf' })).toEqual(true)
+  expect(rendersInBrowser({ name: 'logo.svg' })).toEqual(true)
+  expect(rendersInBrowser({ name: 'README.md' })).toEqual(false)
+  expect(rendersInBrowser({ name: 'notes.txt' })).toEqual(false)
+  expect(rendersInBrowser({ name: 'clip.mkv' })).toEqual(false)
 })
 
 test('pairs removed and added lines for the side by side diff', () => {

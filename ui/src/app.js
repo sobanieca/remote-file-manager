@@ -1,4 +1,4 @@
-import { component, env } from 'imp'
+import { component } from 'imp'
 import { initHttpClient } from 'imp/http'
 import { guard, router, wait } from 'imp/router'
 import { initState } from 'imp/state'
@@ -34,7 +34,7 @@ const isSearchShortcut = (event) =>
 export const root = component('rfm-root', {
   setup: (self) => {
     const api = initHttpClient(self, 'rfm.api', {
-      baseUrl: env.API_URL ?? '',
+      baseUrl: '',
       headers: { accept: 'application/json' },
       requestId: false,
     })

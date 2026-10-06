@@ -2,6 +2,17 @@
 
 All notable changes to Remote File Manager are documented here.
 
+## 0.10.2
+
+### Fixed
+
+- `rfm` no longer asks for permission to read the `RFM_DEV_UI_ORIGIN`
+  environment variable on startup. The variable only enabled CORS for a separate
+  UI dev server, which is gone: the UI is always served built by `rfm` itself.
+- "Open raw" is offered only for files the browser shows on its own (HTML, SVG,
+  PDF, common images, MP4/WebM video and MP3/AAC/Opus audio). For Markdown,
+  source code and other files it only downloaded the file or showed plain text.
+
 ## 0.10.1
 
 ### Fixed

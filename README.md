@@ -235,8 +235,7 @@ published package and the compiled binaries need nothing else at runtime.
 
 | Command                 | Does                                                                     |
 | ----------------------- | ------------------------------------------------------------------------ |
-| `deno task dev`         | Starts the server in `test/` and lets the UI dev server call it          |
-| `deno task ui`          | Serves `ui/` with live reload at `http://localhost:4507`                 |
+| `deno task dev`         | Builds the UI and starts the server in `test/`                           |
 | `deno task build-ui`    | Builds `ui/` with imp and regenerates `src/ui-assets.js`                 |
 | `imp test --unit`       | Runs the unit tests of the UI (from `ui/`)                               |
 | `imp test --e2e --mock` | Runs the browser tests of the UI against mocked API answers (from `ui/`) |

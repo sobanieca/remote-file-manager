@@ -10,7 +10,7 @@ Takes no props. It owns everything app-wide:
 
 | Name              | Kind        | Holds                                                           |
 | ----------------- | ----------- | --------------------------------------------------------------- |
-| `rfm.api`         | http client | the server API, `baseUrl` from the `API_URL` environment value  |
+| `rfm.api`         | http client | the server API, same origin as the page                         |
 | `rfm.git`         | state       | `undefined` while loading, `null` outside git, else the summary |
 | `rfm.search-open` | state       | whether the search palette is open                              |
 | `rfm.dialog`      | state       | the request of `askName` / `askConfirmation`                    |

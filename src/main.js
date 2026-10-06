@@ -21,7 +21,6 @@ import { gitCompare } from "./endpoints/git-compare.js";
 import { searchFiles } from "./endpoints/search-files.js";
 import { switchWorktree } from "./endpoints/switch-worktree.js";
 import { serveUiApp, UI_PREFIX } from "./endpoints/ui-app.js";
-import { devCors, readDevOrigin } from "./dev-cors.js";
 import { decodeUrlPath } from "./endpoints/utils.js";
 import { getWorkingDir } from "./workspace.js";
 import { update } from "./commands/update.js";
@@ -93,12 +92,6 @@ if (customPortProvided) {
   }
 }
 const workingDir = getWorkingDir();
-
-const devOrigin = readDevOrigin();
-if (devOrigin) {
-  app.use("/*", devCors(devOrigin));
-  console.log(`Allowing API calls from the UI dev server at ${devOrigin}`);
-}
 
 app.get(UI_PREFIX, (c) => serveUiApp(c));
 app.get(`${UI_PREFIX}/*`, (c) => serveUiApp(c));

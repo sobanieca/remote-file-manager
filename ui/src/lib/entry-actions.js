@@ -15,6 +15,7 @@ import {
   luTrash2,
 } from 'imp/icons'
 import { copyText } from './clipboard.js'
+import { rendersInBrowser } from './files.js'
 import { diffHref, editHref, entryHref, historyHref } from './routes.js'
 import { downloadUrl, openInNewTab, rawFileUrl, startDownload } from './server.js'
 
@@ -53,12 +54,14 @@ const openActions = (entry, inViewer) => {
     entry.isText
       ? { id: 'edit', label: 'Edit', icon: luPencil, onClick: () => navigate(editHref(entry.path)) }
       : null,
-    {
-      id: 'raw',
-      label: 'Open raw',
-      icon: luExternalLink,
-      onClick: () => openInNewTab(rawFileUrl(entry.path)),
-    },
+    rendersInBrowser(entry)
+      ? {
+        id: 'raw',
+        label: 'Open raw',
+        icon: luExternalLink,
+        onClick: () => openInNewTab(rawFileUrl(entry.path)),
+      }
+      : null,
   ]
 }
 

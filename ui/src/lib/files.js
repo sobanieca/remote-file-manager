@@ -125,6 +125,31 @@ export const previewKindOf = (entry) => {
   return null
 }
 
+// Served with a Content-Type the browser shows on its own; other files would
+// only download or show as plain text, which the viewer already does better
+const BROWSER_RENDERED_EXTENSIONS = [
+  '.html',
+  '.htm',
+  '.svg',
+  '.pdf',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.webp',
+  '.avif',
+  '.bmp',
+  '.ico',
+  '.mp4',
+  '.webm',
+  '.mp3',
+  '.aac',
+  '.opus',
+]
+
+export const rendersInBrowser = (entry) =>
+  BROWSER_RENDERED_EXTENSIONS.includes(extensionOf(entry.name))
+
 export const GIT_STATUSES = {
   added: { label: 'A', title: 'Added / Untracked', color: 'green' },
   modified: { label: 'M', title: 'Modified', color: 'amber' },

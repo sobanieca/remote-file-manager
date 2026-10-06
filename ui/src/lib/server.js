@@ -1,7 +1,6 @@
-import { env } from 'imp'
 import { toUrlPath } from './paths.js'
 
-const serverOrigin = () => env.API_URL || globalThis.location.origin
+const serverOrigin = () => globalThis.location.origin
 
 const serverUrl = (path, query = {}) => {
   const target = new URL(path, serverOrigin())
