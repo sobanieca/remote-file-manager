@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "/",
+    "/compare",
+    "/diff",
+    "/edit",
+    "/history",
+    "/status",
+    "/view"
+  ],
+  "zones": [],
+  "outcomes": []
+}

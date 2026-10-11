@@ -2,6 +2,40 @@
 
 All notable changes to Remote File Manager are documented here.
 
+## 1.0.0
+
+### Changed
+
+- Breaking change: `rfm` is rewritten in Rust and distributed only as a
+  standalone binary for Linux and macOS (x64 and arm64). The Deno/JSR package
+  (`jsr:@sobanieca/remote-file-manager`) is no longer published. Install with
+  `curl -fsSL sobanieca.github.io/remote-file-manager/install.sh | bash` and
+  remove the Deno version with `deno uninstall -g rfm`.
+- `rfm update` downloads the latest release and replaces the binary (the
+  `--deno` option is removed). `rfm` checks for a new version once a day and
+  prints a notice when one is available (`RFM_NO_UPDATE_CHECK=1` disables it).
+- The custom port is remembered in `~/.config/rfm/settings.json` instead of
+  Deno's local storage. A port saved by the Deno version is not carried over.
+- Folder and bulk downloads are streamed while the ZIP archive is built instead
+  of being assembled in memory first, and keep the file permissions and
+  modification times. Files are downloaded without loading them into memory.
+
+### Added
+
+- `rfm --version` and `rfm --help`.
+- Static files support byte range requests, so videos and audio can be seeked
+  in every browser.
+
+### Fixed
+
+- Downloading the served root folder as a ZIP archive cut the first characters
+  off every path in the archive and named it `..zip`. It is now named after the
+  served directory.
+- Bulk downloads were named after the first selected entry even when that entry
+  could not be added to the archive.
+- A symbolic link to a folder was reported as a text file (`isText`) in the
+  listing.
+
 ## 0.10.2
 
 ### Fixed

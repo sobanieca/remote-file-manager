@@ -90,12 +90,13 @@ $SUDO mv "${TMP_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
 echo ""
 echo -e "${GREEN}✓ Remote File Manager has been installed successfully!${NC}"
 echo ""
-echo "Run 'rfm' to get started"
+echo "Run 'rfm' in the directory you want to manage to get started"
 echo ""
 
 # Verify installation
 if command -v rfm &> /dev/null; then
-  echo "Installation verified - rfm is ready to use"
+  VERSION=$(rfm --version 2>&1 || echo "unknown")
+  echo "Installed version: ${VERSION}"
 else
   echo -e "${YELLOW}Warning: ${INSTALL_DIR} may not be in your PATH${NC}"
   echo "Add it to your PATH or move the binary to a directory in your PATH"

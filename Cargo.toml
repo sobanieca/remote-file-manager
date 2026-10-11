@@ -1,0 +1,20 @@
+[package]
+name = "rfm"
+version = "1.0.0"
+edition = "2024"
+description = "Web-based file explorer for managing files on a remote machine"
+license = "MIT"
+repository = "https://github.com/sobanieca/remote-file-manager"
+publish = false
+
+[dependencies]
+flate2 = "1.1"
+ureq = { version = "3.4.2", default-features = false, features = ["rustls"] }
+
+[workspace]
+members = ["xtask"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
