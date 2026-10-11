@@ -12,7 +12,8 @@ this change fits that goal, or why it is a fix rather than a feature.
 
 ## Checklist
 
-- [ ] `deno fmt --check` and `deno lint` pass locally
+- [ ] `cargo verify` passes locally, and `imp lint`, `imp fmt` and the UI tests
+      pass inside `ui/` when the UI changed
 - [ ] Help text and README are updated if behaviour changed
 - [ ] No new dependency, or the reason for it is explained above
 - [ ] No secrets, connection strings or keys in tests, fixtures or logs

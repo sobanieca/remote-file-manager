@@ -84,44 +84,10 @@ worktree is served when it exists.
 
 ## Installation
 
-### Option 1: Install via Deno (Recommended)
+`rfm` is a single binary for Linux and macOS (x64 and arm64). No runtime is
+needed, only `git` for the git features.
 
-**Prerequisites:**
-
-- Deno runtime environment
-
-**Install Command:**
-
-```bash
-deno install -g --allow-write --allow-net --allow-read --allow-run --allow-env=TERM,CI,FORCE_COLOR,NO_COLOR -f -r -n rfm jsr:@sobanieca/remote-file-manager
-```
-
-To update to the latest version, run the same installation command.
-
-**Installing a release that is less than 24 hours old:**
-
-Since Deno 2.9, package resolution ignores versions published within the last 24
-hours as a supply chain safeguard. Right after a new release this means the
-command above silently installs the _previous_ version instead of the newest one
-(there is no error message - check the version printed on startup to see which
-one you got).
-
-To opt out of that waiting period and force the freshest release, disable the
-cooldown with `--minimum-dependency-age=0`:
-
-```bash
-deno install -g --minimum-dependency-age=0 --allow-write --allow-net --allow-read --allow-run --allow-env=TERM,CI,FORCE_COLOR,NO_COLOR -f -r -n rfm jsr:@sobanieca/remote-file-manager
-```
-
-The flag also accepts other cutoffs, e.g. `P3D` for three days or `120` for two
-hours, and can be set permanently via `"minimumDependencyAge": 0` in a
-`deno.json` file. Note that this lowers the protection for every dependency
-being resolved, so prefer using it only for this one-off install command.
-
-### Option 2: Quick Install Script (Standalone Binary)
-
-If you don't have Deno installed, you can install the pre-compiled binary with a
-single command:
+### Option 1: Quick Install Script (Recommended)
 
 ```bash
 curl -fsSL sobanieca.github.io/remote-file-manager/install.sh | bash
@@ -136,9 +102,9 @@ To install to a custom location:
 curl -fsSL sobanieca.github.io/remote-file-manager/install.sh | INSTALL_DIR=~/bin bash
 ```
 
-### Option 3: Manual Binary Installation
+### Option 2: Manual Binary Installation
 
-Download the latest pre-compiled binary for your operating system from the
+Download the latest binary for your operating system from the
 [releases page](https://github.com/sobanieca/remote-file-manager/releases/latest):
 
 **Example for Linux x64:**
@@ -152,6 +118,13 @@ sudo mv rfm /usr/local/bin/
 Available binaries: `remote-file-manager-linux-x64`,
 `remote-file-manager-linux-arm64`, `remote-file-manager-macos-x64`,
 `remote-file-manager-macos-arm64`
+
+### Migrating from the Deno version (0.x)
+
+Versions up to 0.10 were distributed for Deno (`jsr:@sobanieca/remote-file-manager`).
+Remove the Deno installation with `deno uninstall -g rfm` and install the binary
+as described above. The saved port is not carried over, start `rfm -p <port>`
+once to remember it again.
 
 ## Usage
 
@@ -172,8 +145,9 @@ To change port execute:
 rfm -p 5432
 ```
 
-**Note**: The application remembers the last used port, so you don't need to
-specify it on subsequent runs unless you want to change it again.
+**Note**: The application remembers the last used port (in
+`~/.config/rfm/settings.json`), so you don't need to specify it on subsequent
+runs unless you want to change it again. `rfm -p 8000` goes back to the default.
 
 ### Update
 
@@ -183,12 +157,10 @@ To update Remote File Manager to the latest version:
 rfm update
 ```
 
-This will display available update methods. If you installed via Deno, you can
-update automatically:
-
-```bash
-rfm update --deno
-```
+This downloads the latest release and replaces the binary. If `rfm` is installed
+in a system directory (like `/usr/local/bin`) run `sudo rfm update`. `rfm`
+checks for new versions once a day and prints a notice when one is available
+(set `RFM_NO_UPDATE_CHECK=1` to disable it).
 
 ## Remote File Management with SSH Port Forwarding
 
@@ -224,22 +196,24 @@ server:
 
 The repository holds two parts:
 
-- `src/` - the Deno server (Hono). It serves the files of the working directory
-  and a JSON API under `/api`.
+- `src/` - the Rust server. It serves the files of the working directory and a
+  JSON API under `/api`.
 - `ui/` - the browser app, a single page application built with imp. It is
   served at `/file-explorer` and routes in the URL fragment, for example
   `/file-explorer#/view?path=README.md`.
 
-The built app is embedded into the server as `src/ui-assets.js`, so the
-published package and the compiled binaries need nothing else at runtime.
+The built app is embedded into the binary from `src/ui-assets/`, so the release
+binaries need nothing else at runtime. Development tasks are cargo aliases:
 
 | Command                 | Does                                                                     |
 | ----------------------- | ------------------------------------------------------------------------ |
-| `deno task dev`         | Builds the UI and starts the server in `test/`                           |
-| `deno task build-ui`    | Builds `ui/` with imp and regenerates `src/ui-assets.js`                 |
+| `cargo rfm [args]`      | Runs `rfm` from source in the current directory                          |
+| `cargo verify`          | Formatting, lints and all tests (run before committing, CI runs it)      |
+| `cargo dev`             | Builds the UI and starts the server in `test/`                           |
+| `cargo build-ui`        | Builds `ui/` with imp and embeds it into `src/ui-assets/`                |
 | `imp test --unit`       | Runs the unit tests of the UI (from `ui/`)                               |
 | `imp test --e2e --mock` | Runs the browser tests of the UI against mocked API answers (from `ui/`) |
 
 Run `imp skill` inside `ui/` to learn the framework, and `imp lint` and
-`imp fmt` after changing the UI. Commit the regenerated `src/ui-assets.js`
-together with the UI change.
+`imp fmt` after changing the UI. Commit the regenerated `src/ui-assets/` and
+`src/ui_assets.rs` together with the UI change.

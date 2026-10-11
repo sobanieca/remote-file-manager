@@ -1,0 +1,11 @@
+# Development tasks.
+[alias]
+xtask = "run --quiet --package xtask --"
+# Run rfm from source: cargo rfm <args>
+rfm = "run --quiet --package rfm --"
+# Formatting, lints and tests: run before committing.
+verify = "xtask verify"
+# Build ui/ with imp and embed it into the server (src/ui-assets).
+build-ui = "xtask build-ui"
+# Build the UI and serve test/.
+dev = "xtask dev"
