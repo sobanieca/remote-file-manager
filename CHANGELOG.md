@@ -2,6 +2,17 @@
 
 All notable changes to Remote File Manager are documented here.
 
+## 1.1.0
+
+### Changed
+
+- Breaking change: the default port is 4000 instead of 8000. `rfm -p 8000`
+  keeps the old port, and a port saved in `~/.config/rfm/settings.json` still
+  wins.
+- Breaking change: `rfm` listens on 127.0.0.1 only, instead of every network
+  interface. Other machines reach it through SSH port forwarding
+  (`ssh -L 4000:localhost:4000 user@server`).
+
 ## 1.0.0
 
 ### Changed

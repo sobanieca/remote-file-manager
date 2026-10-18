@@ -644,7 +644,7 @@
           <div class="browser"
             aria-label="Browser window showing the file explorer">
             <div
-              class="chrome"><i></i><i></i><i></i><span class="url">localhost:8000/file-explorer</span></div>
+              class="chrome"><i></i><i></i><i></i><span class="url">localhost:4000/file-explorer</span></div>
             <div class="panes">
               <div class="pane">
                 <div class="path">/srv/app/config</div>
@@ -680,7 +680,7 @@
 
           <div class="ssh" aria-hidden="true">
         <span class="pk"></span><span class="pk b"></span>
-        <span class="tag">ssh -L 8000:localhost:8000</span>
+        <span class="tag">ssh -L 4000:localhost:4000</span>
       </div>
 
           <div class="server" aria-label="Remote server terminal">
@@ -688,7 +688,7 @@
             <pre><span class="dim">$</span> cd /srv/app
 <span class="dim">$</span> rfm
 Remote File Manager v0.10.2
-<span class="dim">Listening on</span> http://localhost:8000</pre>
+<span class="dim">Listening on</span> http://localhost:4000</pre>
             <span class="live"><i></i>serving /srv/app</span>
           </div>
         </div>
@@ -730,9 +730,9 @@ Remote File Manager v0.10.2
         <p
           class="lead"><code class="name">rfm</code> has no accounts or passwords of its own. Keep its port closed to the outside world and reach it through the port you forward, so the SSH key you already use is the whole login.</p>
         <ol>
-          <li><b>Forward a port</b><code>ssh -L 8000:localhost:8000 user@server</code></li>
+          <li><b>Forward a port</b><code>ssh -L 4000:localhost:4000 user@server</code></li>
           <li><b>Start it where the files are</b><code>cd /srv/app &amp;&amp; rfm</code></li>
-          <li><b>Open it locally</b><code>http://localhost:8000/file-explorer</code></li>
+          <li><b>Open it locally</b><code>http://localhost:4000/file-explorer</code></li>
         </ol>
         <p
           class="note">Every path is resolved inside the folder you started in. Requests that try to climb out of it are rejected. Stop the process and the interface is gone.</p>

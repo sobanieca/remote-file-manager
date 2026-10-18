@@ -17,7 +17,7 @@ mod zip;
 use std::net::TcpListener;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
-const DEFAULT_PORT: u16 = 8000;
+const DEFAULT_PORT: u16 = 4000;
 const HELP_TEXT: &str = include_str!("help.txt");
 
 /// `--port=N`, `--port N` or `-p N`. Invalid values fall back to the default.
@@ -98,7 +98,7 @@ fn main() {
         colors::bold(&format!("Remote File Manager v{VERSION}"))
     );
     let port = resolve_port(&args);
-    let listener = match TcpListener::bind(("0.0.0.0", port)) {
+    let listener = match TcpListener::bind(("127.0.0.1", port)) {
         Ok(listener) => listener,
         Err(err) => {
             eprintln!(

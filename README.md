@@ -142,7 +142,9 @@ rfm
 ```
 
 The server will start and provide access to the file management interface
-through your web browser on default port (8000).
+through your web browser on default port (4000). It listens on 127.0.0.1 only,
+so other machines cannot connect to it directly. Use SSH port forwarding (see
+below) to open it from another machine.
 
 ### Custom Port
 
@@ -154,7 +156,7 @@ rfm -p 5432
 
 **Note**: The application remembers the last used port (in
 `~/.config/rfm/settings.json`), so you don't need to specify it on subsequent
-runs unless you want to change it again. `rfm -p 8000` goes back to the default.
+runs unless you want to change it again. `rfm -p 4000` goes back to the default.
 
 ### Update
 
@@ -183,7 +185,7 @@ server:
 
 1. **Connect to the remote server with port forwarding:**
    ```bash
-   ssh -L 8000:localhost:8000 user@remote-server.com
+   ssh -L 4000:localhost:4000 user@remote-server.com
    ```
 
 2. **Navigate to your target directory on the remote server:**
@@ -197,7 +199,7 @@ server:
    ```
 
 4. **Access the file manager from your local browser:** Open
-   `http://localhost:8000/file-explorer` in your local web browser
+   `http://localhost:4000/file-explorer` in your local web browser
 
 ## Development
 

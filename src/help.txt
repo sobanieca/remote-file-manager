@@ -6,15 +6,15 @@ Usage:
   rfm update           Update rfm to the latest version
 
 Options:
-  -p, --port <port>    Port to listen on (default 8000). A custom port is
-                       remembered for the next runs, --port 8000 forgets it
+  -p, --port <port>    Port to listen on (default 4000). A custom port is
+                       remembered for the next runs, --port 4000 forgets it
   -h, --help           Show this help
   -v, --version        Show the version
 
 Open http://localhost:<port>/file-explorer in a browser. On a remote machine
 forward the port over SSH first:
 
-  ssh -L 8000:localhost:8000 user@remote-server.com
+  ssh -L 4000:localhost:4000 user@remote-server.com
 
 Environment:
   RFM_NO_UPDATE_CHECK=1   Disable the daily check for new versions

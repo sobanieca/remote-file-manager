@@ -1,6 +1,6 @@
 [package]
 name = "rfm"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2024"
 description = "Web-based file explorer for managing files on a remote machine"
 license = "MIT"
