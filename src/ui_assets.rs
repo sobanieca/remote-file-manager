@@ -4,8 +4,9 @@
 pub const UI_ASSETS: &[(&str, &[u8])] = &[
     ("LICENSES.txt", include_bytes!("ui-assets/LICENSES.txt")),
     ("app-analytics.json", include_bytes!("ui-assets/app-analytics.json")),
-    ("chunks/env-01490CD4.js", include_bytes!("ui-assets/chunks/env-01490CD4.js")),
-    ("chunks/main-ZCJ46PES.js", include_bytes!("ui-assets/chunks/main-ZCJ46PES.js")),
+    ("chunks/en-165a835e.js", include_bytes!("ui-assets/chunks/en-165a835e.js")),
+    ("chunks/env-01490cd4.js", include_bytes!("ui-assets/chunks/env-01490cd4.js")),
+    ("chunks/main-1df54853.js", include_bytes!("ui-assets/chunks/main-1df54853.js")),
     ("favicon.svg", include_bytes!("ui-assets/favicon.svg")),
     ("index.html", include_bytes!("ui-assets/index.html")),
 ];

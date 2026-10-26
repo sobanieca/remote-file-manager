@@ -8,6 +8,13 @@ test('lists the served directory', async ({ page }) => {
   await expect(page).toHaveAccessibleControls()
 })
 
+test('shows the files screen as the first tab of the bar', async ({ page }) => {
+  await page.waitForSelector('rfm-entry-name[data-path="README.md"]')
+  const current = 'imp-shell >>> .bar-nav [aria-current="page"]'
+  await page.waitForSelector(current)
+  expect(await textOf(page, current)).toEqual('Files')
+})
+
 test('moves the cursor with the keyboard and opens a folder', async ({ page }) => {
   await page.keyboard.press('ArrowDown')
   await page.keyboard.press('Enter')

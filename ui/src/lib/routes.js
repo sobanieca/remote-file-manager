@@ -11,15 +11,15 @@ const withQuery = (handle, query = {}) => {
 }
 
 export const filesHref = ({ path = ROOT_PATH, right, reveal } = {}) =>
-  withQuery(app.files, {
+  withQuery(app, {
     path: path === ROOT_PATH && right === undefined && !reveal ? undefined : path,
     right,
     reveal,
   })
 
-export const viewHref = (path) => withQuery(app.files.view, { path })
+export const viewHref = (path) => withQuery(app.view, { path })
 
-export const editHref = (path) => withQuery(app.files.edit, { path })
+export const editHref = (path) => withQuery(app.edit, { path })
 
 export const statusHref = () => app.status.href()
 

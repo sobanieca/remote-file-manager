@@ -17,5 +17,8 @@ Takes no props. It owns everything app-wide:
 | `rfm.dialog-open` | state       | whether that dialog is open                                     |
 | `rfm.active-pane` | state       | `'left'` or `'right'`, the pane the keyboard acts on            |
 
-`Ctrl`/`Cmd` + `P` opens the search palette from anywhere. The git sections carry `access: 'git'`;
-the guard waits for `rfm.git` and sends a non-repository to the files screen.
+`Ctrl`/`Cmd` + `P` opens the search palette from anywhere. The git nodes carry the
+`gitRepository` guard in `router({ guards })`; it waits for `rfm.git` and sends a
+non-repository to the files screen at `/`.
+The files screen binds the root, so it is the first tab of the bar. `src/locales/en.js` names it
+"Files" through the message `appMap.label`.

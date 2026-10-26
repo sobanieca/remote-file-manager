@@ -6,7 +6,7 @@ import { screenQuery } from '../lib/screen-query.js'
 
 export const fileView = component('rfm-file-view', {
   setup: () => {
-    const query = screenQuery(app.files.view)
+    const query = screenQuery(app.view)
     return screenFrame(
       query.view((current) => (current ? fileDetails({ path: current.path ?? '' }) : null)),
     )

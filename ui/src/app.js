@@ -1,6 +1,6 @@
 import { component } from 'imp'
 import { initHttpClient } from 'imp/http'
-import { guard, router, wait } from 'imp/router'
+import { router, wait } from 'imp/router'
 import { initState } from 'imp/state'
 import { icon } from 'imp/std'
 import { emptyState } from 'imp/std/display'
@@ -21,11 +21,13 @@ import { gitDiff } from './screens/git-diff.js'
 import { gitCompare } from './screens/git-compare.js'
 import { loadRepository } from './lib/repository.js'
 
-const access = guard(['rfm.git'], (repository, { need }) => {
-  if (need !== 'git') return true
-  if (repository === undefined) return wait
-  return repository ? true : '/'
-})
+const gitRepository = {
+  states: ['rfm.git'],
+  check: (repository) => {
+    if (repository === undefined) return wait
+    return repository ? true : '/'
+  },
+}
 
 const isSearchShortcut = (event) =>
   (event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey &&
@@ -58,16 +60,18 @@ export const root = component('rfm-root', {
         logo: appLogo({
           label: 'Remote File Manager',
           icon: icon(luFolderOpen, { size: 'lg', color: 'primary' }),
-          href: app.files.href(),
+          href: app.href(),
         }),
-        navbar: {
-          label: 'Sections',
-          map: app,
-          icons: {
-            [app.files]: luFolder,
-            [app.status]: luGitCompareArrows,
-            [app.history]: luRotateCcwClock,
-          },
+        map: app,
+        navbar: { label: 'Sections' },
+        nav: {
+          [app]: { icon: luFolder },
+          [app.view]: { hidden: true },
+          [app.edit]: { hidden: true },
+          [app.status]: { icon: luGitCompareArrows },
+          [app.history]: { icon: luRotateCcwClock },
+          [app.diff]: { hidden: true },
+          [app.compare]: { hidden: true },
         },
         extras: [searchTrigger(), branchMenu(), themeSelect()],
         breadcrumbs: false,
@@ -78,12 +82,17 @@ export const root = component('rfm-root', {
       searchPalette(),
       router({
         map: app,
-        access,
+        guards: {
+          [app.status]: gitRepository,
+          [app.history]: gitRepository,
+          [app.diff]: gitRepository,
+          [app.compare]: gitRepository,
+        },
         title: ({ crumbs }) => `${crumbs.at(-1)} · Remote File Manager`,
         screens: {
-          [app.files]: () => explorer(),
-          [app.files.view]: () => fileView(),
-          [app.files.edit]: () => fileEditor(),
+          [app]: () => explorer(),
+          [app.view]: () => fileView(),
+          [app.edit]: () => fileEditor(),
           [app.status]: () => gitStatus(),
           [app.history]: () => gitHistory(),
           [app.diff]: () => gitDiff(),

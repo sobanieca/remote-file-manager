@@ -6,7 +6,7 @@ import { screenQuery } from '../lib/screen-query.js'
 
 export const fileEditor = component('rfm-file-editor', {
   setup: () => {
-    const query = screenQuery(app.files.edit)
+    const query = screenQuery(app.edit)
     return screenFrame(
       query.view((current) => (current ? fileEditorPanel({ path: current.path ?? '' }) : null)),
     )

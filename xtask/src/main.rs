@@ -56,10 +56,15 @@ fn imp_build() -> bool {
     }
 }
 
+const IMP_OUTPUT_MARKER: &str = ".imp-output";
+
 fn collect_files(dir: &Path, base: &Path, files: &mut Vec<String>) -> std::io::Result<()> {
     for entry in std::fs::read_dir(dir)? {
         let entry = entry?;
         let path = entry.path();
+        if entry.file_name() == IMP_OUTPUT_MARKER {
+            continue;
+        }
         if entry.file_type()?.is_dir() {
             collect_files(&path, base, files)?;
         } else {

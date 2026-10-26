@@ -82,7 +82,7 @@ export const explorer = component('rfm-explorer', {
     const searchOpen = useState(self, 'rfm.search-open')
     const activePane = useState(self, 'rfm.active-pane')
     const repository = useState(self, 'rfm.git')
-    const query = screenQuery(app.files)
+    const query = screenQuery(app)
     const currentQuery = () => query.get() ?? {}
 
     const leftPath = computed([query], (current) => (current ? current.path || ROOT_PATH : null))
