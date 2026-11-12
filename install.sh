@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 REPO="sobanieca/remote-file-manager"
 DEFAULT_INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="rfm"
-SCRIPT_URL="sobanieca.github.io/remote-file-manager/install.sh"
+SCRIPT_URL="adam.sobaniec.com/remote-file-manager/install.sh"
 
 usage() {
   cat <<USAGE

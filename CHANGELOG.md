@@ -20,7 +20,7 @@ All notable changes to Remote File Manager are documented here.
 - Breaking change: `rfm` is rewritten in Rust and distributed only as a
   standalone binary for Linux and macOS (x64 and arm64). The Deno/JSR package
   (`jsr:@sobanieca/remote-file-manager`) is no longer published. Install with
-  `curl -fsSL sobanieca.github.io/remote-file-manager/install.sh | bash` and
+  `curl -fsSL adam.sobaniec.com/remote-file-manager/install.sh | bash` and
   remove the Deno version with `deno uninstall -g rfm`.
 - `rfm update` downloads the latest release and replaces the binary (the
   `--deno` option is removed). `rfm` checks for a new version once a day and

@@ -1,6 +1,6 @@
 # Remote File Manager
 
-Website: https://sobanieca.github.io/remote-file-manager/
+Website: https://adam.sobaniec.com/remote-file-manager/
 
 A web-based file management system that provides HTTP server functionality for
 browsing and managing files on remote machines. The application creates a
@@ -90,7 +90,7 @@ needed, only `git` for the git features.
 ### Option 1: Quick Install Script (Recommended)
 
 ```bash
-curl -fsSL sobanieca.github.io/remote-file-manager/install.sh | bash
+curl -fsSL adam.sobaniec.com/remote-file-manager/install.sh | bash
 ```
 
 This script automatically detects your OS and architecture (Linux/macOS,
@@ -99,14 +99,14 @@ can't write to `/usr/local/bin`, the script stops with an error. Run it with
 `sudo`:
 
 ```bash
-curl -fsSL sobanieca.github.io/remote-file-manager/install.sh | sudo bash
+curl -fsSL adam.sobaniec.com/remote-file-manager/install.sh | sudo bash
 ```
 
 Or install to a custom location: set `INSTALL_DIR` to a directory that is on
 your `PATH`:
 
 ```bash
-curl -fsSL sobanieca.github.io/remote-file-manager/install.sh | INSTALL_DIR=~/.local/bin bash
+curl -fsSL adam.sobaniec.com/remote-file-manager/install.sh | INSTALL_DIR=~/.local/bin bash
 ```
 
 ### Option 2: Manual Binary Installation
