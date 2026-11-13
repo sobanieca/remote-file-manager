@@ -15,6 +15,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Rust
         run: rustup toolchain install stable --profile minimal --component rustfmt,clippy && rustup default stable
+      - name: Install imp
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL https://imp-ui.com/install.sh | INSTALL_DIR="$HOME/.local/bin" bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Build the UI
+        working-directory: ui
+        run: imp build --env prod
       - run: cargo verify
 
   build:
@@ -42,6 +51,15 @@ jobs:
       - name: Install musl tools
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - name: Install imp
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL https://imp-ui.com/install.sh | INSTALL_DIR="$HOME/.local/bin" bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Build the UI
+        working-directory: ui
+        run: imp build --env prod
       - name: Build
         env:
           CC_x86_64_unknown_linux_musl: musl-gcc

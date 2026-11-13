@@ -211,7 +211,7 @@ The repository holds two parts:
   served at `/file-explorer` and routes in the URL fragment, for example
   `/file-explorer#/view?path=README.md`.
 
-The built app is embedded into the binary from `src/ui-assets/`, so the release
+The built app (`ui/dist`) is embedded into the binary by `build.rs`, so the release
 binaries need nothing else at runtime. Development tasks are cargo aliases:
 
 | Command                 | Does                                                                     |
@@ -219,10 +219,10 @@ binaries need nothing else at runtime. Development tasks are cargo aliases:
 | `cargo rfm [args]`      | Runs `rfm` from source in the current directory                          |
 | `cargo verify`          | Formatting, lints and all tests (run before committing, CI runs it)      |
 | `cargo dev`             | Builds the UI and starts the server in `test/`                           |
-| `cargo build-ui`        | Builds `ui/` with imp and embeds it into `src/ui-assets/`                |
+| `cargo build-ui`        | Builds `ui/` with imp into `ui/dist`, which the server build embeds      |
 | `imp test --unit`       | Runs the unit tests of the UI (from `ui/`)                               |
 | `imp test --e2e --mock` | Runs the browser tests of the UI against mocked API answers (from `ui/`) |
 
 Run `imp skill` inside `ui/` to learn the framework, and `imp lint` and
-`imp fmt` after changing the UI. Commit the regenerated `src/ui-assets/` and
-`src/ui_assets.rs` together with the UI change.
+`imp fmt` after changing the UI. The build output is not committed: run
+`cargo build-ui` before building or testing the server. CI builds the UI itself.

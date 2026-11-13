@@ -5,7 +5,7 @@ xtask = "run --quiet --package xtask --"
 rfm = "run --quiet --package rfm --"
 # Formatting, lints and tests: run before committing.
 verify = "xtask verify"
-# Build ui/ with imp and embed it into the server (src/ui-assets).
+# Build ui/ with imp into ui/dist, which build.rs embeds into the server.
 build-ui = "xtask build-ui"
 # Build the UI and serve test/.
 dev = "xtask dev"

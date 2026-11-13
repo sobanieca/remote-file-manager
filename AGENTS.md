@@ -10,8 +10,7 @@ The project has two parts:
 
 - `src/` - the Rust server. It serves the working directory as static files and
   a JSON API under `/api`. It also serves the built user interface at
-  `/file-explorer`, embedded into the binary from `src/ui-assets/` through the
-  generated `src/ui_assets.rs`.
+  `/file-explorer`, embedded into the binary from `ui/dist` by `build.rs`.
 - `ui/` - the user interface, a single page application built with imp. Run
   `imp skill` inside `ui/` to learn imp before changing anything there.
 
@@ -23,7 +22,7 @@ the `xtask` crate):
 ```bash
 cargo rfm [args]     # Run rfm from source in the current directory
 cargo verify         # fmt --check, clippy -D warnings and all tests
-cargo build-ui       # Build ui/ with imp and embed it into the server
+cargo build-ui       # Build ui/ with imp into ui/dist (embedded by build.rs)
 cargo dev            # Build the UI and serve test/
 ```
 
@@ -34,8 +33,8 @@ cargo dev            # Build the UI and serve test/
 - Lint code: `cargo clippy` (server) and `imp lint` (inside `ui/`)
 - UI tests: `imp test --unit` and `imp test --e2e --mock` inside `ui/`
 - Build the UI into the server: `cargo build-ui`. Run it after every UI change
-  and commit the regenerated `src/ui-assets/` and `src/ui_assets.rs`.
-  `cargo xtask bundle-ui` embeds an existing `ui/dist` without rebuilding
+  and before `cargo verify` (the API tests serve the UI). `ui/dist` is not
+  committed: CI builds the UI with imp before it builds the server
 
 ## Architecture
 
