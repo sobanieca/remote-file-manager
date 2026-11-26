@@ -2,7 +2,7 @@
 
 use crate::VERSION;
 use crate::colors;
-use crate::settings::home_dir;
+use crate::settings::data_dir;
 use std::io::IsTerminal;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -166,11 +166,7 @@ fn install(temp: &Path, exe: &Path, binary: &[u8], version: &str) -> Result<(), 
 }
 
 fn cache_file() -> Option<PathBuf> {
-    let base = std::env::var_os("XDG_CACHE_HOME")
-        .filter(|dir| !dir.is_empty())
-        .map(PathBuf::from)
-        .or_else(|| home_dir().map(|home| home.join(".cache")))?;
-    Some(base.join("rfm").join("latest-version"))
+    data_dir().map(|dir| dir.join("latest-version"))
 }
 
 fn now() -> u64 {

@@ -748,6 +748,6 @@ fn remembers_the_port_and_prints_the_version() {
     assert!(String::from_utf8_lossy(&help.stdout).contains("--port"));
 
     let server = Server::start(&dir);
-    let settings = std::fs::read_to_string(server.home.join(".config/rfm/settings.json")).unwrap();
+    let settings = std::fs::read_to_string(server.home.join(".rfm/settings.json")).unwrap();
     assert_eq!(settings.trim(), format!("{{\"port\":{}}}", server.port));
 }

@@ -40,7 +40,7 @@ cargo dev            # Build the UI and serve test/
 
 `src/main.rs` parses the arguments (`--port`, `update`, `--version`, `--help`),
 resolves the port (a custom port is remembered in
-`$XDG_CONFIG_HOME/rfm/settings.json`, `src/settings.rs`) and starts the server.
+`~/.rfm/settings.json`, `src/settings.rs`) and starts the server.
 
 - `src/http/` - a small HTTP/1.1 server on `std::net`: one thread per
   connection, keep-alive, `Content-Length` and chunked bodies, form data

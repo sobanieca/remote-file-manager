@@ -37,8 +37,6 @@ pub fn rfm_command(cwd: &Path, home: &Path) -> Command {
     command
         .current_dir(cwd)
         .env("HOME", home)
-        .env("XDG_CONFIG_HOME", home.join(".config"))
-        .env("XDG_CACHE_HOME", home.join(".cache"))
         .env("RFM_NO_UPDATE_CHECK", "1")
         .env("NO_COLOR", "1")
         .stdin(Stdio::null());

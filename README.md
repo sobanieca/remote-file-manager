@@ -94,16 +94,12 @@ curl -fsSL adam.sobaniec.com/remote-file-manager/install.sh | bash
 ```
 
 This script automatically detects your OS and architecture (Linux/macOS,
-x64/arm64) and installs the appropriate binary to `/usr/local/bin`, for all users. If you
-can't write to `/usr/local/bin`, the script stops with an error. Run it with
-`sudo`:
+x64/arm64) and installs the appropriate binary to `~/.rfm/bin`, with no `sudo` needed. If
+that folder is not on your `PATH`, the script asks to add it in your shell's startup file
+(`~/.bashrc`, `~/.zshrc`, fish's `conf.d` or `~/.profile`). Set `RFM_NO_MODIFY_PATH=1` to
+leave the file unchanged. Run as root, the script installs to `/usr/local/bin`.
 
-```bash
-curl -fsSL adam.sobaniec.com/remote-file-manager/install.sh | sudo bash
-```
-
-Or install to a custom location: set `INSTALL_DIR` to a directory that is on
-your `PATH`:
+Or install to another folder: set `INSTALL_DIR`:
 
 ```bash
 curl -fsSL adam.sobaniec.com/remote-file-manager/install.sh | INSTALL_DIR=~/.local/bin bash
@@ -155,7 +151,7 @@ rfm -p 5432
 ```
 
 **Note**: The application remembers the last used port (in
-`~/.config/rfm/settings.json`), so you don't need to specify it on subsequent
+`~/.rfm/settings.json`), so you don't need to specify it on subsequent
 runs unless you want to change it again. `rfm -p 4000` goes back to the default.
 
 ### Update

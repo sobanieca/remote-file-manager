@@ -2,6 +2,22 @@
 
 All notable changes to Remote File Manager are documented here.
 
+## 1.1.2
+
+### Changed
+
+- `rfm` keeps everything in `~/.rfm`: the saved port in `~/.rfm/settings.json`
+  instead of `~/.config/rfm`, and the update check instead of `~/.cache/rfm`.
+
+## 1.1.1
+
+### Changed
+
+- The install script installs `rfm` to `~/.rfm/bin`, with no `sudo` needed,
+  and asks to add that folder to `PATH` in your shell's startup file.
+- The arm64 Linux binary is a static-pie executable, so it also runs in Termux
+  on Android.
+
 ## 1.1.0
 
 ### Changed

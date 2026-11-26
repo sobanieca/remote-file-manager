@@ -1,5 +1,5 @@
-//! Settings remembered between runs, stored in
-//! `$XDG_CONFIG_HOME/rfm/settings.json` (default `~/.config/rfm`).
+//! Settings remembered between runs, stored in `~/.rfm/settings.json`, next
+//! to the `bin` folder that `install.sh` installs rfm to.
 
 use crate::json::{self, Object, Value};
 use std::path::PathBuf;
@@ -10,12 +10,12 @@ pub fn home_dir() -> Option<PathBuf> {
         .map(PathBuf::from)
 }
 
+pub fn data_dir() -> Option<PathBuf> {
+    home_dir().map(|home| home.join(".rfm"))
+}
+
 fn settings_file() -> Option<PathBuf> {
-    let base = std::env::var_os("XDG_CONFIG_HOME")
-        .filter(|dir| !dir.is_empty())
-        .map(PathBuf::from)
-        .or_else(|| home_dir().map(|home| home.join(".config")))?;
-    Some(base.join("rfm").join("settings.json"))
+    data_dir().map(|dir| dir.join("settings.json"))
 }
 
 fn read_settings() -> Object {
