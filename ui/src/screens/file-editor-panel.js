@@ -112,25 +112,36 @@ export const fileEditorPanel = component('rfm-file-editor-panel', {
       }
     }
 
-    beforeLeave(self, () =>
-      !isDirty.get() ||
-      askConfirmation(dialogRequest, {
-        title: 'Unsaved changes',
-        message: `Discard the unsaved changes to ${entry.name}?`,
-        confirmLabel: 'Discard',
-        isDanger: true,
-      }))
+    beforeLeave(
+      self,
+      () =>
+        !isDirty.get()
+        || askConfirmation(dialogRequest, {
+          title: 'Unsaved changes',
+          message: `Discard the unsaved changes to ${entry.name}?`,
+          confirmLabel: 'Discard',
+          isDanger: true,
+        }),
+    )
 
     const options = { signal: self.abortSignal }
-    globalThis.addEventListener('beforeunload', (event) => {
-      if (isDirty.get()) event.preventDefault()
-    }, options)
+    globalThis.addEventListener(
+      'beforeunload',
+      (event) => {
+        if (isDirty.get()) event.preventDefault()
+      },
+      options,
+    )
     globalThis.addEventListener('resize', () => rows.set(rowsForWindow()), options)
-    document.addEventListener('keydown', (event) => {
-      if (!isSaveShortcut(event)) return
-      event.preventDefault()
-      save()
-    }, options)
+    document.addEventListener(
+      'keydown',
+      (event) => {
+        if (!isSaveShortcut(event)) return
+        event.preventDefault()
+        save()
+      },
+      options,
+    )
 
     return stack(
       { gap: 3 },

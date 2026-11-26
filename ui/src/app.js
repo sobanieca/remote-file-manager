@@ -30,8 +30,10 @@ const gitRepository = {
 }
 
 const isSearchShortcut = (event) =>
-  (event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey &&
-  event.key.toLowerCase() === 'p'
+  (event.ctrlKey || event.metaKey)
+  && !event.altKey
+  && !event.shiftKey
+  && event.key.toLowerCase() === 'p'
 
 export const root = component('rfm-root', {
   setup: (self) => {
@@ -48,12 +50,16 @@ export const root = component('rfm-root', {
 
     loadRepository(api, repository)
 
-    globalThis.addEventListener('keydown', (event) => {
-      if (!isSearchShortcut(event)) return
-      event.preventDefault()
-      event.stopPropagation()
-      searchOpen.set(true)
-    }, { capture: true, signal: self.abortSignal })
+    globalThis.addEventListener(
+      'keydown',
+      (event) => {
+        if (!isSearchShortcut(event)) return
+        event.preventDefault()
+        event.stopPropagation()
+        searchOpen.set(true)
+      },
+      { capture: true, signal: self.abortSignal },
+    )
 
     return shell(
       {
@@ -73,7 +79,7 @@ export const root = component('rfm-root', {
           [app.diff]: { hidden: true },
           [app.compare]: { hidden: true },
         },
-        extras: [searchTrigger(), branchMenu(), themeSelect()],
+        navbarExtras: [searchTrigger(), branchMenu(), themeSelect()],
         breadcrumbs: false,
         maxWidth: 'none',
       },

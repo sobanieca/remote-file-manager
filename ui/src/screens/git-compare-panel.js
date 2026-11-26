@@ -25,19 +25,21 @@ const revisionCard = (label, { revision, commit }) =>
       commit ? text(commit.subject) : text({ tone: 'secondary' }, 'Unresolved revision'),
       commit
         ? text(
-          { size: 'sm', tone: 'secondary' },
-          `${commit.author} · ${formatRelativeTime(commit.date)} (${formatTimestamp(commit.date)})`,
-        )
+            { size: 'sm', tone: 'secondary' },
+            `${commit.author} · ${formatRelativeTime(commit.date)} (${formatTimestamp(commit.date)})`,
+          )
         : null,
     ),
   )
 
 const changeTags = (change) =>
-  change.added === null ? tag({ size: 'sm' }, 'binary') : flex(
-    { gap: 1 },
-    tag({ size: 'sm', color: 'green' }, `+${change.added}`),
-    tag({ size: 'sm', color: 'red' }, `-${change.deleted}`),
-  )
+  change.added === null
+    ? tag({ size: 'sm' }, 'binary')
+    : flex(
+        { gap: 1 },
+        tag({ size: 'sm', color: 'green' }, `+${change.added}`),
+        tag({ size: 'sm', color: 'red' }, `-${change.deleted}`),
+      )
 
 export const gitComparePanel = component('rfm-git-compare-panel', {
   loading: () => loader({ label: 'Comparing the commits' }),
@@ -71,33 +73,35 @@ export const gitComparePanel = component('rfm-git-compare-panel', {
       ),
       changes.length > 0
         ? card(
-          {
-            header: flex(
-              { gap: 2, verticalAlign: 'center' },
-              heading({ level: 2 }, 'Changed files'),
-              tag({ size: 'sm' }, changes.length),
-            ),
-          },
-          list({
-            label: 'Changed files',
-            items: changes.map((change) => ({
-              id: change.path,
-              title: change.path,
-              description: change.originalPath ? `Renamed from ${change.originalPath}` : undefined,
-              tag: {
-                text: change.statusCode,
-                color: (GIT_STATUSES[change.status] ?? GIT_STATUSES.modified).color,
-              },
-            })),
-            actions: (item) => changeTags(changes.find((change) => change.path === item.id)),
-            events: {
-              select: (event) => {
-                focus.set(null)
-                focus.set(event.detail.id)
-              },
+            {
+              header: flex(
+                { gap: 2, verticalAlign: 'center' },
+                heading({ level: 2 }, 'Changed files'),
+                tag({ size: 'sm' }, changes.length),
+              ),
             },
-          }),
-        )
+            list({
+              label: 'Changed files',
+              items: changes.map((change) => ({
+                id: change.path,
+                title: change.path,
+                description: change.originalPath
+                  ? `Renamed from ${change.originalPath}`
+                  : undefined,
+                tag: {
+                  text: change.statusCode,
+                  color: (GIT_STATUSES[change.status] ?? GIT_STATUSES.modified).color,
+                },
+              })),
+              actions: (item) => changeTags(changes.find((change) => change.path === item.id)),
+              events: {
+                select: (event) => {
+                  focus.set(null)
+                  focus.set(event.detail.id)
+                },
+              },
+            }),
+          )
         : null,
       diffView({ files: comparison.files, focus }),
     )

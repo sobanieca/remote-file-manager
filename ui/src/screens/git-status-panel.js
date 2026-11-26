@@ -61,15 +61,15 @@ const changeSection = (title, changes, mode, actions) => {
         const change = byPath.get(item.id)
         return change.canDiff && change.canOpen
           ? button(
-            {
-              size: 'sm',
-              variant: 'ghost',
-              square: true,
-              label: `Open ${change.displayPath}`,
-              events: { click: () => navigate(viewHref(change.servedPath)) },
-            },
-            icon(luEye, { size: 'sm' }),
-          )
+              {
+                size: 'sm',
+                variant: 'ghost',
+                square: true,
+                label: `Open ${change.displayPath}`,
+                events: { click: () => navigate(viewHref(change.servedPath)) },
+              },
+              icon(luEye, { size: 'sm' }),
+            )
           : null
       },
     }),
@@ -101,15 +101,17 @@ const worktreeSection = (api, worktrees) => {
       })),
       actions: (item) => {
         const worktree = byPath.get(item.id)
-        return worktree.isCurrent ? null : button(
-          {
-            size: 'sm',
-            disabled: worktree.isPrunable,
-            events: { click: () => switchWorktree(api, worktree) },
-          },
-          icon(luArrowRight, { size: 'sm' }),
-          'Switch',
-        )
+        return worktree.isCurrent
+          ? null
+          : button(
+              {
+                size: 'sm',
+                disabled: worktree.isPrunable,
+                events: { click: () => switchWorktree(api, worktree) },
+              },
+              icon(luArrowRight, { size: 'sm' }),
+              'Switch',
+            )
       },
     }),
   )
@@ -167,9 +169,9 @@ export const gitStatusPanel = component('rfm-git-status-panel', {
       card({ padding: 'sm' }, descriptionList({ columns: 3, items: summaryItems(status) })),
       status.changeCount === 0
         ? notice({
-          kind: 'success',
-          title: scopePath ? 'No changes in this directory' : 'The working tree is clean',
-        })
+            kind: 'success',
+            title: scopePath ? 'No changes in this directory' : 'The working tree is clean',
+          })
         : null,
       worktreeSection(api, status.worktrees),
       changeSection('Staged changes', status.staged, 'staged', [

@@ -17,8 +17,10 @@ const alignmentOf = (delimiter) => {
 }
 
 const isTableStart = (line, nextLine) =>
-  line.includes('|') && nextLine !== undefined && nextLine.includes('|') &&
-  DELIMITER_PATTERN.test(nextLine)
+  line.includes('|')
+  && nextLine !== undefined
+  && nextLine.includes('|')
+  && DELIMITER_PATTERN.test(nextLine)
 
 export const splitMarkdownBlocks = (markdown) => {
   const lines = markdown.split('\n')

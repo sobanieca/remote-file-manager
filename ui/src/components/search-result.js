@@ -5,7 +5,7 @@ import { luFolderSearch } from 'imp/icons'
 import { iconOfKind } from '../lib/files.js'
 
 const highlighted = (text, offset, marks) =>
-  [...text].map((character, index) => marks.has(offset + index) ? mark(character) : character)
+  [...text].map((character, index) => (marks.has(offset + index) ? mark(character) : character))
 
 const pathLabel = (result) => {
   const marks = new Set(result.positions ?? [])

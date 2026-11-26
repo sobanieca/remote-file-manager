@@ -48,10 +48,8 @@ export const createPane = (self, { side, path, api, onNavigate }) => {
   const cursor = initState(self, `${scope}.cursor`, null)
   const sort = initState(self, `${scope}.sort`, readSort())
 
-  const visible = computed(
-    [listing, filter, sort],
-    (current, needle, order) =>
-      [...filterEntries(current?.entries ?? [], needle)].sort(compareEntries(order)),
+  const visible = computed([listing, filter, sort], (current, needle, order) =>
+    [...filterEntries(current?.entries ?? [], needle)].sort(compareEntries(order)),
   )
 
   const history = []
@@ -147,7 +145,7 @@ export const createPane = (self, { side, path, api, onNavigate }) => {
     if (!loading.get() && listing.get()?.path === parentOf(targetPath)) applyReveal()
   }
 
-  const cursorEntry = () => (cursor.get() === null ? null : entryAt(cursor.get()) ?? null)
+  const cursorEntry = () => (cursor.get() === null ? null : (entryAt(cursor.get()) ?? null))
 
   const selectedEntries = () => {
     const chosen = new Set(selected.get())
@@ -175,9 +173,12 @@ export const createPane = (self, { side, path, api, onNavigate }) => {
     const entries = visible.get()
     if (entries.length === 0) return
     const currentIndex = entries.findIndex((entry) => entry.path === cursor.get())
-    const nextIndex = currentIndex === -1
-      ? (step > 0 ? 0 : entries.length - 1)
-      : Math.min(Math.max(currentIndex + step, 0), entries.length - 1)
+    const nextIndex =
+      currentIndex === -1
+        ? step > 0
+          ? 0
+          : entries.length - 1
+        : Math.min(Math.max(currentIndex + step, 0), entries.length - 1)
     const nextPath = entries[nextIndex].path
     if (isExtending) {
       anchor = anchor ?? cursor.get() ?? nextPath
@@ -192,7 +193,7 @@ export const createPane = (self, { side, path, api, onNavigate }) => {
     selected.set((paths) =>
       paths.includes(entryPath)
         ? paths.filter((candidate) => candidate !== entryPath)
-        : [...paths, entryPath]
+        : [...paths, entryPath],
     )
     anchor = entryPath
   }

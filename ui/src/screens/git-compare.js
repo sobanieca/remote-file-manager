@@ -9,7 +9,7 @@ export const gitCompare = component('rfm-git-compare', {
     const query = screenQuery(app.compare)
     return screenFrame(
       query.view((current) =>
-        current ? gitComparePanel({ from: current.from ?? '', to: current.to ?? '' }) : null
+        current ? gitComparePanel({ from: current.from ?? '', to: current.to ?? '' }) : null,
       ),
     )
   },

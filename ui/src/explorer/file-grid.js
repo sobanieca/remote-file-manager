@@ -12,9 +12,8 @@ const tile = ({ entry, isCursor, isSelected }, { model, actionsFor }) => {
       class: { tile: true, cursor: isCursor, selected: isSelected, deleted: entry.isDeleted },
       events: {
         click: (event) => {
-          if (
-            event.composedPath().some((node) => node.tagName === 'A' || node.tagName === 'INPUT')
-          ) return
+          if (event.composedPath().some((node) => node.tagName === 'A' || node.tagName === 'INPUT'))
+            return
           model.pick(entry.path, {
             isToggling: event.ctrlKey || event.metaKey,
             isExtending: event.shiftKey,

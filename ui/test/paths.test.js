@@ -44,6 +44,9 @@ test('pairs removed and added lines for the side by side diff', () => {
   ]
   expect(
     pairHunkLines(lines).map(({ left, right }) => [left?.content ?? null, right?.content ?? null]),
-  )
-    .toEqual([['a', 'a'], ['b', 'd'], ['c', null]])
+  ).toEqual([
+    ['a', 'a'],
+    ['b', 'd'],
+    ['c', null],
+  ])
 })

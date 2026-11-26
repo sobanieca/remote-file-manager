@@ -14,32 +14,32 @@ export const uploadDialog = component('rfm-upload-dialog', {
       open.view((isOpen) =>
         isOpen
           ? form(
-            {
-              initialValues: { files: [] },
-              onSubmit: () => {
-                open.set(false)
-                return onUpload(self.chosenFiles)
-              },
-            },
-            stack(
-              { gap: 4 },
-              fileUpload({
-                field: 'files',
-                label: 'Files',
-                multiple: true,
-                required: true,
-                onFiles: (files) => {
-                  self.chosenFiles = files
+              {
+                initialValues: { files: [] },
+                onSubmit: () => {
+                  open.set(false)
+                  return onUpload(self.chosenFiles)
                 },
-              }),
-              flex(
-                { horizontalAlign: 'end', gap: 2 },
-                button({ events: { click: () => open.set(false) } }, 'Cancel'),
-                button({ variant: 'primary', events: { click: submitForm } }, 'Upload'),
+              },
+              stack(
+                { gap: 4 },
+                fileUpload({
+                  field: 'files',
+                  label: 'Files',
+                  multiple: true,
+                  required: true,
+                  onFiles: (files) => {
+                    self.chosenFiles = files
+                  },
+                }),
+                flex(
+                  { horizontalAlign: 'end', gap: 2 },
+                  button({ events: { click: () => open.set(false) } }, 'Cancel'),
+                  button({ variant: 'primary', events: { click: submitForm } }, 'Upload'),
+                ),
               ),
-            ),
-          )
-          : null
+            )
+          : null,
       ),
     )
   },

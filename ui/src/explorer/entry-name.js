@@ -23,12 +23,12 @@ const opensElsewhere = (event) =>
 export const entryVisual = (entry, size = 'md') =>
   entry.isImage && !entry.isDeleted
     ? img({
-      class: `thumbnail ${size}`,
-      src: thumbnailUrl(entry.path),
-      alt: '',
-      loading: 'lazy',
-      decoding: 'async',
-    })
+        class: `thumbnail ${size}`,
+        src: thumbnailUrl(entry.path),
+        alt: '',
+        loading: 'lazy',
+        decoding: 'async',
+      })
     : icon(iconOfEntry(entry), { size, color: KIND_COLORS[entry.kind] ?? 'secondary' })
 
 export const entryName = component('rfm-entry-name', {

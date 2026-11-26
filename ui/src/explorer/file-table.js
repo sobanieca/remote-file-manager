@@ -26,10 +26,12 @@ const permissionsCell = ({ entry }) => {
 }
 
 const modifiedCell = ({ entry }) =>
-  entry.isDeleted ? 'deleted' : span(
-    { title: formatTimestamp(entry.modifiedAt) },
-    formatRelativeTime(entry.modifiedAt) || '—',
-  )
+  entry.isDeleted
+    ? 'deleted'
+    : span(
+        { title: formatTimestamp(entry.modifiedAt) },
+        formatRelativeTime(entry.modifiedAt) || '—',
+      )
 
 const tableRows = (model, isSplit) => {
   let known = new Map()
@@ -38,10 +40,13 @@ const tableRows = (model, isSplit) => {
     const rows = entries.map((entry) => {
       const isCursor = entry.path === cursorPath
       const previous = known.get(entry.path)
-      const row = previous && previous.entry === entry && previous.isCursor === isCursor &&
-          previous.split === split
-        ? previous
-        : { id: entry.path, entry, isCursor, split }
+      const row =
+        previous
+        && previous.entry === entry
+        && previous.isCursor === isCursor
+        && previous.split === split
+          ? previous
+          : { id: entry.path, entry, isCursor, split }
       next.set(entry.path, row)
       return row
     })
@@ -98,14 +103,17 @@ export const fileTable = ({ model, isSplit, actionsFor }) => {
       },
     },
   })
-  files.addEventListener('click', (event) => {
-    isExtendingClick = event.shiftKey
-    if (event.detail !== 2) return
-    const path = rowPathOf(event)
-    const entry = path === null
-      ? null
-      : model.visible.get().find((candidate) => candidate.path === path)
-    if (entry) model.open(entry)
-  }, { capture: true })
+  files.addEventListener(
+    'click',
+    (event) => {
+      isExtendingClick = event.shiftKey
+      if (event.detail !== 2) return
+      const path = rowPathOf(event)
+      const entry =
+        path === null ? null : model.visible.get().find((candidate) => candidate.path === path)
+      if (entry) model.open(entry)
+    },
+    { capture: true },
+  )
   return files
 }

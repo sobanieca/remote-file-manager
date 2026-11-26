@@ -12,7 +12,7 @@ const isOnControl = (event) =>
   event.composedPath().some((node) => ['A', 'INPUT', 'BUTTON'].includes(node.tagName))
 
 const sortButton = (key, label, { model }) => {
-  const direction = computed([model.sort], (sort) => sort.key === key ? sort.direction : 'none')
+  const direction = computed([model.sort], (sort) => (sort.key === key ? sort.direction : 'none'))
   return button(
     {
       variant: 'ghost',
@@ -26,7 +26,7 @@ const sortButton = (key, label, { model }) => {
     direction.view((current) =>
       current === 'none'
         ? null
-        : icon(current === 'ascending' ? luArrowUp : luArrowDown, { size: 'sm' })
+        : icon(current === 'ascending' ? luArrowUp : luArrowDown, { size: 'sm' }),
     ),
   )
 }
@@ -129,7 +129,7 @@ export const fileList = component('rfm-file-list', {
         (count, entries) => count > 0 && count === entries.length,
       ),
       events: {
-        change: (event) => event.target.checked ? model.selectAll() : model.clearSelection(),
+        change: (event) => (event.target.checked ? model.selectAll() : model.clearSelection()),
       },
     })
     const markPartial = () => {
@@ -150,7 +150,10 @@ export const fileList = component('rfm-file-list', {
       ),
       div(
         { role: 'list', 'aria-label': 'Folder contents' },
-        rows.each((item) => row(item, { model, actionsFor }), (item) => item.entry.path),
+        rows.each(
+          (item) => row(item, { model, actionsFor }),
+          (item) => item.entry.path,
+        ),
       ),
     )
   },

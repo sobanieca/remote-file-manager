@@ -14,8 +14,8 @@ const MAX_HIGHLIGHT_BYTES = 1_000_000
 const MAX_HIGHLIGHT_LINES = 20_000
 
 const sourceView = (entry, content) => {
-  const isTooLarge = (entry.size ?? 0) > MAX_HIGHLIGHT_BYTES ||
-    content.split('\n').length > MAX_HIGHLIGHT_LINES
+  const isTooLarge =
+    (entry.size ?? 0) > MAX_HIGHLIGHT_BYTES || content.split('\n').length > MAX_HIGHLIGHT_LINES
   return codeBlock({
     code: content,
     language: isTooLarge ? 'text' : languageOf(entry.path),

@@ -15,17 +15,17 @@ const hunkHeading = (hunk) => `@@ ${hunk.range} @@${hunk.heading ? ` ${hunk.head
 const unifiedRow = (line) =>
   line.type === 'note'
     ? tr(
-      { class: 'note' },
-      td({ class: 'gutter' }),
-      td({ class: 'gutter' }),
-      td({ class: 'code' }, line.content),
-    )
+        { class: 'note' },
+        td({ class: 'gutter' }),
+        td({ class: 'gutter' }),
+        td({ class: 'code' }, line.content),
+      )
     : tr(
-      { class: line.type },
-      td({ class: 'gutter' }, line.oldLineNumber ?? ''),
-      td({ class: 'gutter' }, line.newLineNumber ?? ''),
-      td({ class: 'code' }, span({ class: 'marker' }, MARKERS[line.type]), line.content),
-    )
+        { class: line.type },
+        td({ class: 'gutter' }, line.oldLineNumber ?? ''),
+        td({ class: 'gutter' }, line.newLineNumber ?? ''),
+        td({ class: 'code' }, span({ class: 'marker' }, MARKERS[line.type]), line.content),
+      )
 
 const unifiedTable = (file) =>
   table(
@@ -66,7 +66,7 @@ const splitTable = (file) =>
           td({ class: 'code' }),
         ),
         ...pairHunkLines(hunk.lines).map((pair) =>
-          tr(...splitCell(pair.left, 'left'), ...splitCell(pair.right, 'right'))
+          tr(...splitCell(pair.left, 'left'), ...splitCell(pair.right, 'right')),
         ),
       ]),
     ),
@@ -173,20 +173,20 @@ export const diffFile = component('rfm-diff-file', {
         tag({ size: 'sm', color: 'red' }, `-${file.removed}`),
         file.servedPath
           ? button(
-            {
-              size: 'sm',
-              variant: 'ghost',
-              square: true,
-              label: `Open ${file.servedPath}`,
-              events: {
-                click: (event) => {
-                  event.preventDefault()
-                  navigate(viewHref(file.servedPath))
+              {
+                size: 'sm',
+                variant: 'ghost',
+                square: true,
+                label: `Open ${file.servedPath}`,
+                events: {
+                  click: (event) => {
+                    event.preventDefault()
+                    navigate(viewHref(file.servedPath))
+                  },
                 },
               },
-            },
-            icon(luEye, { size: 'sm' }),
-          )
+              icon(luEye, { size: 'sm' }),
+            )
           : null,
       ),
       fileBody(file, mode),

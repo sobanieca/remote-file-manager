@@ -42,12 +42,14 @@ const copyPath = async (path) => {
 }
 
 const openActions = (entry, inViewer) => {
-  const open = inViewer ? null : {
-    id: 'open',
-    label: entry.isMarkdown ? 'Open rendered' : 'Open',
-    icon: entry.isDirectory ? luFolderOpen : luEye,
-    onClick: () => navigate(entryHref(entry)),
-  }
+  const open = inViewer
+    ? null
+    : {
+        id: 'open',
+        label: entry.isMarkdown ? 'Open rendered' : 'Open',
+        icon: entry.isDirectory ? luFolderOpen : luEye,
+        onClick: () => navigate(entryHref(entry)),
+      }
   if (entry.isDirectory) return [open]
   return [
     open,
@@ -56,11 +58,11 @@ const openActions = (entry, inViewer) => {
       : null,
     rendersInBrowser(entry)
       ? {
-        id: 'raw',
-        label: 'Open raw',
-        icon: luExternalLink,
-        onClick: () => openInNewTab(rawFileUrl(entry.path)),
-      }
+          id: 'raw',
+          label: 'Open raw',
+          icon: luExternalLink,
+          onClick: () => openInNewTab(rawFileUrl(entry.path)),
+        }
       : null,
   ]
 }
@@ -95,19 +97,19 @@ export const entryActions = (
     },
     isSplit
       ? {
-        id: 'copy',
-        label: 'Copy to other pane',
-        icon: luCopy,
-        onClick: () => onTransfer(entry, false),
-      }
+          id: 'copy',
+          label: 'Copy to other pane',
+          icon: luCopy,
+          onClick: () => onTransfer(entry, false),
+        }
       : null,
     isSplit
       ? {
-        id: 'move',
-        label: 'Move to other pane',
-        icon: luArrowRightLeft,
-        onClick: () => onTransfer(entry, true),
-      }
+          id: 'move',
+          label: 'Move to other pane',
+          icon: luArrowRightLeft,
+          onClick: () => onTransfer(entry, true),
+        }
       : null,
     { id: 'delete', label: 'Delete', icon: luTrash2, onClick: () => operations.remove([entry]) },
   ]

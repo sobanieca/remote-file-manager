@@ -20,7 +20,10 @@ test('splits pipe tables out of the prose', () => {
   expect(blocks.map((block) => block.type)).toEqual(['prose', 'table', 'prose'])
   expect(blocks[1].header).toEqual(['Name', 'Size'])
   expect(blocks[1].alignments).toEqual(['start', 'end'])
-  expect(blocks[1].rows).toEqual([['a', '1'], ['b | c', '2']])
+  expect(blocks[1].rows).toEqual([
+    ['a', '1'],
+    ['b | c', '2'],
+  ])
 })
 
 test('leaves tables inside a fenced code block alone', () => {

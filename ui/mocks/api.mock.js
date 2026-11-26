@@ -44,7 +44,10 @@ const folders = new Map([
   ['docs', [fileEntry('docs/guide.md', 12)]],
 ])
 
-const contents = new Map([['README.md', README], ['docs/guide.md', '# The guide']])
+const contents = new Map([
+  ['README.md', README],
+  ['docs/guide.md', '# The guide'],
+])
 
 const json = (body, status = 200) => ({ status, body })
 
@@ -91,15 +94,15 @@ export const mocks = [
       const entries = allEntries()
       const results = term
         ? entries
-          .filter((entry) => entry.path.toLowerCase().includes(term))
-          .map((entry) => ({
-            path: entry.path,
-            name: entry.name,
-            isDirectory: entry.isDirectory,
-            isMarkdown: entry.isMarkdown,
-            kind: entry.kind,
-            positions: [],
-          }))
+            .filter((entry) => entry.path.toLowerCase().includes(term))
+            .map((entry) => ({
+              path: entry.path,
+              name: entry.name,
+              isDirectory: entry.isDirectory,
+              isMarkdown: entry.isMarkdown,
+              kind: entry.kind,
+              positions: [],
+            }))
         : []
       return json({
         ok: true,

@@ -60,7 +60,8 @@ export const createFileOperations = ({ api, dialogRequest, onChanged }) => {
     return run(`Could not create "${name}"`, () =>
       api.post('/api/create-item', {
         body: { path: directory, name, type: isDirectory ? 'directory' : 'file' },
-      }))
+      }),
+    )
   }
 
   const rename = async (entry) => {
@@ -71,9 +72,8 @@ export const createFileOperations = ({ api, dialogRequest, onChanged }) => {
       confirmLabel: 'Rename',
     })
     if (!newName || newName === entry.name) return null
-    return run(
-      `Could not rename "${entry.name}"`,
-      () => api.post('/api/rename-item', { body: { path: entry.path, newName } }),
+    return run(`Could not rename "${entry.name}"`, () =>
+      api.post('/api/rename-item', { body: { path: entry.path, newName } }),
     )
   }
 
@@ -88,7 +88,10 @@ export const createFileOperations = ({ api, dialogRequest, onChanged }) => {
           isDanger: true,
         })
         if (confirmed) {
-          return deletePaths(paths.filter((path) => result.notEmpty.includes(nameOf(path))), true)
+          return deletePaths(
+            paths.filter((path) => result.notEmpty.includes(nameOf(path))),
+            true,
+          )
         }
       }
       report(result)
@@ -109,7 +112,10 @@ export const createFileOperations = ({ api, dialogRequest, onChanged }) => {
       isDanger: true,
     })
     if (!confirmed) return null
-    return deletePaths(entries.map((entry) => entry.path), false)
+    return deletePaths(
+      entries.map((entry) => entry.path),
+      false,
+    )
   }
 
   const transfer = async (entries, targetPath, isMove, overwrite = false) => {

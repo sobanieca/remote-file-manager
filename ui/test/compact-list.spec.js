@@ -16,8 +16,9 @@ test('shows one compact row per entry on a phone', async ({ page }) => {
 test('selects an entry with its checkbox', async ({ page }) => {
   await page.click(`${LIST} >>> input[aria-label="Select README.md"]`)
   await page.waitForSelector(`${LIST} >>> .row.selected`)
-  expect(await page.$eval(`${LIST} >>> input[aria-label="Select all"]`, (box) => box.indeterminate))
-    .toEqual(true)
+  expect(
+    await page.$eval(`${LIST} >>> input[aria-label="Select all"]`, (box) => box.indeterminate),
+  ).toEqual(true)
 })
 
 test('returns to the table on a wide screen', async ({ page }) => {

@@ -247,18 +247,18 @@ export const filePane = component('rfm-file-pane', {
       isSplit.view((split) =>
         split
           ? [
-            button(
-              { size: 'sm', events: { click: () => transfer(model.selectedEntries(), false) } },
-              icon(luCopy, { size: 'sm' }),
-              'Copy to other pane',
-            ),
-            button(
-              { size: 'sm', events: { click: () => transfer(model.selectedEntries(), true) } },
-              icon(luArrowRightLeft, { size: 'sm' }),
-              'Move to other pane',
-            ),
-          ]
-          : null
+              button(
+                { size: 'sm', events: { click: () => transfer(model.selectedEntries(), false) } },
+                icon(luCopy, { size: 'sm' }),
+                'Copy to other pane',
+              ),
+              button(
+                { size: 'sm', events: { click: () => transfer(model.selectedEntries(), true) } },
+                icon(luArrowRightLeft, { size: 'sm' }),
+                'Move to other pane',
+              ),
+            ]
+          : null,
       ),
       button(
         { size: 'sm', events: { click: () => downloadEntries(model.selectedEntries()) } },
@@ -358,9 +358,8 @@ export const filePane = component('rfm-file-pane', {
         { class: 'status' },
         text(
           { size: 'sm', tone: 'secondary' },
-          computed(
-            [model.listing, model.selected],
-            (listing, paths) => summaryOf(listing, paths.length),
+          computed([model.listing, model.selected], (listing, paths) =>
+            summaryOf(listing, paths.length),
           ).text(),
         ),
       ),

@@ -23,9 +23,9 @@ const BACK_TARGETS = {
 
 const subtitleOf = (diff) => {
   if (diff.commit) {
-    return `${diff.commit.shortHash} · ${diff.commit.author} · ${
-      formatRelativeTime(diff.commit.date)
-    }`
+    return `${diff.commit.shortHash} · ${diff.commit.author} · ${formatRelativeTime(
+      diff.commit.date,
+    )}`
   }
   return diff.subtitle ?? ''
 }

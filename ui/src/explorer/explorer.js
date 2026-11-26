@@ -43,9 +43,9 @@ const isTyping = (event) => {
 }
 
 const isInsideMenu = (event) =>
-  event.composedPath().some((node) =>
-    /^(menu|menuitem|listbox|option)/.test(node.getAttribute?.('role') ?? '')
-  )
+  event
+    .composedPath()
+    .some((node) => /^(menu|menuitem|listbox|option)/.test(node.getAttribute?.('role') ?? ''))
 
 const commandButton = (label, glyph, onClick, variant = 'default') =>
   button({ size: 'sm', variant, events: { click: onClick } }, icon(glyph, { size: 'sm' }), label)
@@ -86,9 +86,8 @@ export const explorer = component('rfm-explorer', {
     const currentQuery = () => query.get() ?? {}
 
     const leftPath = computed([query], (current) => (current ? current.path || ROOT_PATH : null))
-    const rightPath = computed(
-      [query],
-      (current) => (current?.right === undefined ? null : current.right || ROOT_PATH),
+    const rightPath = computed([query], (current) =>
+      current?.right === undefined ? null : current.right || ROOT_PATH,
     )
     const isSplit = computed([rightPath], (path) => path !== null)
     const viewMode = initState(self, 'rfm.view-mode', readSetting(VIEW_MODE_SETTING, 'list'))
@@ -149,10 +148,9 @@ export const explorer = component('rfm-explorer', {
     layout.watch(self, (value) => {
       if ((value === 'split') === isSplit.get()) return
       const leftSide = currentQuery().path || ROOT_PATH
-      navigate(
-        filesHref({ path: leftSide, right: value === 'split' ? leftSide : undefined }),
-        { replace: true },
-      )
+      navigate(filesHref({ path: leftSide, right: value === 'split' ? leftSide : undefined }), {
+        replace: true,
+      })
     })
 
     const focusedEntry = () => active().focusedOrFirstSelected()
@@ -258,10 +256,10 @@ export const explorer = component('rfm-explorer', {
         isSplit.view((split) =>
           split
             ? [
-              commandButton('Copy', luCopy, runCommand.copy),
-              commandButton('Move', luArrowRightLeft, runCommand.move),
-            ]
-            : null
+                commandButton('Copy', luCopy, runCommand.copy),
+                commandButton('Move', luArrowRightLeft, runCommand.move),
+              ]
+            : null,
         ),
         commandButton('New folder', luFolderPlus, runCommand.newFolder),
         commandButton('Delete', luTrash2, runCommand.remove, 'danger'),

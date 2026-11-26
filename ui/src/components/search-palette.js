@@ -1,4 +1,4 @@
-import { component } from 'imp'
+import { component, delay } from 'imp'
 import { useHttpClient } from 'imp/http'
 import { navigate, useRoute } from 'imp/router'
 import { computed, initState, useState } from 'imp/state'
@@ -65,8 +65,8 @@ export const searchPalette = component('rfm-search-palette', {
     }
 
     const scheduleSearch = () => {
-      clearTimeout(self.searchTimer)
-      self.searchTimer = setTimeout(search, SEARCH_DELAY)
+      self.stopSearchTimer?.()
+      self.stopSearchTimer = delay(self, SEARCH_DELAY, search)
     }
 
     const openResult = (result, reveal) => {
@@ -114,10 +114,8 @@ export const searchPalette = component('rfm-search-palette', {
       requestAnimationFrame(() => field.focus())
     })
 
-    const rows = computed(
-      [results, activeIndex],
-      (items, index) =>
-        items.map((result, position) => ({ result, position, isActive: position === index })),
+    const rows = computed([results, activeIndex], (items, index) =>
+      items.map((result, position) => ({ result, position, isActive: position === index })),
     )
 
     return dialog(
@@ -137,7 +135,6 @@ export const searchPalette = component('rfm-search-palette', {
     )
   },
   onRemove: (self) => {
-    clearTimeout(self.searchTimer)
     self.controller?.abort()
   },
 })

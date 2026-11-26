@@ -17,8 +17,10 @@ const PERMISSION_TRIPLETS = ['---', '--x', '-w-', '-wx', 'r--', 'r-x', 'rw-', 'r
 const withSpecialBit = (triplet, isSet, specialCharacter) => {
   if (!isSet) return triplet
   const isExecutable = triplet[2] === 'x'
-  return triplet.slice(0, 2) +
-    (isExecutable ? specialCharacter.toLowerCase() : specialCharacter.toUpperCase())
+  return (
+    triplet.slice(0, 2)
+    + (isExecutable ? specialCharacter.toLowerCase() : specialCharacter.toUpperCase())
+  )
 }
 
 export const formatPermissions = (mode, isDirectory, isSymlink) => {
@@ -62,9 +64,9 @@ export const formatTimestamp = (value) => {
   const date = toDate(value)
   if (!date) return ''
   const pad = (number) => String(number).padStart(2, '0')
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${
-    pad(date.getHours())
-  }:${pad(date.getMinutes())}`
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(
+    date.getHours(),
+  )}:${pad(date.getMinutes())}`
 }
 
 export const pluralize = (count, noun) => `${count} ${noun}${count === 1 ? '' : 's'}`

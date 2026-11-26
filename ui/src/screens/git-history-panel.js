@@ -20,12 +20,13 @@ const commitItem = (commit) => ({
   title: commit.subject,
   description: `${commit.shortHash} · ${commit.author} · ${formatRelativeTime(commit.date)}`,
   href: diffHref({ commit: commit.hash }),
-  tag: commit.refs.length > 0
-    ? {
-      text: refLabel(commit.refs[0]),
-      color: commit.refs[0].startsWith('HEAD') ? 'green' : 'blue',
-    }
-    : undefined,
+  tag:
+    commit.refs.length > 0
+      ? {
+          text: refLabel(commit.refs[0]),
+          color: commit.refs[0].startsWith('HEAD') ? 'green' : 'blue',
+        }
+      : undefined,
 })
 
 const pickButton = (label, side, commit, picks) =>
@@ -86,9 +87,9 @@ export const gitHistoryPanel = component('rfm-git-history-panel', {
 
     const scope = firstPage.scopePath
       ? notice(
-        { kind: 'info', title: `History for ${firstPage.scopePath}` },
-        link({ href: historyHref() }, 'Show the whole history'),
-      )
+          { kind: 'info', title: `History for ${firstPage.scopePath}` },
+          link({ href: historyHref() }, 'Show the whole history'),
+        )
       : null
 
     if (firstPage.commits.length === 0) {
@@ -115,10 +116,8 @@ export const gitHistoryPanel = component('rfm-git-history-panel', {
         ),
         text(
           { inline: true, size: 'sm', weight: 'bold' },
-          computed(
-            [picks, commits],
-            ({ from, to }, loaded) =>
-              from && to ? `${shortOf(loaded, from)} → ${shortOf(loaded, to)}` : '',
+          computed([picks, commits], ({ from, to }, loaded) =>
+            from && to ? `${shortOf(loaded, from)} → ${shortOf(loaded, to)}` : '',
           ).text(),
         ),
         button(
