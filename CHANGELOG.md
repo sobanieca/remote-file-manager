@@ -2,6 +2,12 @@
 
 All notable changes to Remote File Manager are documented here.
 
+## 1.1.3
+
+### Changed
+
+- The user interface is built with imp 0.1.6.
+
 ## 1.1.2
 
 ### Changed
